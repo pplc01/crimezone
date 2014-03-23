@@ -1,0 +1,52 @@
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.3"
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "desk4578"
+            keyAlias "desk"
+            keyPassword "desk123"
+        }
+        release {
+            storeFile file("debug.keystore")
+            storePassword "desk4578"
+            keyAlias "desk"
+            keyPassword "desk123"
+        }
+    }
+
+    buildTypes {
+
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
+        }
+
+        debug{
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.debug
+        }
+
+
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.google.android.gms:play-services:4.0.30'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
