@@ -1,7 +1,7 @@
 package com.ppl.crimezone.activities;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+//import com.google.gson.JsonObject;
+//import com.google.gson.JsonParser;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,12 +16,13 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by pnj on 3/30/2014.
  */
+
 public class GsonParser {
     static InputStream is = null;
-    static JsonObject obj = null;
+    //static JsonObject obj = null;
     static String gson = "";
 
-
+    /*
     public JsonObject getJSONfromURL(final String url){
         try{
             //Construct client and HTTP request
@@ -43,5 +44,5 @@ public class GsonParser {
         } catch(IOException e){
             e.printStackTrace();
         }
-    }
+    }*/
 }
