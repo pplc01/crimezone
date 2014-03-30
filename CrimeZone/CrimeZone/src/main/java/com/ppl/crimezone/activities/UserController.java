@@ -149,8 +149,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            //mAuthTask = new UserLoginTask(email, password);
+            //mAuthTask.execute((Void) null);
         }
     }
     private boolean isEmailValid(String email) {
@@ -286,7 +286,10 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask {
+
+            //extends AsyncTask<Void, Void, Boolean> {
+
 
         private final String mUser;
         private final String mPassword;
@@ -295,16 +298,16 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             mUser = user;
             mPassword = password;
         }
-
+        /*
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
             try {
                 //Building parameters
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("user", mUser));
-                params.add(new BasicNameValuePair("password", mPassword));
+                //List<NameValuePair> params = new ArrayList<NameValuePair>();
+                //params.add(new BasicNameValuePair("user", mUser));
+                //params.add(new BasicNameValuePair("password", mPassword));
             } catch (InterruptedException e) {
                 return false;
             } catch (JSONException e) {
@@ -322,7 +325,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // TODO: register the new account here.
             return true;
         }
-
+        */
+        /*
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
@@ -340,7 +344,7 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
-        }
+        }*/
     }
 }
 
