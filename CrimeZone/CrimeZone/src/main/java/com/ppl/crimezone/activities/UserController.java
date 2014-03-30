@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import com.ppl.crimezone.R;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+
 /**
  * A login screen that offers login via email/password.
 
@@ -145,8 +149,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            //mAuthTask = new UserLoginTask(email, password);
+            //mAuthTask.execute((Void) null);
         }
     }
     private boolean isEmailValid(String email) {
@@ -282,30 +286,37 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask {
 
-        private final String mEmail;
+            //extends AsyncTask<Void, Void, Boolean> {
+
+
+        private final String mUser;
         private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
+        UserLoginTask(String user, String password) {
+            mUser = user;
             mPassword = password;
         }
-
+        /*
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
+                //Building parameters
+                //List<NameValuePair> params = new ArrayList<NameValuePair>();
+                //params.add(new BasicNameValuePair("user", mUser));
+                //params.add(new BasicNameValuePair("password", mPassword));
             } catch (InterruptedException e) {
                 return false;
+            } catch (JSONException e) {
+
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
+                if (pieces[0].equals(mUser)) {
                     // Account exists, return true if the password matches.
                     return pieces[1].equals(mPassword);
                 }
@@ -314,7 +325,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // TODO: register the new account here.
             return true;
         }
-
+        */
+        /*
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
@@ -332,7 +344,7 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
-        }
+        }*/
     }
 }
 
