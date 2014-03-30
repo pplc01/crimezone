@@ -21,4 +21,7 @@
     <string name="color4">#348bd3</string>
     <string name="color5">#f2e019</string>
 
+    <string name="action_search">Search Location</string>
+
+
 </resources>
