@@ -19,7 +19,7 @@ public class SignUp extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.sign_up, menu);
+        getMenuInflater().inflate( R.menu.sign_up, menu);
         return true;
     }
 
