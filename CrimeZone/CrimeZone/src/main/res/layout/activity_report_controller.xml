@@ -23,6 +23,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@string/color3"
                 android:id="@+id/headline"
                 android:text="Headline" />
 
@@ -30,14 +31,71 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
+                android:textColor="@string/color3"
                 android:ems="10"
                 android:id="@+id/description"
                 android:text="Description" />
 
-            <ScrollView
+            <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/scrollView2" />
+                android:id="@+id/horizontalScrollView" >
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/drugs"
+                        android:src="@drawable/ic_drugs" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/burglary"
+                        android:src="@drawable/ic_burglary" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/homicide"
+                        android:src="@drawable/ic_homicide" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/kidnap"
+                        android:src="@drawable/ic_kidnap" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/sxassault"
+                        android:src="@drawable/ic_sxassault" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/theft"
+                        android:src="@drawable/ic_theft" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/vehicletheft"
+                        android:src="@drawable/ic_vehicletheft" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/violence"
+                        android:src="@drawable/ic_violence" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
 
         </LinearLayout>
     </ScrollView>
