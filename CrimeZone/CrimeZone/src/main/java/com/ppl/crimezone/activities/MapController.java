@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
@@ -53,7 +54,10 @@ public class MapController extends ActionBarActivity {
 
     private LatLng location;
 
+    private Location locs;
     //provide the data
+    LocationManager locationManager;
+
     private CrimeReport[] locationList;
 
     //for filter
@@ -79,7 +83,43 @@ public class MapController extends ActionBarActivity {
         setContentView(R.layout.home_map_ui);
 
 
+        map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMyLocationEnabled(true);
+
     }
+
+    // Define a listener that responds to location updates
+    LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location loc) {
+            // Called when a new location is found by the network location provider.
+            locs = loc;
+            double lat =  locs.getLatitude();
+            double lng = locs.getLongitude();
+            location = new LatLng(lat, lng);
+
+            map.addMarker(new MarkerOptions()
+                            .position(location)
+                            .title("Marker")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.mk_burglary))
+            );
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(location)      // Sets the center of the map to Mountain View
+                    .zoom(17)                   // Sets the zoom
+                    .bearing(90)                // Sets the orientation of the camera to east
+                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            locationManager.removeUpdates(locationListener);
+        }
+
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+        public void onProviderEnabled(String provider) {}
+
+        public void onProviderDisabled(String provider) {}
+    };
 
 
     //set up the action bar menu
@@ -124,55 +164,20 @@ public class MapController extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.setMyLocationEnabled(true);
-
-        //LocationSource a = (LocationSource) getSystemService(Context.LOCATION_SERVICE);
-        //LocationManager b = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //map.setLocationSource(a);
-
-        Criteria criteria = new Criteria();
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        String provider = locationManager.getBestProvider(criteria, false);
-        Location theLocation = locationManager.getLastKnownLocation(provider);
-        double lat =  theLocation.getLatitude();
-        double lng = theLocation.getLongitude();
-        location = new LatLng(lat, lng);
-
-        this.map.addMarker(new MarkerOptions()
-                        .position(location)
-                        .title("Marker")
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mk_burglary))
-        );
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(location)      // Sets the center of the map to Mountain View
-                .zoom(17)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        //setUpMapIfNeeded();
-        //setUpLocationClientIfNeeded();
-       // locationClient.connect();
-        //setUpMap();
-
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
-        //if(locationClient != null) {
-         //   locationClient.disconnect();
-       // }
     }
 
     /*
