@@ -3,9 +3,12 @@ package com.ppl.crimezone.activities;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -25,120 +28,61 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
+import com.ppl.crimezone.model.CrimeReport;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 /**
- * This shows how to create a simple activity with a map and a marker on the map.
- * <p>
- * Notice how we deal with the possibility that the Google Play services APK is not
- * installed/enabled/updated on a user's device.
+ * This is controller for HomeMap UI
  */
 public class MapController extends ActionBarActivity {
 
+    //the map
+    private GoogleMap map = null;
 
-    private static final LatLng SYDNEY = new LatLng(-33.87365, 151.20689);
+    private LatLng location;
 
+    //provide the data
+    private CrimeReport[] locationList;
 
-    private GoogleMap map;
+    //for filter
+    private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
 
-    //private LocationClient mLocationClient;
+    boolean dateFilter;
+    boolean crimeTypeFilter;
 
-    //private LatLng location =  new LatLng(-33.87365, 151.20689);
+    Date dateStart;
+    Date dateEnd;
 
-    private static final LocationRequest REQUEST = LocationRequest.create()
-            .setInterval(5000)         // 5 seconds
-            .setFastestInterval(16)    // 16ms = 60fps
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-
-    private final static int
-            CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    public MapController() {
-        super();
-    }
-
-    // Define a DialogFragment that displays the error dialog
-    public static class ErrorDialogFragment extends DialogFragment {
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-        // Default constructor. Sets the dialog field to null
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
-
-
-    private boolean servicesConnected() {
-        // Check that Google Play services is available
-        int resultCode =
-                GooglePlayServicesUtil.
-                        isGooglePlayServicesAvailable(this);
-
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d("Location Updates",
-                    "Google Play services is available.");
-            // Continue
-            return true;
-            // Google Play services was not available for some reason
-        } else {
-            // Get the error code
-
-
-            // Get the error dialog from Google Play services
-            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
-                    resultCode,
-                    this,
-                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-            // If Google Play services can provide an error dialog
-            if (errorDialog != null) {
-                // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment =
-                        new ErrorDialogFragment();
-                // Set the dialog in the DialogFragment
-                errorFragment.setDialog(errorDialog);
-
-                errorDialog.show();
-
-
-            }
-        }
-        return true;
-    }
-
-
+    boolean crimeTypeBugrlar;
+    boolean crimeTypeHomicide;
+    boolean crimeTypeKidnap;
+    boolean crimeTypeSexAssaust;
+    boolean crimeTypeTheft;
+    boolean crimeTypeVehicleTheft;
+    boolean crimeTypeViolence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map_controller);
-        setUpMapIfNeeded();
-        //mLocationClient.connect();
+        setContentView(R.layout.home_map_ui);
+
+
     }
 
+
+    //set up the action bar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
@@ -147,24 +91,7 @@ public class MapController extends ActionBarActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //setUpLocationClientIfNeeded();
-        //mLocationClient.connect();
-    }
-
-    /*
-    private void setUpLocationClientIfNeeded() {
-        if (mLocationClient == null) {
-            mLocationClient = new LocationClient(
-                    getApplicationContext(),
-                    this,  // ConnectionCallbacks
-                    this); // OnConnectionFailedListener
-        }
-    }*/
-
-
+    //set up the response for action bar menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
@@ -191,59 +118,69 @@ public class MapController extends ActionBarActivity {
 
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #map} is not null.
-     * <p>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not have been
-     * completely destroyed during this process (it is likely that it would only be stopped or
-     * paused), {@link #onCreate(Bundle)} may not be called again so we should call this method in
-     * {@link #onResume()} to guarantee that it will be called.
+    /*
+     * Called when the Activity becomes visible.
      */
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (this.map == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            this.map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (this.map != null) {
-                setUpMap();
-            }
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMyLocationEnabled(true);
+
+        //LocationSource a = (LocationSource) getSystemService(Context.LOCATION_SERVICE);
+        //LocationManager b = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //map.setLocationSource(a);
+
+        Criteria criteria = new Criteria();
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        String provider = locationManager.getBestProvider(criteria, false);
+        Location theLocation = locationManager.getLastKnownLocation(provider);
+        double lat =  theLocation.getLatitude();
+        double lng = theLocation.getLongitude();
+        location = new LatLng(lat, lng);
+
+        this.map.addMarker(new MarkerOptions()
+                        .position(location)
+                        .title("Marker")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.mk_burglary))
+        );
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(location)      // Sets the center of the map to Mountain View
+                .zoom(17)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p>
-     * This should only be called once and when we are sure that {@link #map} is not null.
-     */
-    private void setUpMap() {
-        //this.map.setOnMarkerDragListener(this);
-        //this.map.setOnMapLongClickListener(this);
-        //DraggableCircle circle = new DraggableCircle(SYDNEY, DEFAULT_RADIUS);
-        //mCircles.add(circle);
-        // Move the map so that it is centered on the initial circle
-        this.map.moveCamera(CameraUpdateFactory.newLatLngZoom(SYDNEY, 4.0f));
-        this.map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //setUpMapIfNeeded();
+        //setUpLocationClientIfNeeded();
+       // locationClient.connect();
+        //setUpMap();
+
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //if(locationClient != null) {
+         //   locationClient.disconnect();
+       // }
+    }
 
     /*
+     * Called when the Activity is no longer visible.
+     */
     @Override
-    public void onMapLongClick(LatLng point) {
-        // We know the center, let's place the outline at a point 3/4 along the view.
-        View view = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                .getView();
-
-
+    protected void onStop() {
+        super.onStop();
     }
-    */
+
 }
