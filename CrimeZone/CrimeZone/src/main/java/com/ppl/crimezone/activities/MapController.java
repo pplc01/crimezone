@@ -93,6 +93,38 @@ public class MapController extends ActionBarActivity {
         map.setMyLocationEnabled(true);
 
         placeMarkers = new Marker[MAX_PLACES];
+
+        map.setOnCameraChangeListener
+        (   new GoogleMap.OnCameraChangeListener()
+            {
+                @Override
+                public void onCameraChange(CameraPosition cameraPosition)
+                {
+                    // Make a web call for the locations
+                    String url;
+                    try
+                    {
+                        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
+                                + URLEncoder.encode(String.valueOf(cameraPosition.target.latitude), "UTF-8")
+                                + ","
+                                + URLEncoder.encode(String.valueOf(cameraPosition.target.longitude), "UTF-8")
+                                + "&radius="
+                                + URLEncoder.encode("1000", "UTF-8")
+                                + "&sensor="
+                                + URLEncoder.encode("true", "UTF-8")
+                                + "&types="
+                                + URLEncoder.encode("food|bar|store|museum|art_gallery", "UTF-8")
+                                + "&key="
+                                + URLEncoder.encode("AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo", "UTF-8");
+                        new GetPlaces().execute(url);
+                    } catch (UnsupportedEncodingException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        );
     }
 
     // Define a listener that responds to location updates
