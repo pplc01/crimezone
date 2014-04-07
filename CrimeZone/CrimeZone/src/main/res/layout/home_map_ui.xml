@@ -3,20 +3,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView1"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_marginTop="10dp"
-        android:layout_alignRight="@+id/mapButton">
-        <requestFocus></requestFocus>
-    </AutoCompleteTextView>
-    <fragment
+
+    <com.ppl.crimezone.activities.SearchLocationUI
+           android:id="@+id/atv_places"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_alignParentTop="true"
+           android:hint="@string/str_atv_places"
+           android:singleLine="true"
+           android:layout_centerHorizontal="true"
+           android:textSize="20dp"
+        >
+           <requestFocus />
+    </com.ppl.crimezone.activities.SearchLocationUI>
+        <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment" />
-
 </LinearLayout>

@@ -1,16 +1,20 @@
 package com.ppl.crimezone.activities;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -19,11 +23,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.model.CrimeReport;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +41,8 @@ import java.util.Date;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -43,31 +55,42 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import android.util.Log;
 import android.os.AsyncTask;
-
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import com.google.maps.android.SphericalUtil;
 /**
+ com.google.maps.android:android-maps-utils
  * This is controller for HomeMap UI
  */
 public class MapController extends ActionBarActivity {
 
-    //the map
+
+    //the map variable
     private GoogleMap map = null;
-
-    private LatLng location;
-
-    private Location locs;
-    //provide the data
+    private Location location;
     private LocationManager locationManager;
-
+    private LocationListener locationListener;
     private Marker[] placeMarkers;
-
     private final int MAX_PLACES = 20;
-
     private MarkerOptions[] places;
 
+    //data variable
     private CrimeReport[] locationList;
 
     //for filter
     private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
+    AutoCompleteTextView searchLocation;
+    DownloadTask placesDownloadTask;
+    DownloadTask placeDetailsDownloadTask;
+    ParserTask placesParserTask;
+    ParserTask placeDetailsParserTask;
+
+    final int PLACES=0;
+    final int PLACES_DETAILS=1;
 
     boolean dateFilter;
     boolean crimeTypeFilter;
@@ -75,114 +98,20 @@ public class MapController extends ActionBarActivity {
     Date dateStart;
     Date dateEnd;
 
-    boolean crimeTypeBugrlar;
-    boolean crimeTypeHomicide;
-    boolean crimeTypeKidnap;
-    boolean crimeTypeSexAssaust;
-    boolean crimeTypeTheft;
-    boolean crimeTypeVehicleTheft;
-    boolean crimeTypeViolence;
-
+    boolean crimeCategories[] = new boolean[8];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_map_ui);
 
-
-        map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.setMyLocationEnabled(true);
-
         placeMarkers = new Marker[MAX_PLACES];
 
-        map.setOnCameraChangeListener
-        (   new GoogleMap.OnCameraChangeListener()
-            {
-                @Override
-                public void onCameraChange(CameraPosition cameraPosition)
-                {
-                    // Make a web call for the locations
-                    String url;
-                    try
-                    {
-                        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                                + URLEncoder.encode(String.valueOf(cameraPosition.target.latitude), "UTF-8")
-                                + ","
-                                + URLEncoder.encode(String.valueOf(cameraPosition.target.longitude), "UTF-8")
-                                + "&radius="
-                                + URLEncoder.encode("1000", "UTF-8")
-                                + "&sensor="
-                                + URLEncoder.encode("true", "UTF-8")
-                                + "&types="
-                                + URLEncoder.encode("food|bar|store|museum|art_gallery", "UTF-8")
-                                + "&key="
-                                + URLEncoder.encode("AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo", "UTF-8");
-                        new GetPlaces().execute(url);
-                    } catch (UnsupportedEncodingException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-        );
+        setUpMap();
+
+        setUpSearchLocation();
+
     }
 
-    // Define a listener that responds to location updates
-    LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location loc) {
-            // Called when a new location is found by the network location provider.
-            locs = loc;
-            double lat =  locs.getLatitude();
-            double lng = locs.getLongitude();
-            location = new LatLng(lat, lng);
-
-            map.addMarker(new MarkerOptions()
-                            .position(location)
-                            .title("Marker")
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.mk_burglary))
-            );
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(location)      // Sets the center of the map to Mountain View
-                    .zoom(15)                   // Sets the zoom level
-                    .bearing(0)                // Sets the orientation of the camera to east
-                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
-            LatLng far = map.getProjection().getVisibleRegion().farLeft;
-            //double distanceKM = computeDistanceBetween(location, far);
-            String latVal=String.valueOf(lat);
-            String lngVal=String.valueOf(lng);
-            String url;
-            try {
-                url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
-                        + URLEncoder.encode(latVal, "UTF-8")
-                        +","
-                        +URLEncoder.encode(lngVal, "UTF-8")
-                        +"&radius="
-                        +URLEncoder.encode("1000", "UTF-8")
-                        +"&sensor="
-                        +URLEncoder.encode("true", "UTF-8")
-                        +"&types="
-                        +URLEncoder.encode("food|bar|store|museum|art_gallery", "UTF-8")
-                        +"&key="
-                        +URLEncoder.encode("AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo", "UTF-8");
-                new GetPlaces().execute(url);
-            } catch (UnsupportedEncodingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            locationManager.removeUpdates(locationListener);
-        }
-
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-        public void onProviderEnabled(String provider) {}
-
-        public void onProviderDisabled(String provider) {}
-    };
     //set up the action bar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -207,26 +136,16 @@ public class MapController extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    public void openReport()
-    {
-
-    }
-
-
-    public void openSettings()
-    {
-
-    }
-
     /*
      * Called when the Activity becomes visible.
      */
     @Override
     protected void onStart() {
         super.onStart();
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //updateLocationUser();
+
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
 
@@ -249,8 +168,249 @@ public class MapController extends ActionBarActivity {
         super.onStop();
     }
 
-    //fetch and parse place data
-    private class GetPlaces extends AsyncTask<String, Void, String> {
+    //method for action bar moving to other activities
+    public void openReport()
+    {
+
+    }
+
+    public void openSettings()
+    {
+
+    }
+
+    //initialize map
+    private void setUpMap(){
+        if(map == null) {
+            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            map.setMyLocationEnabled(true);
+        }else {
+ //           setUpMapListener();
+        }
+    }
+    //add listener if user swap or zoom the map
+    private void setUpMapListener(){
+        map.setOnCameraChangeListener
+                (   new GoogleMap.OnCameraChangeListener()
+                    {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition)
+                        {
+                            String latitude = String.valueOf(cameraPosition.target.latitude);
+                            String longitude = String.valueOf(cameraPosition.target.latitude);
+                            LatLng far = map.getProjection().getVisibleRegion().farLeft;
+                            double distance = SphericalUtil.computeDistanceBetween(far, cameraPosition.target);
+                            updateCrimeMarker(latitude, longitude, distance);
+                        }
+                    }
+                );
+
+
+    }
+
+    //set the map to point to current user location
+    private void updateLocationUser(){
+        locationListener = new LocationListener() {
+            public void onLocationChanged(Location userLocation) {
+                // Called when a new location is found by the network location provider.
+                location = userLocation;
+
+                LatLng target = new LatLng(location.getLatitude(), location.getLongitude());
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(target)      // Sets the center of the map to Mountain View
+                        .zoom(15)                   // Sets the zoom level
+                        .bearing(0)                // Sets the orientation of the camera to east
+                        .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+                LatLng far = map.getProjection().getVisibleRegion().farLeft;
+                double distance = SphericalUtil.computeDistanceBetween(far,  target);
+                String latVal=String.valueOf(location.getLatitude());
+                String lngVal=String.valueOf(location.getLongitude());
+                updateCrimeMarker(latVal, lngVal, distance );
+                locationManager.removeUpdates(locationListener);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {}
+
+            public void onProviderDisabled(String provider) {}
+        };
+    }
+
+    private void updateCrimeMarker(String latitude, String longitude, double distance){
+        String url;
+        try {
+            url = "http:/http://crimezone.besaba.com/webservice/crimeLocation.php?distance="
+                    + URLEncoder.encode(String.valueOf(distance), "UTF-8")
+                    +"&latitude"
+                    +URLEncoder.encode(latitude, "UTF-8")
+                    +"&longitudee="
+                    +URLEncoder.encode(longitude, "UTF-8");
+            new GetCrimeReport().execute(url);
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    //initialize autocomplete view
+    private void setUpSearchLocation(){
+        if(searchLocation == null) {
+            searchLocation = (AutoCompleteTextView) findViewById(R.id.atv_places);
+            searchLocation.setThreshold(1);
+            setUpSearchLocationListener();
+        }
+    }
+
+    private void setUpSearchLocationListener(){
+        // Adding textchange listener
+        searchLocation.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Creating a DownloadTask to download Google Places matching "s"
+                placesDownloadTask = new DownloadTask(PLACES);
+
+                // Getting url to the Google Places Autocomplete api
+                String url = getAutoCompleteUrl(s.toString());
+
+                // Start downloading Google Places
+                // This causes to execute doInBackground() of DownloadTask class
+                placesDownloadTask.execute(url);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        // Setting an item click listener for the AutoCompleteTextView dropdown list
+        searchLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int index,
+                                    long id) {
+
+                ListView lv = (ListView) arg0;
+                SimpleAdapter adapter = (SimpleAdapter) arg0.getAdapter();
+
+                HashMap<String, String> hm = (HashMap<String, String>) adapter.getItem(index);
+
+                // Creating a DownloadTask to download Places details of the selected place
+                placeDetailsDownloadTask = new DownloadTask(PLACES_DETAILS);
+
+                // Getting url to the Google Places details api
+                String url = getPlaceDetailsUrl(hm.get("reference"));
+
+                // Start downloading Google Place Details
+                // This causes to execute doInBackground() of DownloadTask class
+                placeDetailsDownloadTask.execute(url);
+            }
+        });
+    }
+    private String getAutoCompleteUrl(String place){
+
+        // Obtain browser key from https://code.google.com/apis/console
+        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
+
+        // place to be be searched
+        String input = "input="+place;
+
+        // place type to be searched
+        String types = "types=geocode";
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = input+"&"+types+"&"+sensor+"&"+key;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
+
+        return url;
+    }
+
+    private String getPlaceDetailsUrl(String ref){
+
+        // Obtain browser key from https://code.google.com/apis/console
+        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
+
+        // reference of place
+        String reference = "reference="+ref;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = reference+"&"+sensor+"&"+key;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/place/details/"+output+"?"+parameters;
+
+        return url;
+    }
+
+
+    /** A method to download json data from url */
+    private String downloadUrl(String strUrl) throws IOException{
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb  = new StringBuffer();
+
+            String line = "";
+            while( ( line = br.readLine())  != null){
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        }catch(Exception e){
+            Log.d("Exception while downloading url", e.toString());
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+
+    //fetch and parse crime report data
+    private class GetCrimeReport extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... placesURL) {
@@ -364,7 +524,196 @@ public class MapController extends ActionBarActivity {
                 }
             }
         }
-
-
     }
+
+    // Fetches data from url passed
+    private class DownloadTask extends AsyncTask<String, Void, String>{
+
+        private int downloadType=0;
+
+        // Constructor
+        public DownloadTask(int type){
+            this.downloadType = type;
+        }
+
+        @Override
+        protected String doInBackground(String... url) {
+
+            // For storing data from web service
+            String data = "";
+
+            try{
+                // Fetching the data from web service
+                data = downloadUrl(url[0]);
+            }catch(Exception e){
+                Log.d("Background Task",e.toString());
+            }
+            Log.d("Hasil Data ", data);
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            switch(downloadType){
+                case PLACES:
+                    // Creating ParserTask for parsing Google Places
+                    placesParserTask = new ParserTask(PLACES);
+
+                    // Start parsing google places json data
+                    // This causes to execute doInBackground() of ParserTask class
+                    placesParserTask.execute(result);
+                    break;
+
+                case PLACES_DETAILS :
+                    // Creating ParserTask for parsing Google Places
+                    placeDetailsParserTask = new ParserTask(PLACES_DETAILS);
+
+                    // Starting Parsing the JSON string
+                    // This causes to execute doInBackground() of ParserTask class
+                    placeDetailsParserTask.execute(result);
+            }
+        }
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<HashMap<String,String>>>{
+
+        int parserType = 0;
+
+        public ParserTask(int type){
+            this.parserType = type;
+        }
+
+        @Override
+        protected List<HashMap<String, String>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<HashMap<String, String>> list = null;
+
+            try{
+                jObject = new JSONObject(jsonData[0]);
+
+                switch(parserType){
+                    case PLACES :
+                        // Getting the parsed data as a List construct
+                        list = GsonParser.parsePlace(jObject);
+                        break;
+                    case PLACES_DETAILS :
+
+                        // Getting the parsed data as a List construct
+                        list = GsonParser.parseDetailPlace(jObject);
+                }
+
+            }catch(Exception e){
+                Log.d("Exception",e.toString());
+            }
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> result) {
+
+            switch(parserType){
+                case PLACES :
+                    String[] from = new String[] { "description"};
+                    int[] to = new int[] { android.R.id.text2 };
+
+
+
+                    // Creating a SimpleAdapter for the AutoCompleteTextView
+                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.item_list, from, to);
+                    // Setting the adapter
+                    searchLocation.setAdapter(adapter);
+                    break;
+                case PLACES_DETAILS :
+                    HashMap<String, String> hm = result.get(0);
+
+                    // Getting latitude from the parsed data
+                    double latitude = Double.parseDouble(hm.get("lat"));
+
+                    // Getting longitude from the parsed data
+                    double longitude = Double.parseDouble(hm.get("lng"));
+
+                    // Getting reference to the SupportMapFragment of the activity_main.xml
+                    SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+                    // Getting GoogleMap from SupportMapFragment
+
+                    LatLng point = new LatLng(latitude, longitude);
+
+                    CameraUpdate cameraPosition = CameraUpdateFactory.newLatLng(point);
+                    CameraUpdate cameraZoom = CameraUpdateFactory.zoomBy(5);
+
+                    // Showing the user input location in the Google Map
+                    map.moveCamera(cameraPosition);
+                    map.animateCamera(cameraZoom);
+
+                    MarkerOptions options = new MarkerOptions();
+                    options.position(point);
+                    options.title("Position");
+                    options.snippet("Latitude:"+latitude+",Longitude:"+longitude);
+
+                    // Adding the marker in the Google Map
+                    map.addMarker(options);
+
+                    break;
+            }
+        }
+    }
+
+    private class Data {
+
+        String title;
+
+        @SerializedName("time_start")
+        Date crimeDateStart;
+        @SerializedName("time_end")
+        Date crimeDateEnd;
+        String [] categories;
+
+        @SerializedName("x_coordinate")
+        double latitude;
+        @SerializedName("y_coordinate")
+        double longitude;
+
+        public Data(String title, Date start, Date end,String[] categories, double lat, double lang){
+            this.title = title;
+            crimeDateStart = start;
+            crimeDateEnd = end;
+            this.categories = categories;
+            latitude = lat;
+            longitude = lang;
+
+        }
+
+
+        public String getTitle(){
+            return title;
+        }
+
+        public Date getCrimeDateStart(){
+            return crimeDateStart;
+        }
+
+        public Date getCrimeDateEnd(){
+            return crimeDateEnd;
+        }
+
+        public double getLatitude(){
+            return latitude;
+        }
+
+        public double getLongitude(){
+            return longitude;
+        }
+
+        public String[] getCategories(){
+            return categories;
+        }
+    }
+
+
 }
+
+

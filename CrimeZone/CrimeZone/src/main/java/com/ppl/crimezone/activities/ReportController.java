@@ -14,7 +14,6 @@ public class ReportController extends ActionBarActivity {
         setContentView(R.layout.activity_report_controller);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
