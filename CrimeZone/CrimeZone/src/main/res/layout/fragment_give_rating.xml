@@ -1,0 +1,69 @@
+<FrameLayout
+    android:layout_width="270dp"
+    android:layout_height="110dp"
+    android:layout_gravity="center"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:src="@drawable/r_nostar"
+                android:layout_marginRight="5dp"
+                android:id="@+id/star1" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:src="@drawable/r_nostar"
+                android:layout_marginRight="5dp"
+                android:id="@+id/star2" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:src="@drawable/r_nostar"
+                android:layout_marginRight="5dp"
+                android:id="@+id/star3" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:src="@drawable/r_nostar"
+                android:layout_marginRight="5dp"
+                android:id="@+id/star4" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:src="@drawable/r_nostar"
+                android:layout_marginRight="5dp"
+                android:id="@+id/star5" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:text="Submit Rating"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/submitrate" />
+    </LinearLayout>
+</FrameLayout>
