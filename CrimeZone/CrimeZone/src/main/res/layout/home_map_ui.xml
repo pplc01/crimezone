@@ -13,8 +13,9 @@
            android:singleLine="true"
            android:layout_centerHorizontal="true"
            android:textSize="20dp"
-        >
-           <requestFocus />
+    >
+
+   <requestFocus />
     </com.ppl.crimezone.activities.SearchLocationUI>
         <fragment
         android:id="@+id/map"

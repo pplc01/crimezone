@@ -31,19 +31,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.model.CrimeReport;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,18 +61,21 @@ public class ReportController extends ActionBarActivity {
 
     public static final String PREFS_NAME = "ReporControllerMode";
 
+
+    public boolean newReportMode = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        boolean newReportMode = settings.getBoolean("NewReportMode", false);
+        newReportMode = settings.getBoolean("NewReportMode", false);
 
         Log.d("Report Mode", newReportMode+"");
-       // showReportForm();
-        setContentView(R.layout.activity_report_controller);
-
-
+        if(newReportMode){
+            setContentView(R.layout.report_form);
+            showReportForm();
+        }else{
+        }
     }
 
     @Override
@@ -110,14 +102,13 @@ public class ReportController extends ActionBarActivity {
 
     public void showReportForm(){
         if(reportMap == null) {
-            //reportMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.report_map)).getMap();
+            reportMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.new_report_map)).getMap();
             reportMap.setMyLocationEnabled(true);
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             updateLocationUser();
-
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            setUpSearchLocation();
         }
-
     }
 
 
@@ -163,16 +154,15 @@ public class ReportController extends ActionBarActivity {
     //initialize autocomplete view
     private void setUpSearchLocation(){
         if(searchLocation == null) {
-            //searchLocation = (AutoCompleteTextView) findViewById(R.id.crime_location);
-            searchLocation.setThreshold(1);
+            searchLocation = (AutoCompleteTextView) findViewById(R.id.crime_location);
             setUpSearchLocationListener();
+            searchLocation.setThreshold(1);
         }
     }
 
     private void setUpSearchLocationListener(){
         // Adding textchange listener
         searchLocation.addTextChangedListener(new TextWatcher() {
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Creating a DownloadTask to download Google Places matching "s"
@@ -358,10 +348,15 @@ public class ReportController extends ActionBarActivity {
 
                     // Adding the marker in the Google Map
                     placeMarker = reportMap.addMarker(place);
-
                     break;
             }
         }
     }
+
+    private boolean submitForm(){
+        return false;
+    }
+
+
 
 }
