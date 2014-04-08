@@ -181,6 +181,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
+                android:layout_marginTop="10dp"
                 android:inputType="textMultiLine"
                 android:textColor="@string/color3"
                 android:ems="10"
