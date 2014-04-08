@@ -3,6 +3,8 @@ package com.ppl.crimezone.activities;
 //import com.google.gson.JsonObject;
 //import com.google.gson.JsonParser;
 
+import android.util.Log;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -12,9 +14,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -138,4 +144,93 @@ public class GsonParser {
         return place;
     }
 
+
+    /** A method to download json data from url */
+    protected static String downloadUrl(String strUrl) throws IOException{
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try{
+            URL url = new URL(strUrl);
+
+            // Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            // Connecting to url
+            urlConnection.connect();
+
+            // Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb  = new StringBuffer();
+
+            String line = "";
+            while( ( line = br.readLine())  != null){
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        }catch(Exception e){
+            Log.d("Exception while downloading url", e.toString());
+        }finally{
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+
+    protected static String getAutoCompleteUrl(String place){
+
+        // Obtain browser key from https://code.google.com/apis/console
+        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
+
+        // place to be be searched
+        String input = "input="+place;
+
+        // place type to be searched
+        String types = "types=geocode";
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = input+"&"+types+"&"+sensor+"&"+key;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
+
+        return url;
+    }
+
+    protected static String getPlaceDetailsUrl(String ref){
+
+        // Obtain browser key from https://code.google.com/apis/console
+        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
+
+        // reference of place
+        String reference = "reference="+ref;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        // Building the parameters to the web service
+        String parameters = reference+"&"+sensor+"&"+key;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/place/details/"+output+"?"+parameters;
+
+        return url;
+    }
 }

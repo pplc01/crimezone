@@ -1,6 +1,8 @@
 package com.ppl.crimezone.activities;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -9,7 +11,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,7 +58,6 @@ import android.util.Log;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -171,7 +171,16 @@ public class MapController extends ActionBarActivity {
     //method for action bar moving to other activities
     public void openReport()
     {
+        String PREFS_NAME = "ReporControllerMode";
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("NewReportMode", true);
 
+        // Commit the edits!
+        editor.commit();
+
+        Intent intent = new Intent(this, ReportController.class);
+        startActivity(intent);
     }
 
     public void openSettings()
@@ -184,8 +193,6 @@ public class MapController extends ActionBarActivity {
         if(map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             map.setMyLocationEnabled(true);
-        }else {
- //           setUpMapListener();
         }
     }
     //add listener if user swap or zoom the map
@@ -277,7 +284,7 @@ public class MapController extends ActionBarActivity {
                 placesDownloadTask = new DownloadTask(PLACES);
 
                 // Getting url to the Google Places Autocomplete api
-                String url = getAutoCompleteUrl(s.toString());
+                String url = GsonParser.getAutoCompleteUrl(s.toString());
 
                 // Start downloading Google Places
                 // This causes to execute doInBackground() of DownloadTask class
@@ -311,101 +318,13 @@ public class MapController extends ActionBarActivity {
                 placeDetailsDownloadTask = new DownloadTask(PLACES_DETAILS);
 
                 // Getting url to the Google Places details api
-                String url = getPlaceDetailsUrl(hm.get("reference"));
+                String url = GsonParser.getPlaceDetailsUrl(hm.get("reference"));
 
                 // Start downloading Google Place Details
                 // This causes to execute doInBackground() of DownloadTask class
                 placeDetailsDownloadTask.execute(url);
             }
         });
-    }
-    private String getAutoCompleteUrl(String place){
-
-        // Obtain browser key from https://code.google.com/apis/console
-        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
-
-        // place to be be searched
-        String input = "input="+place;
-
-        // place type to be searched
-        String types = "types=geocode";
-
-        // Sensor enabled
-        String sensor = "sensor=false";
-
-        // Building the parameters to the web service
-        String parameters = input+"&"+types+"&"+sensor+"&"+key;
-
-        // Output format
-        String output = "json";
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/place/autocomplete/"+output+"?"+parameters;
-
-        return url;
-    }
-
-    private String getPlaceDetailsUrl(String ref){
-
-        // Obtain browser key from https://code.google.com/apis/console
-        String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
-
-        // reference of place
-        String reference = "reference="+ref;
-
-        // Sensor enabled
-        String sensor = "sensor=false";
-
-        // Building the parameters to the web service
-        String parameters = reference+"&"+sensor+"&"+key;
-
-        // Output format
-        String output = "json";
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/place/details/"+output+"?"+parameters;
-
-        return url;
-    }
-
-
-    /** A method to download json data from url */
-    private String downloadUrl(String strUrl) throws IOException{
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try{
-            URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
-            urlConnection.connect();
-
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb  = new StringBuffer();
-
-            String line = "";
-            while( ( line = br.readLine())  != null){
-                sb.append(line);
-            }
-
-            data = sb.toString();
-
-            br.close();
-
-        }catch(Exception e){
-            Log.d("Exception while downloading url", e.toString());
-        }finally{
-            iStream.close();
-            urlConnection.disconnect();
-        }
-        return data;
     }
 
 
@@ -544,7 +463,7 @@ public class MapController extends ActionBarActivity {
 
             try{
                 // Fetching the data from web service
-                data = downloadUrl(url[0]);
+                data = GsonParser.downloadUrl(url[0]);
             }catch(Exception e){
                 Log.d("Background Task",e.toString());
             }
@@ -712,8 +631,4 @@ public class MapController extends ActionBarActivity {
             return categories;
         }
     }
-
-
 }
-
-

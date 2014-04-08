@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@string/color1"
+    android:background="@color/color1"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -28,7 +29,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@string/color1"
+                    android:background="@color/color1"
                     android:src="@drawable/mk"
                     android:id="@+id/findaddress" />
 
@@ -36,7 +37,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="10dp"
-                    android:textColor="@string/color2"
+                    android:textColor="@color/color2"
                     android:textSize="20dp"
                     android:text="Address"
                     android:id="@+id/location" />
@@ -56,56 +57,56 @@
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/drugs"
                         android:src="@drawable/ic_drugs" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/burglary"
                         android:src="@drawable/ic_burglary" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/homicide"
                         android:src="@drawable/ic_homicide" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/kidnap"
                         android:src="@drawable/ic_kidnap" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/sxassault"
                         android:src="@drawable/ic_sxassault" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/theft"
                         android:src="@drawable/ic_theft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/vehicletheft"
                         android:src="@drawable/ic_vehicletheft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/violence"
                         android:src="@drawable/ic_violence" />
 
@@ -115,7 +116,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@string/color3"
+                android:textColor="@color/color3"
                 android:id="@+id/headline"
                 android:layout_marginTop="10dp"
                 android:text="Headline" />
@@ -130,7 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:inputType="textMultiLine"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:ems="10"
                     android:id="@+id/description"
                     android:text="Description" />
@@ -147,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:text="Date"
                     android:textSize="20dp"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:id="@+id/textView" />
 
                 <EditText
@@ -156,7 +157,7 @@
                     android:layout_marginLeft="10dp"
                     android:textAlignment="textEnd"
                     android:inputType="date"
-                    android:background="@string/color3"
+                    android:background="@color/color3"
                     android:ems="10"
                     android:id="@+id/inputdate"
                     android:text=" YYYY-MM-DD" />
@@ -165,7 +166,7 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_marginTop="10dp"
-                android:background="@string/color4"
+                android:background="@color/color4"
                 android:layout_height="wrap_content"
                 android:text="Submit Report"
                 android:id="@+id/button" />
@@ -173,3 +174,4 @@
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
+

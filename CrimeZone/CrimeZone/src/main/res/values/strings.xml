@@ -15,11 +15,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_report_controller">ReportController</string>
-    <string name="color1">#eeece4</string>
-    <string name="color2">#e32424</string>
-    <string name="color3">#2c2034</string>
-    <string name="color4">#348bd3</string>
-    <string name="color5">#f2e019</string>
     <string name="action_search">Search Location</string>
     <string name="search_hint">Search Places</string>
     <string name="search_settings">Search Places</string>
