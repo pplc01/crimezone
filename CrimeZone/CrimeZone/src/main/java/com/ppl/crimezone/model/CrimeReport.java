@@ -1,44 +1,35 @@
 package com.ppl.crimezone.model;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.annotations.SerializedName;
-
+import java.util.ArrayList;
 import java.util.Date;
 
+import com.google.android.gms.internal.av;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 /**
- * Created by adesudiman on 4/6/2014.
+ * Created by adesudiman on 3/29/2014.
  */
 public class CrimeReport {
 
+
     private int idReport;
-    @SerializedName("data_created")
+    private String title;
     private Date reportDate;
+    private Date crimeDate;
     private String description;
+    private String[] categories;
+    private LatLng location;
     private double avgScore;
 
-    private String title;
-
-    @SerializedName("time_start")
-    private Date crimeDateStart;
-    @SerializedName("time_end")
-    private Date crimeDateEnd;
-    private String [] categories;
-
-    @SerializedName("x_coordinate")
-    private double latitude;
-    @SerializedName("y_coordinate")
-    private double longitude;
-
-    public CrimeReport(int idReport, String title, Date reportDate, Date start, Date end, String description, String[] categories, double latitude, double langtitude, double avgScore){
-        this.title = title;
-        crimeDateStart = start;
-        crimeDateEnd = end;
-        this.categories = categories;
-        this.latitude = latitude;
-        this.longitude = longitude;
+    public CrimeReport(int idReport, String title, Date reportDate, Date crimeDate, String description, String[] categories, double latitude, double langtitude, double avgScore){
         this.idReport = idReport;
+        this.title = title;
         this.reportDate = reportDate;
+        this.crimeDate = crimeDate;
         this.description = description;
+        this.categories = categories;
+
+        this.location = new LatLng(latitude, langtitude);
         this.avgScore = avgScore;
     }
 
@@ -46,12 +37,24 @@ public class CrimeReport {
         return idReport;
     }
 
+    public String getTitle(){
+        return title;
+    }
+
     public Date getReportDate(){
-        return reportDate;
+       return reportDate;
     }
 
     public String getDescription(){
         return description;
+    }
+
+    public LatLng getLocation(){
+        return location;
+    }
+
+    public String[] getCategories(){
+        return categories;
     }
 
     public double getAvgScore(){
@@ -61,29 +64,4 @@ public class CrimeReport {
     public void setAvgScore(double newAvgScore){
         avgScore = newAvgScore;
     }
-
-    public String getTitle(){
-        return title;
-    }
-
-    public Date getCrimeDateStart(){
-        return crimeDateStart;
-    }
-
-    public Date getCrimeDateEnd(){
-        return crimeDateEnd;
-    }
-
-    public double getLatitude(){
-        return latitude;
-    }
-
-    public double getLongitude(){
-        return longitude;
-    }
-
-    public String[] getCategories(){
-        return categories;
-    }
-
 }

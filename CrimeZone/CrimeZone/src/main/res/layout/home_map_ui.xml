@@ -4,21 +4,10 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.ppl.crimezone.activities.SearchLocationUI
-           android:id="@+id/atv_places"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_alignParentTop="true"
-           android:hint="@string/str_atv_places"
-           android:singleLine="true"
-           android:layout_centerHorizontal="true"
-           android:textSize="20dp"
-        >
-           <requestFocus />
-    </com.ppl.crimezone.activities.SearchLocationUI>
-        <fragment
+    <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment" />
+
 </LinearLayout>

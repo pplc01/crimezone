@@ -6,12 +6,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.ppl.crimezone.R;
 
-public class ReportController extends ActionBarActivity {
+public class UserProfile extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report_controller);
+        setContentView(R.layout.activity_user_profile);
     }
 
 
@@ -19,7 +19,7 @@ public class ReportController extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.report_controller, menu);
+        getMenuInflater().inflate(R.menu.user_profile, menu);
         return true;
     }
 
