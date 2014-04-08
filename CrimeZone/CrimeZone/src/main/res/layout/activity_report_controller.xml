@@ -39,8 +39,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="565dp"
-        android:paddingTop="15dp"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:id="@+id/scrollView"
@@ -73,6 +73,15 @@
                     android:id="@+id/location" />
             </LinearLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Crime Type"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dark"
+                android:id="@+id/l_crimetype" />
+
             <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -81,8 +90,7 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="fill_parent">
 
                     <ImageButton
                         android:layout_width="wrap_content"
@@ -143,29 +151,41 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Headline"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dark"
+                android:id="@+id/l_headline" />
+
             <EditText
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_height="30dp"
+                android:inputType="textMultiLine"
+                android:textColor="@color/dark"
+                android:background="#FFFFFF"
                 android:ems="16"
-                android:id="@+id/headline"
-                android:text="headline" />
+                android:id="@+id/headline" />
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Description"
                 android:layout_marginTop="10dp"
-                android:id="@+id/scrollView2" >
+                android:textColor="@color/dark"
+                android:id="@+id/l_description" />
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="textMultiLine"
-                    android:textColor="@string/color3"
-                    android:ems="10"
-                    android:id="@+id/description"
-                    android:text="Description" />
-            </ScrollView>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:inputType="textMultiLine"
+                android:textColor="@string/color3"
+                android:ems="10"
+                android:background="#FFFFFF"
+                android:id="@+id/description"/>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -180,6 +200,54 @@
                     android:textSize="20dp"
                     android:textColor="@string/color3"
                     android:id="@+id/textView" />
+
+                <EditText
+                    android:layout_width="70dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:ems="10"
+                    android:background="#FFFFFF"
+                    android:id="@+id/day" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="-"
+                    android:textColor="@color/dark"
+                    android:id="@+id/sep1" />
+
+                <EditText
+                    android:layout_width="70dp"
+                    android:background="#FFFFFF"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:ems="10"
+                    android:id="@+id/month" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="-"
+                    android:textColor="@color/dark"
+                    android:id="@+id/sep2" />
+
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:ems="10"
+                    android:id="@+id/year" />
 
             </LinearLayout>
 
