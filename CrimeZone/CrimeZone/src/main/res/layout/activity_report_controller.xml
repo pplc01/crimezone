@@ -1,18 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color1"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.ppl.crimezone.activities.ReportController">
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@string/color1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:weightSum="1">
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:background="@color/blue"
+        android:layout_height="63dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/reportcrime"
+            android:id="@+id/h_reportcrime"
+            android:layout_gravity="center" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/blue"
+            android:src="@drawable/back"
+            android:id="@+id/b_back"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="left|center_vertical" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/blue"
+            android:src="@drawable/write"
+            android:layout_marginRight="20dp"
+            android:id="@+id/imageButton2"
+            android:layout_gravity="right|center_vertical" />
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:id="@+id/scrollView"
         android:layout_centerHorizontal="true" >
 
@@ -29,7 +59,7 @@
                 <ImageButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/color1"
+                    android:background="@string/color1"
                     android:src="@drawable/mk"
                     android:id="@+id/findaddress" />
 
@@ -37,11 +67,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="10dp"
-                    android:textColor="@color/color2"
+                    android:textColor="@string/color2"
                     android:textSize="20dp"
                     android:text="Address"
                     android:id="@+id/location" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Crime Type"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dark"
+                android:id="@+id/l_crimetype" />
 
             <HorizontalScrollView
                 android:layout_width="wrap_content"
@@ -51,127 +90,180 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="fill_parent">
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/drugs"
                         android:src="@drawable/ic_drugs" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/burglary"
                         android:src="@drawable/ic_burglary" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/homicide"
                         android:src="@drawable/ic_homicide" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/kidnap"
                         android:src="@drawable/ic_kidnap" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/sxassault"
                         android:src="@drawable/ic_sxassault" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/theft"
                         android:src="@drawable/ic_theft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/vehicletheft"
                         android:src="@drawable/ic_vehicletheft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/color1"
+                        android:background="@string/color1"
                         android:id="@+id/violence"
                         android:src="@drawable/ic_violence" />
 
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Headline"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dark"
+                android:id="@+id/l_headline" />
+
             <EditText
                 android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:inputType="textMultiLine"
+                android:textColor="@color/dark"
+                android:background="#FFFFFF"
+                android:ems="16"
+                android:id="@+id/headline" />
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color3"
-                android:id="@+id/headline"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Description"
                 android:layout_marginTop="10dp"
-                android:text="Headline" />
+                android:textColor="@color/dark"
+                android:id="@+id/l_description" />
 
-            <ScrollView
+            <EditText
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="10dp"
-                android:id="@+id/scrollView2" >
-
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="textMultiLine"
-                    android:textColor="@color/color3"
-                    android:ems="10"
-                    android:id="@+id/description"
-                    android:text="Description" />
-            </ScrollView>
+                android:inputType="textMultiLine"
+                android:textColor="@string/color3"
+                android:ems="10"
+                android:background="#FFFFFF"
+                android:id="@+id/description"/>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Date"
                     android:textSize="20dp"
-                    android:textColor="@color/color3"
+                    android:textColor="@string/color3"
                     android:id="@+id/textView" />
 
                 <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:textAlignment="textEnd"
-                    android:inputType="date"
-                    android:background="@color/color3"
+                    android:layout_width="70dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="2"
                     android:ems="10"
-                    android:id="@+id/inputdate"
-                    android:text=" YYYY-MM-DD" />
+                    android:background="#FFFFFF"
+                    android:id="@+id/day" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="-"
+                    android:textColor="@color/dark"
+                    android:id="@+id/sep1" />
+
+                <EditText
+                    android:layout_width="70dp"
+                    android:background="#FFFFFF"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:ems="10"
+                    android:id="@+id/month" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="-"
+                    android:textColor="@color/dark"
+                    android:id="@+id/sep2" />
+
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:ems="10"
+                    android:id="@+id/year" />
+
             </LinearLayout>
 
             <Button
-                android:layout_width="match_parent"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="10dp"
-                android:background="@color/color4"
-                android:layout_height="wrap_content"
-                android:text="Submit Report"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:background="@string/color4"
+                android:text="SUBMIT REPORT"
+                android:textSize="20dp"
                 android:id="@+id/button" />
 
         </LinearLayout>
     </ScrollView>
-</RelativeLayout>
 
+</LinearLayout>
