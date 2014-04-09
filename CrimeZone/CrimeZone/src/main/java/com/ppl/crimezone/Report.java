@@ -11,7 +11,7 @@ public class Report extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_report);
+        setContentView(R.layout.report_detail_ui);
     }
 
 

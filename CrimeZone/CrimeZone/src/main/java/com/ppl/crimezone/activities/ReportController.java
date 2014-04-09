@@ -1,6 +1,7 @@
 package com.ppl.crimezone.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,7 +50,6 @@ public class ReportController extends ActionBarActivity {
 
 
     //for filter
-    private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
     AutoCompleteTextView searchLocation;
     DownloadTask placesDownloadTask;
     DownloadTask placeDetailsDownloadTask;
@@ -71,21 +71,29 @@ public class ReportController extends ActionBarActivity {
         newReportMode = settings.getBoolean("NewReportMode", false);
 
         Log.d("Report Mode", newReportMode+"");
+
+
         if(newReportMode){
-            setContentView(R.layout.report_form);
+            setContentView(R.layout.report_form_ui);
             showReportForm();
         }else{
+
         }
     }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.
         // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.map_controller_actions, menu);
-        return super.onCreateOptionsMenu(menu);
+        if(newReportMode) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.new_report_menu_bar, menu);
+            return super.onCreateOptionsMenu(menu);
+        }
+        else{
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.map_controller_actions, menu);
+            return super.onCreateOptionsMenu(menu);
+        }
     }
 
     @Override
@@ -93,12 +101,40 @@ public class ReportController extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_report:
+                openReport();
+                return true;
+            case R.id.action_settings:
+                openSettings();
+                return true;
+            case R.id.settings:
+                openSettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
+
+    public void openReport()
+    {
+        String PREFS_NAME = "ReporControllerMode";
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("NewReportMode", true);
+
+        // Commit the edits!
+        editor.commit();
+
+        Intent intent = new Intent(this, ReportController.class);
+        startActivity(intent);
+    }
+
+    public void openSettings()
+    {
+
+    }
+
 
     public void showReportForm(){
         if(reportMap == null) {
@@ -311,7 +347,7 @@ public class ReportController extends ActionBarActivity {
 
 
                     // Creating a SimpleAdapter for the AutoCompleteTextView
-                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.item_list, from, to);
+                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.autocomplete, from, to);
                     // Setting the adapter
                     searchLocation.setAdapter(adapter);
                     break;
@@ -356,7 +392,4 @@ public class ReportController extends ActionBarActivity {
     private boolean submitForm(){
         return false;
     }
-
-
-
 }

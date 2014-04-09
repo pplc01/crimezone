@@ -38,7 +38,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Username:"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:id="@+id/usernameLabel" />
 
                 <EditText
@@ -74,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Password:"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:paddingTop="10dp"
                     android:id="@+id/pass1Label" />
 
@@ -93,7 +93,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Reenter Password:"
                     android:paddingTop="10dp"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:id="@+id/pass2Label" />
 
                 <EditText

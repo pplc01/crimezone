@@ -6,7 +6,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Crimezone" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.ppl.crimezone.activities.MapController"
             android:label="@string/app_name" >

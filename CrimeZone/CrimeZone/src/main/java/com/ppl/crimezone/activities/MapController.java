@@ -1,9 +1,7 @@
 package com.ppl.crimezone.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,13 +26,7 @@ import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.model.CrimeReport;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -541,7 +533,7 @@ public class MapController extends ActionBarActivity {
 
 
                     // Creating a SimpleAdapter for the AutoCompleteTextView
-                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.item_list, from, to);
+                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.autocomplete, from, to);
                     // Setting the adapter
                     searchLocation.setAdapter(adapter);
                     break;

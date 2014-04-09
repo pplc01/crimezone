@@ -15,7 +15,6 @@
            android:textSize="20dp"
     >
 
-   <requestFocus />
     </com.ppl.crimezone.activities.SearchLocationUI>
         <fragment
         android:id="@+id/map"

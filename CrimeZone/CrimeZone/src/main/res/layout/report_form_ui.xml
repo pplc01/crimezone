@@ -2,7 +2,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@string/color1"
+    android:background="@color/color1"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:weightSum="1">
 
@@ -36,6 +36,39 @@
             android:id="@+id/imageButton2"
             android:layout_gravity="right|center_vertical" />
     </FrameLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/color1"
+            android:src="@drawable/mk"
+            android:id="@+id/findaddress" />
+
+        <com.ppl.crimezone.activities.SearchLocationUI
+            android:id="@+id/crime_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:hint="@string/str_atv_places"
+            android:singleLine="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="20dp"
+            android:textColor="@color/color2"
+            >
+        </com.ppl.crimezone.activities.SearchLocationUI>
+
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/new_report_map"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        class="com.google.android.gms.maps.SupportMapFragment" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -51,27 +84,6 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@string/color1"
-                    android:src="@drawable/mk"
-                    android:id="@+id/findaddress" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:textColor="@string/color2"
-                    android:textSize="20dp"
-                    android:text="Address"
-                    android:id="@+id/location" />
-            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -95,56 +107,56 @@
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/drugs"
                         android:src="@drawable/ic_drugs" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/burglary"
                         android:src="@drawable/ic_burglary" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/homicide"
                         android:src="@drawable/ic_homicide" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/kidnap"
                         android:src="@drawable/ic_kidnap" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/sxassault"
                         android:src="@drawable/ic_sxassault" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/theft"
                         android:src="@drawable/ic_theft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/vehicletheft"
                         android:src="@drawable/ic_vehicletheft" />
 
                     <ImageButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@string/color1"
+                        android:background="@color/color1"
                         android:id="@+id/violence"
                         android:src="@drawable/ic_violence" />
 
@@ -183,7 +195,7 @@
                 android:layout_height="200dp"
                 android:layout_marginTop="10dp"
                 android:inputType="textMultiLine"
-                android:textColor="@string/color3"
+                android:textColor="@color/color3"
                 android:ems="10"
                 android:background="#FFFFFF"
                 android:id="@+id/description"/>
@@ -199,7 +211,7 @@
                     android:layout_height="wrap_content"
                     android:text="Date"
                     android:textSize="20dp"
-                    android:textColor="@string/color3"
+                    android:textColor="@color/color3"
                     android:id="@+id/textView" />
 
                 <EditText
@@ -258,7 +270,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:background="@string/color4"
+                android:background="@color/color4"
                 android:text="SUBMIT REPORT"
                 android:textSize="20dp"
                 android:id="@+id/button" />
