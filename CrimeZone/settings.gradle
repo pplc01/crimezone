@@ -1,1 +1,1 @@
-include ':CrimeZone'
+include 'Libraries:AndroidSlidingUpPanel:library', ':CrimeZone'

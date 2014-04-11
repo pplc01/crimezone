@@ -1,0 +1,26 @@
+<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="0dp"
+    android:paddingBottom="2dp">
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="fill_parent"
+        android:layout_height="25dp"
+        android:textColor="#329"
+        android:textSize="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_alignParentTop="true"
+    />
+
+    <TextView android:id="@android:id/text2"
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_below="@android:id/text1"
+        android:textColor="#329"
+        android:textSize="20dp"
+        android:layout_marginTop="0dp"
+        android:layout_alignParentTop="true"
+        />
+</TwoLineListItem> 

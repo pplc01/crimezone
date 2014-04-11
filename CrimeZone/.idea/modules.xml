@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CrimeZone.iml" filepath="$PROJECT_DIR$/CrimeZone.iml" />
       <module fileurl="file://$PROJECT_DIR$/CrimeZone/CrimeZone-CrimeZone.iml" filepath="$PROJECT_DIR$/CrimeZone/CrimeZone-CrimeZone.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Libraries/AndroidSlidingUpPanel/library/library.iml" filepath="$PROJECT_DIR$/Libraries/AndroidSlidingUpPanel/library/library.iml" />
     </modules>
   </component>
 </project>

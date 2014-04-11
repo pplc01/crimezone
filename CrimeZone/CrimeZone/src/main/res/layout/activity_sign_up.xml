@@ -9,10 +9,7 @@
     android:background="#eeece4"
     tools:context="com.ppl.crimezone.SignUp">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollView" >
+
 
         <LinearLayout
             android:orientation="vertical"
@@ -23,88 +20,95 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/logo"
-                android:src="@drawable/ic_launcher"
+                android:src="@drawable/logo_l"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:paddingBottom="10dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Username:"
-                android:paddingLeft="10dp"
-                android:paddingTop="10dp"
-                android:textColor="@string/color3"
-                android:id="@+id/usernameLabel" />
+                android:layout_marginTop="10dp"
+                android:layout_gravity="center">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/usernameField"
-                android:text="username"
-                android:layout_below="@+id/imageView"
-                android:layout_centerHorizontal="true"
-                />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Username:"
+                    android:textColor="@color/color3"
+                    android:id="@+id/usernameLabel" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Email Address:"
-                android:textColor="@string/color3"
-                android:paddingLeft="10dp"
-                android:id="@+id/emailLabel"
-                android:paddingTop="10dp"/>
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:id="@+id/usernameField"
+                    android:background="@color/white"
+                    android:text=" username"
+                    android:layout_below="@+id/imageView"
+                    android:layout_centerHorizontal="true"
+                    />
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:ems="10"
-                android:id="@+id/emailField"
-                android:text="email@address" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Email Address:"
+                    android:textColor="@color/dark"
+                    android:id="@+id/emailLabel"
+                    android:paddingTop="10dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Password:"
-                android:paddingLeft="10dp"
-                android:textColor="@string/color3"
-                android:paddingTop="10dp"
-                android:id="@+id/pass1Label" />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:inputType="textEmailAddress"
+                    android:ems="10"
+                    android:background="@color/white"
+                    android:id="@+id/emailField"
+                    android:text="email@address" />
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
-                android:id="@+id/pass1"
-                android:text="password"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Password:"
+                    android:textColor="@color/color3"
+                    android:paddingTop="10dp"
+                    android:id="@+id/pass1Label" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Reenter Password:"
-                android:paddingLeft="10dp"
-                android:paddingTop="10dp"
-                android:textColor="@string/color3"
-                android:id="@+id/pass2Label" />
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:inputType="textPassword"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:id="@+id/pass1"
+                    android:text="password"/>
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
-                android:id="@+id/pass2"
-                android:paddingLeft="10dp"
-                android:text="password"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Reenter Password:"
+                    android:paddingTop="10dp"
+                    android:textColor="@color/color3"
+                    android:id="@+id/pass2Label" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:inputType="textPassword"
+                    android:ems="10"
+                    android:background="@color/white"
+                    android:id="@+id/pass2"
+                    android:text="password"/>
+            </LinearLayout>
 
             <Button
-                android:layout_width="match_parent"
+                android:layout_width="200dp"
+                android:layout_gravity="center"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:text="CREATE ACCOUNT"
@@ -112,6 +116,6 @@
                 android:id="@+id/signUp" />
 
         </LinearLayout>
-    </ScrollView>
+
 
 </RelativeLayout>

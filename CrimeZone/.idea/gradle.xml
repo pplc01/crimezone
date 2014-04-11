@@ -9,10 +9,14 @@
           <set>
             <option value="G:\PPL\crimezone\CrimeZone" />
             <option value="G:\PPL\crimezone\CrimeZone\CrimeZone" />
+            <option value="G:\PPL\crimezone\CrimeZone\Libraries" />
+            <option value="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel" />
+            <option value="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library" />
           </set>
         </option>
       </GradleProjectSettings>
     </option>
+    <option name="offlineWork" value="true" />
   </component>
 </project>
 
