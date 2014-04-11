@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.google.android.gms.internal.av;
 import com.google.android.gms.maps.model.LatLng;
-
+import com.google.gson.annotations.SerializedName;
 /**
  * Created by adesudiman on 3/29/2014.
  */

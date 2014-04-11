@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +33,7 @@ import com.ppl.crimezone.R;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A login screen that offers login via email/password.
@@ -149,10 +151,11 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            //mAuthTask = new UserLoginTask(email, password);
-            //mAuthTask.execute((Void) null);
+            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask.execute((Void) null);
         }
     }
+
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");
@@ -286,32 +289,44 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask {
-
-            //extends AsyncTask<Void, Void, Boolean> {
-
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mUser;
         private final String mPassword;
+        private final String LOGIN_URL = "http://crimezone.besaba.com/webservice/login.php";
+
+        GsonParser parser = new GsonParser();
 
         UserLoginTask(String user, String password) {
             mUser = user;
             mPassword = password;
         }
-        /*
+
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... args) {
             // TODO: attempt authentication against a network service.
 
             try {
                 //Building parameters
-                //List<NameValuePair> params = new ArrayList<NameValuePair>();
-                //params.add(new BasicNameValuePair("user", mUser));
-                //params.add(new BasicNameValuePair("password", mPassword));
-            } catch (InterruptedException e) {
-                return false;
-            } catch (JSONException e) {
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("user", mUser));
+                params.add(new BasicNameValuePair("password", mPassword));
 
+                Log.d("Request", "Starting");
+
+                JSONObject json = parser.makeHTTPRequest(LOGIN_URL, "POST", params);
+
+                Log.d("Login attempt", json.toString());
+
+                //json success
+                
+            } catch (Exception e) {
+                return false;
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
@@ -325,8 +340,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             // TODO: register the new account here.
             return true;
         }
-        */
-        /*
+
+
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
@@ -344,7 +359,7 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
-        }*/
+        }
     }
 }
 

@@ -20,24 +20,155 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/headline"
-                android:text="Headline" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:ems="10"
-                android:id="@+id/description"
-                android:text="Description" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@string/color1"
+                    android:src="@drawable/mk"
+                    android:id="@+id/findaddress" />
 
-            <ScrollView
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@string/color2"
+                    android:textSize="20dp"
+                    android:text="Address"
+                    android:id="@+id/location" />
+            </LinearLayout>
+
+            <HorizontalScrollView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/scrollView2" />
+                android:id="@+id/horizontalScrollView" >
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginTop="10dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/drugs"
+                        android:src="@drawable/ic_drugs" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/burglary"
+                        android:src="@drawable/ic_burglary" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/homicide"
+                        android:src="@drawable/ic_homicide" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/kidnap"
+                        android:src="@drawable/ic_kidnap" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/sxassault"
+                        android:src="@drawable/ic_sxassault" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/theft"
+                        android:src="@drawable/ic_theft" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/vehicletheft"
+                        android:src="@drawable/ic_vehicletheft" />
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@string/color1"
+                        android:id="@+id/violence"
+                        android:src="@drawable/ic_violence" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@string/color3"
+                android:id="@+id/headline"
+                android:layout_marginTop="10dp"
+                android:text="Headline" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:id="@+id/scrollView2" >
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textMultiLine"
+                    android:textColor="@string/color3"
+                    android:ems="10"
+                    android:id="@+id/description"
+                    android:text="Description" />
+            </ScrollView>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date"
+                    android:textSize="20dp"
+                    android:textColor="@string/color3"
+                    android:id="@+id/textView" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:textAlignment="textEnd"
+                    android:inputType="date"
+                    android:background="@string/color3"
+                    android:ems="10"
+                    android:id="@+id/inputdate"
+                    android:text=" YYYY-MM-DD" />
+            </LinearLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:background="@string/color4"
+                android:layout_height="wrap_content"
+                android:text="Submit Report"
+                android:id="@+id/button" />
 
         </LinearLayout>
     </ScrollView>

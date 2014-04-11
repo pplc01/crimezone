@@ -20,8 +20,7 @@
     <string name="color3">#2c2034</string>
     <string name="color4">#348bd3</string>
     <string name="color5">#f2e019</string>
-
     <string name="action_search">Search Location</string>
-
+    <string name="title_activity_report">Report</string>
 
 </resources>
