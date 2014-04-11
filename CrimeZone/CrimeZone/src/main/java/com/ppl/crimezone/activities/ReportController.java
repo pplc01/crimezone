@@ -1,25 +1,34 @@
 package com.ppl.crimezone.activities;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
+import android.os.Handler;
+import android.os.Message;
+
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,19 +39,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
-import com.ppl.crimezone.model.CrimeReport;
+import com.ppl.crimezone.fragments.DatePickerDialogFragment;
+import com.ppl.crimezone.fragments.TimePickerDialogFragment;
 
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReportController extends ActionBarActivity {
+public class ReportController extends FragmentActivity {
 
     //variable for point to the map
     private GoogleMap reportMap = null;
-    private LatLng location;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private Marker placeMarker;
@@ -63,6 +72,38 @@ public class ReportController extends ActionBarActivity {
 
 
     public boolean newReportMode = false;
+    /*
+        for new Report
+     */
+    DatePickerDialog.OnDateSetListener ondate;
+    Button crimeDate;
+    Button crimeStartTime;
+    Button crimeEndTime;
+    FrameLayout mapContainer;
+
+
+    int hour_start = 15;
+    int minute_start = 15;
+
+    int hour_end = 15;
+    int minute_end = 15;
+
+    int year;
+    int month;
+    int day;
+
+    private LatLng location;
+
+    EditText titleEditText;
+    String title;
+
+    EditText descriptionEditText;
+    String description;
+
+    /** This handles the message send from TimePickerDialogFragment on setting Time */
+    Handler timeStartHandler;
+    Handler timeEndHandler;
+    Handler dateHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,63 +117,238 @@ public class ReportController extends ActionBarActivity {
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
             showReportForm();
+            crimeDate = (Button)findViewById(R.id.crime_date);
+
+
+
+            titleEditText = (EditText) findViewById(R.id.headline);
+            descriptionEditText = (EditText) findViewById(R.id.description);
+            crimeStartTime = (Button) findViewById(R.id.crime_time_start);
+            crimeEndTime = (Button) findViewById(R.id.crime_time_end);
+            mapContainer = (FrameLayout)findViewById(R.id.map_container);
+            titleEditText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    collapse(mapContainer);
+                }
+
+            });
+
+            descriptionEditText.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    collapse(mapContainer);
+                }
+            });
+
+            Calendar cal = Calendar.getInstance();
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);
+            day = cal.get(Calendar.DATE);
+
+            hour_end = cal.get(Calendar.HOUR);
+            minute_end = cal.get(Calendar.MINUTE);
+
+            hour_start = cal.get(Calendar.HOUR);
+            minute_start = cal.get(Calendar.MINUTE);
+
+            dateHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the year from bundle */
+                    year = b.getInt("set_year");
+
+                    /** Getting the month from bundle */
+                    month = b.getInt("set_month");
+
+                    /** Getting the day from bundle */
+                    day = b.getInt("set_day");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeDate.setText(month+"/"+day+"/"+year);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener dateListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_year", year);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_month", month);
+
+                    b.putInt("set_day", day);
+                    /** Instantiating TimePickerDialogFragment */
+                    DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    datePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(datePicker, "date_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+
+
+
+            timeStartHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the Hour of day from bundle */
+                    hour_start = b.getInt("set_hour");
+
+                    /** Getting the Minute of the hour from bundle */
+                    minute_start = b.getInt("set_minute");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeStartTime.setText(hour_start + ":" + minute_start);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener timeStartListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_hour", hour_start);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_minute", minute_start);
+
+                    /** Instantiating TimePickerDialogFragment */
+                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    timePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(timePicker, "time_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+
+            timeEndHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the Hour of day from bundle */
+                    hour_end = b.getInt("set_hour");
+
+                    /** Getting the Minute of the hour from bundle */
+                    minute_end = b.getInt("set_minute");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeEndTime.setText(hour_end+":"+minute_end);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener timeEndListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_hour", hour_start);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_minute", minute_start);
+
+                    /** Instantiating TimePickerDialogFragment */
+                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    timePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(timePicker, "time_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+            crimeDate.setOnClickListener(dateListener);
+            crimeStartTime.setOnClickListener(timeStartListener);
+            crimeEndTime.setOnClickListener(timeEndListener);
+
+
         }else{
 
         }
     }
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        // Inflate the menu items for use in the action bar
-        if(newReportMode) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.new_report_menu_bar, menu);
-            return super.onCreateOptionsMenu(menu);
-        }
-        else{
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.map_controller_actions, menu);
-            return super.onCreateOptionsMenu(menu);
-        }
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.action_report:
-                openReport();
-                return true;
-            case R.id.action_settings:
-                openSettings();
-                return true;
-            case R.id.settings:
-                openSettings();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
-    public void openReport()
-    {
-        String PREFS_NAME = "ReporControllerMode";
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("NewReportMode", true);
 
-        // Commit the edits!
-        editor.commit();
 
-        Intent intent = new Intent(this, ReportController.class);
-        startActivity(intent);
-    }
+    public void setUpMarkerListener(){
+        reportMap.setOnMarkerDragListener(
+          new GoogleMap.OnMarkerDragListener()
+          {
+              @Override
+              public void onMarkerDragStart(Marker marker) {}
 
-    public void openSettings()
-    {
+              @Override
+              public void onMarkerDrag(Marker marker) {}
 
+              @Override
+              public void onMarkerDragEnd(Marker marker) {
+                location = marker.getPosition();
+              }
+          }
+
+        );
     }
 
 
@@ -144,6 +360,7 @@ public class ReportController extends ActionBarActivity {
             updateLocationUser();
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
             setUpSearchLocation();
+            setUpMarkerListener();
         }
     }
 
@@ -171,7 +388,7 @@ public class ReportController extends ActionBarActivity {
                 place.position(location);
                 place.title("Crime Location");
                 place.snippet("Latitude:"+location.latitude+",Longitude:"+location.longitude);
-
+                place.draggable(true);
                 // Adding the marker in the Google Map
                 placeMarker = reportMap.addMarker(place);
 
@@ -193,8 +410,11 @@ public class ReportController extends ActionBarActivity {
             searchLocation = (AutoCompleteTextView) findViewById(R.id.crime_location);
             setUpSearchLocationListener();
             searchLocation.setThreshold(1);
+
         }
     }
+
+
 
     private void setUpSearchLocationListener(){
         // Adding textchange listener
@@ -246,6 +466,16 @@ public class ReportController extends ActionBarActivity {
                 placeDetailsDownloadTask.execute(url);
             }
         });
+
+
+        searchLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expand(mapContainer);
+            }
+
+        });
+
     }
 
 
@@ -381,7 +611,7 @@ public class ReportController extends ActionBarActivity {
                     place.position(location);
                     place.title("Crime Location");
                     place.snippet("Latitude:"+location.latitude+",Longitude:"+location.longitude);
-
+                    place.draggable(true);
                     // Adding the marker in the Google Map
                     placeMarker = reportMap.addMarker(place);
                     break;
@@ -392,4 +622,71 @@ public class ReportController extends ActionBarActivity {
     private boolean submitForm(){
         return false;
     }
+
+
+
+
+
+
+
+    /*
+    for collapsing and expanding the map
+     */
+    public static void expand(final ViewGroup v) {
+
+        v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        final int targtetHeight = v.getMeasuredHeight();
+
+        v.getLayoutParams().height = 0;
+        v.setVisibility(View.VISIBLE);
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? ViewGroup.LayoutParams.WRAP_CONTENT
+                        : (int)(targtetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
+    public static void collapse(final ViewGroup v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                if(interpolatedTime == 1){
+                    v.setVisibility(View.GONE);
+                }else{
+                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                    v.requestLayout();
+                }
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 1dp/ms
+        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
+        v.startAnimation(a);
+    }
+
 }
+
+
+

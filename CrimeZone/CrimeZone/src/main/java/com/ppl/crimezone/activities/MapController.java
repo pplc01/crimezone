@@ -203,8 +203,6 @@ public class MapController extends ActionBarActivity {
                         }
                     }
                 );
-
-
     }
 
     //set the map to point to current user location
