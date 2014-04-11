@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/blue"
-            android:src="@drawable/rate"
+            android:src="@drawable/r_star"
             android:layout_marginRight="20dp"
             android:id="@+id/b_rate"
             android:layout_gravity="right|center_vertical" />
@@ -118,7 +118,28 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"></LinearLayout>
+                    android:layout_height="fill_parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/type1" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/type2" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/type3" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/type4" />
+                </LinearLayout>
             </HorizontalScrollView>
 
             <LinearLayout
