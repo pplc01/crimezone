@@ -1,5 +1,44 @@
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="fill_parent"
+    android:background="@color/cream"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"></LinearLayout>
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="63dp"
+        android:background="@color/blue">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/back"
+            android:src="@drawable/back"
+            android:background="@color/blue"
+            android:layout_marginLeft="15dp"
+            android:layout_gravity="left|center_vertical" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings"
+            android:src="@drawable/ic_settings"
+            android:background="@color/blue"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="right|center_vertical" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/scrollView" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
