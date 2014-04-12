@@ -387,7 +387,7 @@ public class ReportController extends FragmentActivity {
     }
 
     private void setUpButtonListener(){
-        ImageButton  type [] = new ImageButton[8];
+        final ImageButton  type [] = new ImageButton[8];
         type[0] = (ImageButton) findViewById(R.id.drugs);
         type[1] = (ImageButton) findViewById(R.id.burglary);
         type[2] = (ImageButton) findViewById(R.id.homicide);
@@ -396,27 +396,124 @@ public class ReportController extends FragmentActivity {
         type[5] = (ImageButton) findViewById(R.id.theft);
         type[6] = (ImageButton) findViewById(R.id.vehicletheft);
         type[7] = (ImageButton) findViewById(R.id.violence);
-        /*
-        for(int ii=0; ii<9; ++ii) {
-            final int finalIi = ii;
-            type[ii].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(newReportCrimeType[finalIi]){
-                        newReportCrimeType[finalIi
-                        newReportCrimeType[finalIi] = newReportCrimeType[finalIi] ?false:true;
-                    }
-            });
-        }*/
+
+        type[0].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[0]) {
+                                               type[0].setImageResource(R.drawable.nc_drugs);
+                                               newReportCrimeType[0] = false;
+                                           }else{
+                                               type[0].setImageResource(R.drawable.ic_drugs);
+                                               newReportCrimeType[0] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[1].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[1]) {
+                                               type[1].setImageResource(R.drawable.nc_burglary);
+                                               newReportCrimeType[1] = false;
+                                           }else{
+                                               type[1].setImageResource(R.drawable.ic_burglary);
+                                               newReportCrimeType[1] = true;
+                                           }
+                                       }
+                                   }
+        );
+
+        type[2].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[2]) {
+                                               type[2].setImageResource(R.drawable.nc_homicide);
+                                               newReportCrimeType[2] = false;
+                                           }else{
+                                               type[2].setImageResource(R.drawable.ic_homicide);
+                                               newReportCrimeType[2] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[3].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[3]) {
+                                               type[3].setImageResource(R.drawable.nc_kidnap);
+                                               newReportCrimeType[3] = false;
+                                           }else{
+                                               type[3].setImageResource(R.drawable.ic_kidnap);
+                                               newReportCrimeType[3] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[4].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[4]) {
+                                               type[4].setImageResource(R.drawable.nc_sxassault);
+                                               newReportCrimeType[4] = false;
+                                           }else{
+                                               type[4].setImageResource(R.drawable.ic_sxassault);
+                                               newReportCrimeType[4] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[5].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[5]) {
+                                               type[5].setImageResource(R.drawable.nc_theft);
+                                               newReportCrimeType[5] = false;
+                                           }else{
+                                               type[5].setImageResource(R.drawable.ic_theft);
+                                               newReportCrimeType[5] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[6].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[6]) {
+                                               type[6].setImageResource(R.drawable.nc_vehicletheft);
+                                               newReportCrimeType[6] = false;
+                                           }else{
+                                               type[6].setImageResource(R.drawable.ic_vehicletheft);
+                                               newReportCrimeType[6] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[7].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[7]) {
+                                               type[7].setImageResource(R.drawable.nc_violence);
+                                               newReportCrimeType[7] = false;
+                                           }else{
+                                               type[7].setImageResource(R.drawable.ic_violence);
+                                               newReportCrimeType[7] = true;
+                                           }
+                                       }
+                                   }
+        );
+
 
     }
+
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initReportMode();
 
-        newReportMode = false;
+        newReportMode = true;
 
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
@@ -834,6 +931,7 @@ public class ReportController extends FragmentActivity {
         }else if(timeEnd.getText().toString().equals("End")){
             timeEnd.performClick();
             Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
+
         }else {
 
         }

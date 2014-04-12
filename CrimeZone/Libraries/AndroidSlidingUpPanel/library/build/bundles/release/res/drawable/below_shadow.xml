@@ -5,8 +5,4 @@
         android:endColor="@android:color/transparent"
         android:angle="270" >
     </gradient>
-<<<<<<< HEAD
 </shape><!-- From: file:/C:/Users/adesudiman/AndroidStudioProjects/ppl/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/below_shadow.xml -->
-=======
-</shape><!-- From: file:/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/below_shadow.xml -->
->>>>>>> d3a81f54c6c61dbabab1ec3066d80221838c3b12
