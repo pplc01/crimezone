@@ -522,7 +522,7 @@ public class ReportController extends FragmentActivity {
             showTimeDialog();
             autoCollapsExpandMap();
             //seFtUpBottonListener();
-            submitForm();
+            //submitForm();
         }else{
             setContentView(R.layout.report_detail_ui);
             final ImageButton giveRatingButton = (ImageButton) findViewById(R.id.b_rate);
