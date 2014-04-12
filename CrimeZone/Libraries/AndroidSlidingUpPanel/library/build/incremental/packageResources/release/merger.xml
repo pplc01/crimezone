@@ -2,19 +2,19 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res" >
+        <source path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res" >
             <file
                 name="above_shadow"
-                path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\drawable\above_shadow.xml"
+                path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/above_shadow.xml"
                 qualifiers=""
                 type="drawable" />
             <file
                 name="below_shadow"
-                path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\drawable\below_shadow.xml"
+                path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/below_shadow.xml"
                 qualifiers=""
                 type="drawable" />
             <file
-                path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\values\attrs.xml"
+                path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/values/attrs.xml"
                 qualifiers="" >
                 <declare-styleable name="SlidingUpPanelLayout" >
                     <attr
@@ -41,11 +41,11 @@
                 </declare-styleable>
             </file>
         </source>
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\build\res\rs\release" />
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\build\res\generated\release" />
+        <source path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/build/res/rs/release" />
+        <source path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/build/res/generated/release" />
     </dataSet>
     <dataSet config="release" >
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\src\release\res" />
+        <source path="/Users/tanya/Documents/ProjectCrimeZone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/src/release/res" />
     </dataSet>
 
 </merger>

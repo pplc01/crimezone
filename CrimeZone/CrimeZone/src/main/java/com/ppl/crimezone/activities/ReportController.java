@@ -17,7 +17,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -27,7 +26,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -43,7 +41,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 import com.ppl.crimezone.fragments.TimePickerDialogFragment;
-import com.ppl.crimezone.model.CrimeReport;
 
 import org.json.JSONObject;
 
@@ -71,6 +68,7 @@ public class ReportController extends FragmentActivity {
     final int PLACES=0;
     final int PLACES_DETAILS=1;
 
+    public static final String PREFS_NAME = "ReporControllerMode";
 
 
     public boolean newReportMode = false;
@@ -78,6 +76,10 @@ public class ReportController extends FragmentActivity {
         for new Report
      */
     DatePickerDialog.OnDateSetListener ondate;
+    Button crimeDate;
+    Button crimeStartTime;
+    Button crimeEndTime;
+    FrameLayout mapContainer;
 
 
     int hour_start = 15;
@@ -98,306 +100,232 @@ public class ReportController extends FragmentActivity {
     EditText descriptionEditText;
     String description;
 
-
-
-
-
-    /*
-        Variable for view detail report mode
-     */
-
-    CrimeReport detail;
-    CrimeReport newCrimeReport;
-
-
-
-    private void initReportMode(){
-        final String PREFS_NAME = "ReporControllerMode";
-
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-
-        newReportMode =  settings.getBoolean("NewReportMode", false);
-    }
-
-    private void initWriteListener(){
-
-    }
-
-    private void showDateDialog(){
-        final Button crimeDate = (Button)findViewById(R.id.crime_date);
-        Calendar cal = Calendar.getInstance();
-        year = cal.get(Calendar.YEAR);
-        month = cal.get(Calendar.MONTH);
-        day = cal.get(Calendar.DATE);
-        final Handler dateHandler= new Handler(){
-            @Override
-            public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
-                Bundle b = m.getData();
-
-                /** Getting the year from bundle */
-                year = b.getInt("set_year");
-
-                /** Getting the month from bundle */
-                month = b.getInt("set_month");
-
-                /** Getting the day from bundle */
-                day = b.getInt("set_day");
-
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeDate.setText(month+"/"+day+"/"+year);
-            }
-        };
-
-        /** Click Event Handler for button */
-        View.OnClickListener dateListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_year", year);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_month", month);
-
-                b.putInt("set_day", day);
-                /** Instantiating TimePickerDialogFragment */
-                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateHandler);
-
-                /** Setting the bundle object on timepicker fragment */
-                datePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
-                FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
-                FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
-                ft.add(datePicker, "date_picker");
-
-                /** Opening the TimePicker fragment */
-                ft.commit();
-            }
-        };
-        crimeDate.setOnClickListener(dateListener);
-    }
-
-
-    private void showTimeDialog(){
-        final Button crimeStartTime = (Button) findViewById(R.id.crime_time_start);
-        final Button crimeEndTime = (Button) findViewById(R.id.crime_time_end);
-        Calendar cal = Calendar.getInstance();
-
-        hour_end = cal.get(Calendar.HOUR);
-        minute_end = cal.get(Calendar.MINUTE);
-
-        hour_start = cal.get(Calendar.HOUR);
-        minute_start = cal.get(Calendar.MINUTE);
-
-
-        final Handler timeStartHandler= new Handler(){
-            @Override
-            public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
-                Bundle b = m.getData();
-
-                /** Getting the Hour of day from bundle */
-                hour_start = b.getInt("set_hour");
-
-                /** Getting the Minute of the hour from bundle */
-                minute_start = b.getInt("set_minute");
-
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeStartTime.setText(hour_start + ":" + minute_start);
-
-            }
-        };
-
-
-
-        /** Click Event Handler for button */
-        View.OnClickListener timeStartListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_hour", hour_start);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_minute", minute_start);
-
-                /** Instantiating TimePickerDialogFragment */
-                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
-
-                /** Setting the bundle object on timepicker fragment */
-                timePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
-                FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
-                FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
-                ft.add(timePicker, "time_picker");
-
-                /** Opening the TimePicker fragment */
-                ft.commit();
-            }
-        };
-
-        final Handler timeEndHandler= new Handler(){
-            @Override
-            public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
-                Bundle b = m.getData();
-
-                /** Getting the Hour of day from bundle */
-                hour_end = b.getInt("set_hour");
-
-                /** Getting the Minute of the hour from bundle */
-                minute_end = b.getInt("set_minute");
-
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeEndTime.setText(hour_end+":"+minute_end);
-
-            }
-        };
-
-
-
-        /** Click Event Handler for button */
-        View.OnClickListener timeEndListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_hour", hour_start);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_minute", minute_start);
-
-                /** Instantiating TimePickerDialogFragment */
-                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
-
-                /** Setting the bundle object on timepicker fragment */
-                timePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
-                FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
-                FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
-                ft.add(timePicker, "time_picker");
-
-                /** Opening the TimePicker fragment */
-                ft.commit();
-            }
-        };
-
-        crimeStartTime.setOnClickListener(timeStartListener);
-        crimeEndTime.setOnClickListener(timeEndListener);
-
-    }
-
-
-    private void autoCollapsExpandMap(){
-        final LinearLayout mapContainer;
-        titleEditText = (EditText) findViewById(R.id.headline);
-        descriptionEditText = (EditText) findViewById(R.id.description);
-        mapContainer = (LinearLayout)findViewById(R.id.map_frame);
-
-        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
-                    parms.height = 0;
-                    // Set it back.
-                    mapContainer.setLayoutParams(parms);
-                }else{
-                    Display display = getWindowManager().getDefaultDisplay();
-                    int screen_height = display.getHeight();
-                    screen_height = (int) (0.3*screen_height);
-                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
-                    parms.height = screen_height;
-                    // Set it back.
-                    mapContainer.setLayoutParams(parms);
-                }
-            }
-        });
-
-        titleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
-                    parms.height = 0;
-                    // Set it back.
-                    mapContainer.setLayoutParams(parms);
-                }else{
-                    Display display = getWindowManager().getDefaultDisplay();
-                    int screen_height = display.getHeight();
-                    screen_height = (int) (0.3*screen_height);
-                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
-                    parms.height = screen_height;
-                    // Set it back.
-                    mapContainer.setLayoutParams(parms);
-                }
-            }
-        });
-
-        searchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                    Display display = getWindowManager().getDefaultDisplay();
-                    int screen_height = display.getHeight();
-                    screen_height = (int) (0.3*screen_height);
-                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
-                    parms.height = screen_height;
-                    // Set it back.
-                    mapContainer.setLayoutParams(parms);
-                }
-            }
-        });
-
-        searchLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expand(mapContainer);
-            }
-        });
-
-    }
-
+    /** This handles the message send from TimePickerDialogFragment on setting Time */
+    Handler timeStartHandler;
+    Handler timeEndHandler;
+    Handler dateHandler;
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        initReportMode();
+        newReportMode = settings.getBoolean("NewReportMode", false);
+
+        Log.d("Report Mode", newReportMode+"");
 
 
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
-            showMap();
-            showDateDialog();
-            showTimeDialog();
-            autoCollapsExpandMap();
-            submitForm();
+            showReportForm();
+            crimeDate = (Button)findViewById(R.id.crime_date);
+
+
+
+            titleEditText = (EditText) findViewById(R.id.headline);
+            descriptionEditText = (EditText) findViewById(R.id.description);
+            crimeStartTime = (Button) findViewById(R.id.crime_time_start);
+            crimeEndTime = (Button) findViewById(R.id.crime_time_end);
+            mapContainer = (FrameLayout)findViewById(R.id.map_container);
+            titleEditText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    collapse(mapContainer);
+                }
+
+            });
+
+            descriptionEditText.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    collapse(mapContainer);
+                }
+            });
+
+            Calendar cal = Calendar.getInstance();
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);
+            day = cal.get(Calendar.DATE);
+
+            hour_end = cal.get(Calendar.HOUR);
+            minute_end = cal.get(Calendar.MINUTE);
+
+            hour_start = cal.get(Calendar.HOUR);
+            minute_start = cal.get(Calendar.MINUTE);
+
+            dateHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the year from bundle */
+                    year = b.getInt("set_year");
+
+                    /** Getting the month from bundle */
+                    month = b.getInt("set_month");
+
+                    /** Getting the day from bundle */
+                    day = b.getInt("set_day");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeDate.setText(month+"/"+day+"/"+year);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener dateListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_year", year);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_month", month);
+
+                    b.putInt("set_day", day);
+                    /** Instantiating TimePickerDialogFragment */
+                    DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    datePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(datePicker, "date_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+
+
+
+            timeStartHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the Hour of day from bundle */
+                    hour_start = b.getInt("set_hour");
+
+                    /** Getting the Minute of the hour from bundle */
+                    minute_start = b.getInt("set_minute");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeStartTime.setText(hour_start + ":" + minute_start);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener timeStartListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_hour", hour_start);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_minute", minute_start);
+
+                    /** Instantiating TimePickerDialogFragment */
+                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    timePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(timePicker, "time_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+
+            timeEndHandler= new Handler(){
+                @Override
+                public void handleMessage(Message m){
+                    /** Creating a bundle object to pass currently set Time to the fragment */
+                    Bundle b = m.getData();
+
+                    /** Getting the Hour of day from bundle */
+                    hour_end = b.getInt("set_hour");
+
+                    /** Getting the Minute of the hour from bundle */
+                    minute_end = b.getInt("set_minute");
+
+                    /** Displaying a short time message containing time set by Time picker dialog fragment */
+                    crimeEndTime.setText(hour_end+":"+minute_end);
+
+                }
+            };
+
+
+
+            /** Click Event Handler for button */
+            View.OnClickListener timeEndListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
+
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_hour", hour_start);
+
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_minute", minute_start);
+
+                    /** Instantiating TimePickerDialogFragment */
+                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
+
+                    /** Setting the bundle object on timepicker fragment */
+                    timePicker.setArguments(b);
+
+                    /** Getting fragment manger for this activity */
+                    FragmentManager fm = getSupportFragmentManager();
+
+                    /** Starting a fragment transaction */
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    /** Adding the fragment object to the fragment transaction */
+                    ft.add(timePicker, "time_picker");
+
+                    /** Opening the TimePicker fragment */
+                    ft.commit();
+                }
+            };
+            crimeDate.setOnClickListener(dateListener);
+            crimeStartTime.setOnClickListener(timeStartListener);
+            crimeEndTime.setOnClickListener(timeEndListener);
+
+
         }else{
-            setContentView(R.layout.report_detail_ui);
+
         }
     }
 
@@ -424,7 +352,7 @@ public class ReportController extends FragmentActivity {
     }
 
 
-    public void showMap(){
+    public void showReportForm(){
         if(reportMap == null) {
             reportMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.new_report_map)).getMap();
             reportMap.setMyLocationEnabled(true);
@@ -538,6 +466,16 @@ public class ReportController extends FragmentActivity {
                 placeDetailsDownloadTask.execute(url);
             }
         });
+
+
+        searchLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expand(mapContainer);
+            }
+
+        });
+
     }
 
 
