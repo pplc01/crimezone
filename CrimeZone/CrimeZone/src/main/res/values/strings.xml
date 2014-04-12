@@ -9,15 +9,19 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_basic_map">BasicMapActivity</string>
+    <string name="title_activity_map_controller">MapController</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_user_profile">UserProfile</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_report_controller">ReportController</string>
+    <string name="color1">#eeece4</string>
+    <string name="color2">#e32424</string>
+    <string name="color3">#2c2034</string>
+    <string name="color4">#348bd3</string>
+    <string name="color5">#f2e019</string>
     <string name="action_search">Search Location</string>
-    <string name="search_hint">Search Places</string>
-    <string name="search_settings">Search Places</string>
     <string name="title_activity_report">Report</string>
     <string name="str_atv_places">Enter Place Here</string>
+
 </resources>

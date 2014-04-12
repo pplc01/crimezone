@@ -44,28 +44,35 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
                     android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="Medium Text"
-                    android:id="@+id/textView" />
+                    android:text="Email Address"
+                    android:textColor="@color/dark"/>
 
                 <AutoCompleteTextView
                     android:id="@+id/email"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:layout_marginTop="10dp"
                     android:background="@color/white"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"/>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Password"
+                    android:textColor="@color/dark"
+                    android:layout_marginTop="10dp"/>
+
                 <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:hint="@string/prompt_password"
-                    android:background="@color/white"
-                    android:layout_marginTop="10dp"
+                    android:background="@color/white""
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -76,10 +83,19 @@
                 <Button
                     android:id="@+id/email_sign_in_button"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:layout_marginTop="16dp"
-                    android:background="#348bd3"
+                    android:background="@color/blue"
                     android:text="@string/action_sign_in"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="10dp"
+                    android:text="CREATE ACCOUNT"
+                    android:background="@color/red"
+                    android:id="@+id/signin"
+                    android:layout_gravity="center_horizontal" />
 
             </LinearLayout>
     </ScrollView>

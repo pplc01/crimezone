@@ -9,7 +9,6 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
-    private String getUsernam;
     private boolean twiiterLoginStatus;
     private boolean fbLoginStatus;
 
