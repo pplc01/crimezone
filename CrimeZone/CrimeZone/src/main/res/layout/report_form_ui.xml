@@ -11,7 +11,6 @@
 
     <FrameLayout
         android:layout_width="fill_parent"
-        android:id="@+id/map_container"
         android:background="@color/blue"
         android:layout_height="63dp">
 
@@ -68,24 +67,20 @@
 
     </LinearLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:id="@+id/map_frame"
         >
+
         <fragment
             android:id="@+id/new_report_map"
             android:layout_width="match_parent"
-            android:layout_height="150dp"
+            android:layout_height = "match_parent"
             class="com.google.android.gms.maps.SupportMapFragment"
             tools:layout="@layout/report_form_ui" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="120dp"
-            android:id="@+id/expandMap" />
-    </FrameLayout>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
