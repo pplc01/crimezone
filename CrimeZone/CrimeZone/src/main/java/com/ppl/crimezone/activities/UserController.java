@@ -6,13 +6,16 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build.VERSION;
 import android.os.Build;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
@@ -26,14 +29,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import java.util.ArrayList;
-import java.util.List;
+
 import com.ppl.crimezone.R;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A login screen that offers login via email/password.
@@ -58,6 +63,14 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private static final String MYPREFERENCES = "UserAccount";
+    private static final String NAME = "nameKey";
+    private static final String USERNAME = "usernameKey";
+    private static final String EMAIL = "emailKey";
+    private static final String DATEJOIN = "joinKey";
+    private static final String SEX = "sexKey";
+    private static final String OCCUPATION = "occuKey";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +176,7 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 0;
     }
 
     /**
@@ -212,7 +225,7 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
                 // Select only email addresses.
                 ContactsContract.Contacts.Data.MIMETYPE +
                         " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                                                                     .CONTENT_ITEM_TYPE},
+                .CONTENT_ITEM_TYPE},
 
                 // Show primary email addresses first. Note that there won't be
                 // a primary email address if the user hasn't specified one.
@@ -270,10 +283,10 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             return emailAddressCollection;
         }
 
-	    @Override
-	    protected void onPostExecute(List<String> emailAddressCollection) {
-	       addEmailsToAutoComplete(emailAddressCollection);
-	    }
+        @Override
+        protected void onPostExecute(List<String> emailAddressCollection) {
+            addEmailsToAutoComplete(emailAddressCollection);
+        }
     }
 
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
@@ -295,6 +308,9 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
         private final String mPassword;
         private final String LOGIN_URL = "http://crimezone.besaba.com/webservice/login.php";
 
+        private static final String TAG_SUCCESS = "success";
+        private static final String TAG_MESSAGE = "message";
+
         GsonParser parser = new GsonParser();
 
         UserLoginTask(String user, String password) {
@@ -311,6 +327,8 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
         protected Boolean doInBackground(Void... args) {
             // TODO: attempt authentication against a network service.
 
+            int success;
+
             try {
                 //Building parameters
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -324,21 +342,27 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
                 Log.d("Login attempt", json.toString());
 
                 //json success
-                
+                success = json.getInt(TAG_SUCCESS);
+                if(success == 1){
+                    Log.d("Login successful", json.toString());
+
+                    //set shared preferences
+                    setSharedPreference(json);
+
+                    //start activity
+                    Intent i = new Intent(UserController.this, MapController.class);
+                    finish();
+                    startActivity(i);
+
+                    return true;
+                }else{
+                    Log.d("Login failure", json.toString());
+                    return false;
+                }
             } catch (Exception e) {
+                Log.d("ERROR", e.toString());
                 return false;
             }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUser)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
         }
 
 
@@ -360,8 +384,20 @@ public class UserController extends Activity implements LoaderCallbacks<Cursor>{
             mAuthTask = null;
             showProgress(false);
         }
+
+        protected void setSharedPreference(JSONObject obj){
+            SharedPreferences sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            try{
+                editor.putString(NAME, obj.getString("firstname")+" "+obj.getString("lastname"));
+                editor.putString(EMAIL, obj.getString("email"));
+                editor.putString(USERNAME, obj.getString("username"));
+                editor.putString(DATEJOIN, obj.getString("join_date"));
+                editor.putString(SEX, obj.getString("sex"));
+                editor.putString(OCCUPATION, obj.getString("occupation"));
+            }catch(JSONException e){
+                Log.e("Json Parsing Error", e.toString());
+            }
+        }
     }
 }
-
-
-
