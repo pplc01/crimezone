@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
 
+
 /**
  * Created by adesudiman on 4/6/2014.
  */
@@ -19,20 +20,21 @@ public class CrimeReport {
     private String title;
 
     @SerializedName("time_start")
-    private Date crimeDateStart;
+    private Date crimeTimeStart;
     @SerializedName("time_end")
-    private Date crimeDateEnd;
+    private Date crimeTimeEnd;
     private String [] categories;
 
+    private Date crimeDate;
     @SerializedName("x_coordinate")
     private double latitude;
     @SerializedName("y_coordinate")
     private double longitude;
 
-    public CrimeReport(int idReport, String title, Date reportDate, Date start, Date end, String description, String[] categories, double latitude, double langtitude, double avgScore){
+    public CrimeReport(int idReport, String title, Date reportDate, Date start, Date end, String description, String[] categories, double latitude, double longitude, double avgScore){
         this.title = title;
-        crimeDateStart = start;
-        crimeDateEnd = end;
+        crimeDate = start;
+
         this.categories = categories;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -40,6 +42,10 @@ public class CrimeReport {
         this.reportDate = reportDate;
         this.description = description;
         this.avgScore = avgScore;
+    }
+
+    public CrimeReport(){
+
     }
 
     public int getIdReport(){
@@ -67,11 +73,11 @@ public class CrimeReport {
     }
 
     public Date getCrimeDateStart(){
-        return crimeDateStart;
+        return crimeTimeStart;
     }
 
     public Date getCrimeDateEnd(){
-        return crimeDateEnd;
+        return crimeTimeEnd;
     }
 
     public double getLatitude(){

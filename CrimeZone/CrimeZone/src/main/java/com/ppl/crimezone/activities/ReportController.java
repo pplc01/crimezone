@@ -1,7 +1,9 @@
 package com.ppl.crimezone.activities;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,6 +19,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -26,9 +29,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,9 +47,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 import com.ppl.crimezone.fragments.TimePickerDialogFragment;
-
+import com.ppl.crimezone.model.CrimeReport;
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -68,18 +75,11 @@ public class ReportController extends FragmentActivity {
     final int PLACES=0;
     final int PLACES_DETAILS=1;
 
-    public static final String PREFS_NAME = "ReporControllerMode";
-
-
-    public boolean newReportMode = false;
+    public boolean newReptMode = false;
     /*
         for new Report
      */
     DatePickerDialog.OnDateSetListener ondate;
-    Button crimeDate;
-    Button crimeStartTime;
-    Button crimeEndTime;
-    FrameLayout mapContainer;
 
 
     int hour_start = 15;
@@ -100,232 +100,522 @@ public class ReportController extends FragmentActivity {
     EditText descriptionEditText;
     String description;
 
-    /** This handles the message send from TimePickerDialogFragment on setting Time */
-    Handler timeStartHandler;
-    Handler timeEndHandler;
-    Handler dateHandler;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    Boolean newReportMode;
+    /*
+    Nama Shared Prefereces: UserAccount
+    Nama string usermae: usernameKey;
+     */
+
+
+
+    /*
+        Variable for view detail report mode
+     */
+
+    CrimeReport detail;
+    CrimeReport newCrimeReport;
+
+    boolean newReportCrimeType [] = new boolean [8];
+
+    private void initReportMode(){
+        final String PREFS_NAME = "ReporControllerMode";
+
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        newReportMode = settings.getBoolean("NewReportMode", false);
+        newReportMode =  settings.getBoolean("NewReportMode", false);
+    }
 
-        Log.d("Report Mode", newReportMode+"");
 
+    private void showDateDialog(){
+        final Button crimeDate = (Button)findViewById(R.id.crime_date);
+        Calendar cal = Calendar.getInstance();
+        year = cal.get(Calendar.YEAR);
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DATE);
+        final Handler dateHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the year from bundle */
+                year = b.getInt("set_year");
+
+                /** Getting the month from bundle */
+                month = b.getInt("set_month");
+
+                /** Getting the day from bundle */
+                day = b.getInt("set_day");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                crimeDate.setText(month+"/"+day+"/"+year);
+            }
+        };
+
+        /** Click Event Handler for button */
+        View.OnClickListener dateListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_year", year);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_month", month);
+
+                b.putInt("set_day", day);
+                /** Instantiating TimePickerDialogFragment */
+                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                datePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(datePicker, "date_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+        crimeDate.setOnClickListener(dateListener);
+    }
+
+
+    private void showTimeDialog(){
+        final Button crimeStartTime = (Button) findViewById(R.id.crime_time_start);
+        final Button crimeEndTime = (Button) findViewById(R.id.crime_time_end);
+        Calendar cal = Calendar.getInstance();
+
+        hour_end = cal.get(Calendar.HOUR);
+        minute_end = cal.get(Calendar.MINUTE);
+
+        hour_start = cal.get(Calendar.HOUR);
+        minute_start = cal.get(Calendar.MINUTE);
+
+
+        final Handler timeStartHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the Hour of day from bundle */
+                hour_start = b.getInt("set_hour");
+
+                /** Getting the Minute of the hour from bundle */
+                minute_start = b.getInt("set_minute");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                crimeStartTime.setText(hour_start + ":" + minute_start);
+
+            }
+        };
+
+
+
+        /** Click Event Handler for button */
+        View.OnClickListener timeStartListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_hour", hour_start);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_minute", minute_start);
+
+                /** Instantiating TimePickerDialogFragment */
+                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                timePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(timePicker, "time_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+
+        final Handler timeEndHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the Hour of day from bundle */
+                hour_end = b.getInt("set_hour");
+
+                /** Getting the Minute of the hour from bundle */
+                minute_end = b.getInt("set_minute");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                crimeEndTime.setText(hour_end+":"+minute_end);
+
+            }
+        };
+
+
+
+        /** Click Event Handler for button */
+        View.OnClickListener timeEndListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_hour", hour_start);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_minute", minute_start);
+
+                /** Instantiating TimePickerDialogFragment */
+                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                timePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(timePicker, "time_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+
+        crimeStartTime.setOnClickListener(timeStartListener);
+        crimeEndTime.setOnClickListener(timeEndListener);
+
+    }
+
+
+    private void autoCollapsExpandMap(){
+        final LinearLayout mapContainer;
+        titleEditText = (EditText) findViewById(R.id.headline);
+        descriptionEditText = (EditText) findViewById(R.id.description);
+        mapContainer = (LinearLayout)findViewById(R.id.map_frame);
+
+        descriptionEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
+                    parms.height = 0;
+                    // Set it back.
+                    mapContainer.setLayoutParams(parms);
+                }else{
+                    Display display = getWindowManager().getDefaultDisplay();
+                    int screen_height = display.getHeight();
+                    screen_height = (int) (0.3*screen_height);
+                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
+                    parms.height = screen_height;
+                    // Set it back.
+                    mapContainer.setLayoutParams(parms);
+                }
+            }
+        });
+
+        titleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
+                    parms.height = 0;
+                    // Set it back.
+                    mapContainer.setLayoutParams(parms);
+                }else{
+                    Display display = getWindowManager().getDefaultDisplay();
+                    int screen_height = display.getHeight();
+                    screen_height = (int) (0.3*screen_height);
+                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
+                    parms.height = screen_height;
+                    // Set it back.
+                    mapContainer.setLayoutParams(parms);
+                }
+            }
+        });
+
+        searchLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    Display display = getWindowManager().getDefaultDisplay();
+                    int screen_height = display.getHeight();
+                    screen_height = (int) (0.3*screen_height);
+                    LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
+                    parms.height = screen_height;
+                    // Set it back.
+                    mapContainer.setLayoutParams(parms);
+                }
+            }
+        });
+
+        searchLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expand(mapContainer);
+            }
+        });
+
+    }
+
+    private void setUpButtonListener(){
+        final ImageButton  type [] = new ImageButton[8];
+        type[0] = (ImageButton) findViewById(R.id.drugs);
+        type[1] = (ImageButton) findViewById(R.id.burglary);
+        type[2] = (ImageButton) findViewById(R.id.homicide);
+        type[3] = (ImageButton) findViewById(R.id.kidnap);
+        type[4] = (ImageButton) findViewById(R.id.sxassault);
+        type[5] = (ImageButton) findViewById(R.id.theft);
+        type[6] = (ImageButton) findViewById(R.id.vehicletheft);
+        type[7] = (ImageButton) findViewById(R.id.violence);
+
+        type[0].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[0]) {
+                                               type[0].setImageResource(R.drawable.nc_drugs);
+                                               newReportCrimeType[0] = false;
+                                           }else{
+                                               type[0].setImageResource(R.drawable.ic_drugs);
+                                               newReportCrimeType[0] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[1].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[1]) {
+                                               type[1].setImageResource(R.drawable.nc_burglary);
+                                               newReportCrimeType[1] = false;
+                                           }else{
+                                               type[1].setImageResource(R.drawable.ic_burglary);
+                                               newReportCrimeType[1] = true;
+                                           }
+                                       }
+                                   }
+        );
+
+        type[2].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[2]) {
+                                               type[2].setImageResource(R.drawable.nc_homicide);
+                                               newReportCrimeType[2] = false;
+                                           }else{
+                                               type[2].setImageResource(R.drawable.ic_homicide);
+                                               newReportCrimeType[2] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[3].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[3]) {
+                                               type[3].setImageResource(R.drawable.nc_kidnap);
+                                               newReportCrimeType[3] = false;
+                                           }else{
+                                               type[3].setImageResource(R.drawable.ic_kidnap);
+                                               newReportCrimeType[3] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[4].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[4]) {
+                                               type[4].setImageResource(R.drawable.nc_sxassault);
+                                               newReportCrimeType[4] = false;
+                                           }else{
+                                               type[4].setImageResource(R.drawable.ic_sxassault);
+                                               newReportCrimeType[4] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[5].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[5]) {
+                                               type[5].setImageResource(R.drawable.nc_theft);
+                                               newReportCrimeType[5] = false;
+                                           }else{
+                                               type[5].setImageResource(R.drawable.ic_theft);
+                                               newReportCrimeType[5] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[6].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[6]) {
+                                               type[6].setImageResource(R.drawable.nc_vehicletheft);
+                                               newReportCrimeType[6] = false;
+                                           }else{
+                                               type[6].setImageResource(R.drawable.ic_vehicletheft);
+                                               newReportCrimeType[6] = true;
+                                           }
+                                       }
+                                   }
+        );
+        type[7].setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View v) {
+                                           if (newReportCrimeType[7]) {
+                                               type[7].setImageResource(R.drawable.nc_violence);
+                                               newReportCrimeType[7] = false;
+                                           }else{
+                                               type[7].setImageResource(R.drawable.ic_violence);
+                                               newReportCrimeType[7] = true;
+                                           }
+                                       }
+                                   }
+        );
+
+
+    }
+
+
+
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        initReportMode();
+
+        newReportMode = true;
 
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
-            showReportForm();
-            crimeDate = (Button)findViewById(R.id.crime_date);
-
-
-
-            titleEditText = (EditText) findViewById(R.id.headline);
-            descriptionEditText = (EditText) findViewById(R.id.description);
-            crimeStartTime = (Button) findViewById(R.id.crime_time_start);
-            crimeEndTime = (Button) findViewById(R.id.crime_time_end);
-            mapContainer = (FrameLayout)findViewById(R.id.map_container);
-            titleEditText.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    collapse(mapContainer);
-                }
-
-            });
-
-            descriptionEditText.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View v) {
-                    collapse(mapContainer);
-                }
-            });
-
-            Calendar cal = Calendar.getInstance();
-            year = cal.get(Calendar.YEAR);
-            month = cal.get(Calendar.MONTH);
-            day = cal.get(Calendar.DATE);
-
-            hour_end = cal.get(Calendar.HOUR);
-            minute_end = cal.get(Calendar.MINUTE);
-
-            hour_start = cal.get(Calendar.HOUR);
-            minute_start = cal.get(Calendar.MINUTE);
-
-            dateHandler= new Handler(){
-                @Override
-                public void handleMessage(Message m){
-                    /** Creating a bundle object to pass currently set Time to the fragment */
-                    Bundle b = m.getData();
-
-                    /** Getting the year from bundle */
-                    year = b.getInt("set_year");
-
-                    /** Getting the month from bundle */
-                    month = b.getInt("set_month");
-
-                    /** Getting the day from bundle */
-                    day = b.getInt("set_day");
-
-                    /** Displaying a short time message containing time set by Time picker dialog fragment */
-                    crimeDate.setText(month+"/"+day+"/"+year);
-
-                }
-            };
-
-
-
-            /** Click Event Handler for button */
-            View.OnClickListener dateListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    /** Creating a bundle object to pass currently set time to the fragment */
-                    Bundle b = new Bundle();
-
-                    /** Adding currently set hour to bundle object */
-                    b.putInt("set_year", year);
-
-                    /** Adding currently set minute to bundle object */
-                    b.putInt("set_month", month);
-
-                    b.putInt("set_day", day);
-                    /** Instantiating TimePickerDialogFragment */
-                    DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateHandler);
-
-                    /** Setting the bundle object on timepicker fragment */
-                    datePicker.setArguments(b);
-
-                    /** Getting fragment manger for this activity */
-                    FragmentManager fm = getSupportFragmentManager();
-
-                    /** Starting a fragment transaction */
-                    FragmentTransaction ft = fm.beginTransaction();
-
-                    /** Adding the fragment object to the fragment transaction */
-                    ft.add(datePicker, "date_picker");
-
-                    /** Opening the TimePicker fragment */
-                    ft.commit();
-                }
-            };
-
-
-
-            timeStartHandler= new Handler(){
-                @Override
-                public void handleMessage(Message m){
-                    /** Creating a bundle object to pass currently set Time to the fragment */
-                    Bundle b = m.getData();
-
-                    /** Getting the Hour of day from bundle */
-                    hour_start = b.getInt("set_hour");
-
-                    /** Getting the Minute of the hour from bundle */
-                    minute_start = b.getInt("set_minute");
-
-                    /** Displaying a short time message containing time set by Time picker dialog fragment */
-                    crimeStartTime.setText(hour_start + ":" + minute_start);
-
-                }
-            };
-
-
-
-            /** Click Event Handler for button */
-            View.OnClickListener timeStartListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    /** Creating a bundle object to pass currently set time to the fragment */
-                    Bundle b = new Bundle();
-
-                    /** Adding currently set hour to bundle object */
-                    b.putInt("set_hour", hour_start);
-
-                    /** Adding currently set minute to bundle object */
-                    b.putInt("set_minute", minute_start);
-
-                    /** Instantiating TimePickerDialogFragment */
-                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
-
-                    /** Setting the bundle object on timepicker fragment */
-                    timePicker.setArguments(b);
-
-                    /** Getting fragment manger for this activity */
-                    FragmentManager fm = getSupportFragmentManager();
-
-                    /** Starting a fragment transaction */
-                    FragmentTransaction ft = fm.beginTransaction();
-
-                    /** Adding the fragment object to the fragment transaction */
-                    ft.add(timePicker, "time_picker");
-
-                    /** Opening the TimePicker fragment */
-                    ft.commit();
-                }
-            };
-
-            timeEndHandler= new Handler(){
-                @Override
-                public void handleMessage(Message m){
-                    /** Creating a bundle object to pass currently set Time to the fragment */
-                    Bundle b = m.getData();
-
-                    /** Getting the Hour of day from bundle */
-                    hour_end = b.getInt("set_hour");
-
-                    /** Getting the Minute of the hour from bundle */
-                    minute_end = b.getInt("set_minute");
-
-                    /** Displaying a short time message containing time set by Time picker dialog fragment */
-                    crimeEndTime.setText(hour_end+":"+minute_end);
-
-                }
-            };
-
-
-
-            /** Click Event Handler for button */
-            View.OnClickListener timeEndListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    /** Creating a bundle object to pass currently set time to the fragment */
-                    Bundle b = new Bundle();
-
-                    /** Adding currently set hour to bundle object */
-                    b.putInt("set_hour", hour_start);
-
-                    /** Adding currently set minute to bundle object */
-                    b.putInt("set_minute", minute_start);
-
-                    /** Instantiating TimePickerDialogFragment */
-                    TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
-
-                    /** Setting the bundle object on timepicker fragment */
-                    timePicker.setArguments(b);
-
-                    /** Getting fragment manger for this activity */
-                    FragmentManager fm = getSupportFragmentManager();
-
-                    /** Starting a fragment transaction */
-                    FragmentTransaction ft = fm.beginTransaction();
-
-                    /** Adding the fragment object to the fragment transaction */
-                    ft.add(timePicker, "time_picker");
-
-                    /** Opening the TimePicker fragment */
-                    ft.commit();
-                }
-            };
-            crimeDate.setOnClickListener(dateListener);
-            crimeStartTime.setOnClickListener(timeStartListener);
-            crimeEndTime.setOnClickListener(timeEndListener);
-
-
+            showMap();
+            showDateDialog();
+            showTimeDialog();
+            autoCollapsExpandMap();
+            //seFtUpBottonListener();
+            //submitForm();
         }else{
+            setContentView(R.layout.report_detail_ui);
+            final ImageButton giveRatingButton = (ImageButton) findViewById(R.id.b_rate);
 
+
+            // add button listener
+            giveRatingButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    // custom dialog
+                    final Dialog dialog;
+                    dialog = new Dialog(ReportController.this);
+                    dialog.setContentView(R.layout.fragment_give_rating);
+                    dialog.setTitle("Give Rating");
+
+                    final ImageButton star1 = (ImageButton) dialog.findViewById(R.id.star1);
+                    final ImageButton star2 = (ImageButton) dialog.findViewById(R.id.star2);
+                    final ImageButton star3 = (ImageButton) dialog.findViewById(R.id.star3);
+                    final ImageButton star4 = (ImageButton) dialog.findViewById(R.id.star4);
+                    final ImageButton star5 = (ImageButton) dialog.findViewById(R.id.star5);
+
+                    // set the custom dialog components - text, image and button
+                    Button submitRating = (Button) dialog.findViewById(R.id.submitrate);
+                    Button cancelRating = (Button) dialog.findViewById(R.id.cancelrate);
+
+                    star1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_nostar);
+                            star3.setImageResource(R.drawable.r_nostar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);
+                        }
+                    });
+
+                    star2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_nostar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);                        }
+                    });
+                    star3.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);                        }
+                    });
+                    star4.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_yesstar);
+                            star5.setImageResource(R.drawable.r_nostar);
+                        }
+                    });
+                    star5.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_yesstar);
+                            star5.setImageResource(R.drawable.r_yesstar);
+                        }
+                    });
+
+                    submitRating.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            //send to server
+                        }
+                    });
+
+                    cancelRating.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                }
+            });
         }
     }
 
@@ -352,7 +642,7 @@ public class ReportController extends FragmentActivity {
     }
 
 
-    public void showReportForm(){
+    public void showMap(){
         if(reportMap == null) {
             reportMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.new_report_map)).getMap();
             reportMap.setMyLocationEnabled(true);
@@ -466,16 +756,6 @@ public class ReportController extends FragmentActivity {
                 placeDetailsDownloadTask.execute(url);
             }
         });
-
-
-        searchLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expand(mapContainer);
-            }
-
-        });
-
     }
 
 
@@ -619,10 +899,45 @@ public class ReportController extends FragmentActivity {
         }
     }
 
-    private boolean submitForm(){
-        return false;
-    }
+    private void submitForm(){
 
+        EditText inputTitle = (EditText)findViewById(R.id.title);
+        EditText inputDescription = (EditText)findViewById(R.id.description);
+        Button date = (Button) findViewById(R.id.crime_date);
+        Button timeStart = (Button)findViewById(R.id.crime_time_start);
+        Button timeEnd = (Button)findViewById(R.id.crime_time_end);
+        ImageButton type1 = (ImageButton) findViewById(R.id.drugs);
+        ImageButton type2 = (ImageButton) findViewById(R.id.burglary);
+        ImageButton type3 = (ImageButton) findViewById(R.id.homicide);
+        ImageButton type4 = (ImageButton) findViewById(R.id.kidnap);
+        ImageButton type5 = (ImageButton) findViewById(R.id.sxassault);
+        ImageButton type6 = (ImageButton) findViewById(R.id.theft);
+        ImageButton type7= (ImageButton) findViewById(R.id.vehicletheft);
+        ImageButton type8 = (ImageButton) findViewById(R.id.violence);
+
+        if (inputTitle.getText().toString().equals("")) {
+            inputTitle.requestFocus();
+            Toast.makeText(getApplicationContext(), "Title field empty", Toast.LENGTH_SHORT).show();
+        }else if(inputDescription.toString().equals("")) {
+            inputDescription.requestFocus();
+            Toast.makeText(getApplicationContext(), "Description field empty", Toast.LENGTH_SHORT).show();
+        }
+        else if(date.getText().toString().equals("Date")){
+            date.performClick();
+            Toast.makeText(getApplicationContext(), "Date field empty", Toast.LENGTH_SHORT).show();
+        }else if(timeStart.getText().toString().equals("Start")) {
+            timeStart.performClick();
+            Toast.makeText(getApplicationContext(), "Start Time field empty", Toast.LENGTH_SHORT).show();
+        }else if(timeEnd.getText().toString().equals("End")){
+            timeEnd.performClick();
+            Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
+
+        }else {
+
+        }
+        //validate
+
+    }
 
 
 
