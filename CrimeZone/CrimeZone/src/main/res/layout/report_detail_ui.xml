@@ -57,6 +57,12 @@
                 android:text="HEADLINE"
                 android:id="@+id/headline_detail" />
 
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/borderline" />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp"
@@ -92,7 +98,12 @@
                     android:layout_marginLeft="10dp"
                     android:id="@+id/author" />
             </LinearLayout>
-
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/borderline" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -100,7 +111,12 @@
                 android:text="description..."
                 android:textColor="@color/dark"
                 android:id="@+id/description_detail" />
-
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/borderline" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_marginTop="10dp"
@@ -141,7 +157,12 @@
                         android:id="@+id/type4" />
                 </LinearLayout>
             </HorizontalScrollView>
-
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/borderline" />
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
@@ -164,15 +185,61 @@
                     android:id="@+id/location" />
 
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Report Rating"
                 android:layout_marginTop="10dp"
-                android:textColor="@color/dark"
-                android:id="@+id/l_reportrating" />
+                android:layout_marginRight="10dp"
+                android:background="@drawable/borderline" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Report Rating"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/dark"
+                    android:id="@+id/l_reportrating"
+                    android:gravity="center_vertical" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star1"
+                    android:src="@drawable/r_yesstar"
+                    android:layout_marginLeft="90dp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star2"
+                    android:src="@drawable/r_yesstar" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star3"
+                    android:src="@drawable/r_yesstar" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star4"
+                    android:src="@drawable/r_yesstar" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star5"
+                    android:src="@drawable/r_halfstar" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

@@ -4,6 +4,7 @@
     android:layout_height="fill_parent"
     android:background="@color/cream"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="63dp"
@@ -17,5 +18,134 @@
             android:background="@color/blue"
             android:layout_marginLeft="15dp"
             android:layout_gravity="left|center_vertical" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@drawable/h_settings" />
     </FrameLayout>
-    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="FirstName"
+                android:ems="10"
+                android:id="@+id/firstname"
+                android:gravity="right"
+                android:background="@drawable/b_fname"
+                android:layout_marginTop="20dp" />
+
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="LastName"
+                android:ems="10"
+                android:id="@+id/lastname"
+                android:background="@drawable/b_lastname"
+                android:gravity="right"
+                android:layout_marginTop="30dp" />
+
+            <EditText
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText"
+                android:gravity="right"
+                android:text="user.name"
+                android:selectAllOnFocus="true"
+                android:background="@drawable/b_username"
+                android:layout_marginTop="30dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/b_socline">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageButton"
+                    android:src="@drawable/i_fbn"
+                    android:background="@null" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="not connected"
+                    android:id="@+id/fbstatus"
+                    android:gravity="right"
+                    android:layout_gravity="bottom" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/b_socline"
+                android:layout_marginTop="20dp">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageButton2"
+                    android:src="@drawable/i_twn"
+                    android:background="@null"
+                    android:baselineAlignBottom="true"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="not connected"
+                    android:id="@+id/twstatus"
+                    android:gravity="right"
+                    android:layout_gravity="bottom" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginTop="30dp">
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Save Changes"
+                    android:id="@+id/savesettings"
+                    android:layout_gravity="right|center_vertical"
+                    android:background="@color/blue"
+                    android:focusable="true" />
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Logout"
+                    android:id="@+id/logout"
+                    android:layout_gravity="left|center_vertical"
+                    android:background="@color/red" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
