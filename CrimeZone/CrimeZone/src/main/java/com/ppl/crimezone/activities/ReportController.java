@@ -32,6 +32,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,9 +49,20 @@ import com.ppl.crimezone.R;
 import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 import com.ppl.crimezone.fragments.TimePickerDialogFragment;
 import com.ppl.crimezone.model.CrimeReport;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +117,7 @@ public class ReportController extends FragmentActivity {
     Nama Shared Prefereces: UserAccount
     Nama string usermae: usernameKey;
      */
-
+    ProgressBar pb;
 
 
     /*
@@ -377,16 +389,19 @@ public class ReportController extends FragmentActivity {
             }
         });
 
-        searchLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                expand(mapContainer);
-            }
-        });
 
     }
 
     private void setUpButtonListener(){
+        Button submitButton = (Button) findViewById(R.id.submit);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                submitForm();
+                                            }
+                                        }
+        );
+
         final ImageButton  type [] = new ImageButton[8];
         type[0] = (ImageButton) findViewById(R.id.drugs);
         type[1] = (ImageButton) findViewById(R.id.burglary);
@@ -469,7 +484,7 @@ public class ReportController extends FragmentActivity {
                                            if (newReportCrimeType[5]) {
                                                type[5].setImageResource(R.drawable.nc_theft);
                                                newReportCrimeType[5] = false;
-                                           }else{
+                                           } else {
                                                type[5].setImageResource(R.drawable.ic_theft);
                                                newReportCrimeType[5] = true;
                                            }
@@ -482,7 +497,7 @@ public class ReportController extends FragmentActivity {
                                            if (newReportCrimeType[6]) {
                                                type[6].setImageResource(R.drawable.nc_vehicletheft);
                                                newReportCrimeType[6] = false;
-                                           }else{
+                                           } else {
                                                type[6].setImageResource(R.drawable.ic_vehicletheft);
                                                newReportCrimeType[6] = true;
                                            }
@@ -518,15 +533,16 @@ public class ReportController extends FragmentActivity {
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
             showMap();
+            pb=(ProgressBar)findViewById(R.id.progressBar1);
+            pb=(ProgressBar)findViewById(R.id.progressBar1);
+            pb.setVisibility(View.GONE);
             showDateDialog();
             showTimeDialog();
             autoCollapsExpandMap();
-            //seFtUpBottonListener();
-            //submitForm();
+            setUpButtonListener();
         }else{
             setContentView(R.layout.report_detail_ui);
             final ImageButton giveRatingButton = (ImageButton) findViewById(R.id.b_rate);
-
 
             // add button listener
             giveRatingButton.setOnClickListener(new View.OnClickListener() {
@@ -900,8 +916,7 @@ public class ReportController extends FragmentActivity {
     }
 
     private void submitForm(){
-
-        EditText inputTitle = (EditText)findViewById(R.id.title);
+        EditText inputTitle = (EditText)findViewById(R.id.headline);
         EditText inputDescription = (EditText)findViewById(R.id.description);
         Button date = (Button) findViewById(R.id.crime_date);
         Button timeStart = (Button)findViewById(R.id.crime_time_start);
@@ -914,94 +929,128 @@ public class ReportController extends FragmentActivity {
         ImageButton type6 = (ImageButton) findViewById(R.id.theft);
         ImageButton type7= (ImageButton) findViewById(R.id.vehicletheft);
         ImageButton type8 = (ImageButton) findViewById(R.id.violence);
+        boolean validDate= true;
+        final Button crimeDate = (Button)findViewById(R.id.crime_date);
+        Calendar cal = Calendar.getInstance();
+        if(year > cal.get(Calendar.YEAR)) {
+            validDate = false;
+        }else if(year == cal.get(Calendar.YEAR) && month > cal.get(Calendar.MONTH)){
+            validDate = false;
+        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day > cal.get(Calendar.DATE)){
+            validDate = false;
+        }
+
+        boolean validTimeStart = true;
+        boolean validTimeEnd = true;
+        if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start > cal.get(Calendar.HOUR)) {
+            validTimeStart = false;
+        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start == cal.get(Calendar.HOUR) && minute_start > cal.get(Calendar.MINUTE)){
+           validTimeStart = false;
+        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_end > cal.get(Calendar.HOUR)) {
+            validTimeEnd = false;
+        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start == cal.get(Calendar.HOUR) && minute_end > cal.get(Calendar.MINUTE)){
+            validTimeEnd = false;
+        }else if(hour_start > hour_end) {
+            validTimeStart = false;
+        }else if(hour_start == hour_end && minute_start > minute_end){
+            validTimeStart = false;
+        }else if( hour_start == hour_end && minute_start == minute_end){
+            validTimeStart = false;
+        }
+
 
         if (inputTitle.getText().toString().equals("")) {
             inputTitle.requestFocus();
             Toast.makeText(getApplicationContext(), "Title field empty", Toast.LENGTH_SHORT).show();
-        }else if(inputDescription.toString().equals("")) {
+        }else if(inputDescription.getText().toString().equalsIgnoreCase("")) {
             inputDescription.requestFocus();
+
             Toast.makeText(getApplicationContext(), "Description field empty", Toast.LENGTH_SHORT).show();
         }
-        else if(date.getText().toString().equals("Date")){
+        else if(date.getText().toString().equals("Date") || !validDate){
             date.performClick();
             Toast.makeText(getApplicationContext(), "Date field empty", Toast.LENGTH_SHORT).show();
-        }else if(timeStart.getText().toString().equals("Start")) {
+        }else if(timeStart.getText().toString().equals("Start") || !validTimeStart) {
             timeStart.performClick();
             Toast.makeText(getApplicationContext(), "Start Time field empty", Toast.LENGTH_SHORT).show();
-        }else if(timeEnd.getText().toString().equals("End")){
+        }else if(timeEnd.getText().toString().equals("End") || !validTimeEnd){
             timeEnd.performClick();
             Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
 
         }else {
-
-        }
-        //validate
-
-    }
-
-
-
-
-
-
-    /*
-    for collapsing and expanding the map
-     */
-    public static void expand(final ViewGroup v) {
-
-        v.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final int targtetHeight = v.getMeasuredHeight();
-
-        v.getLayoutParams().height = 0;
-        v.setVisibility(View.VISIBLE);
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                v.getLayoutParams().height = interpolatedTime == 1
-                        ? ViewGroup.LayoutParams.WRAP_CONTENT
-                        : (int)(targtetHeight * interpolatedTime);
-                v.requestLayout();
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        // 1dp/ms
-        a.setDuration((int)(targtetHeight / v.getContext().getResources().getDisplayMetrics().density));
-        v.startAnimation(a);
-    }
-
-    public static void collapse(final ViewGroup v) {
-        final int initialHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation()
-        {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    v.setVisibility(View.GONE);
-                }else{
-                    v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    v.requestLayout();
+            boolean valid = false;
+            for(int ii=0; ii<8; ++ii)
+            {
+                if(newReportCrimeType[ii]){
+                    valid = true;
+                    break;
                 }
             }
+            if(valid){
+                //json
+                String url = "";
+                /*
+                username
+                title
+                dreported
+                start
+                end
+                description
+                crimetype1
+                crimetype2
+                crimetype3
+                crimetype4
+                crimetype5
+                crimetype6
+                crimetype7
+                crimetype8
+                 */
 
-            @Override
-            public boolean willChangeBounds() {
-                return true;
+            }else{
+                Toast.makeText(getApplicationContext(), "Crime Type field empty", Toast.LENGTH_SHORT).show();
             }
-        };
-
-        // 1dp/ms
-        a.setDuration((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density));
-        v.startAnimation(a);
+        }
+        //validate
     }
 
+
+    private class MyAsyncTask extends AsyncTask<String, Integer, Double>{
+
+        @Override
+        protected Double doInBackground(String... params) {
+            // TODO Auto-generated method stub
+            postData(params[0]);
+            return null;
+        }
+
+        protected void onPostExecute(Double result){
+            pb.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
+        }
+        protected void onProgressUpdate(Integer... progress){
+            pb.setProgress(progress[0]);
+        }
+
+        public void postData(String valueIWantToSend) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://somewebsite.com/receiver.php");
+
+            try {
+                // Add your data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("myHttpData", valueIWantToSend));
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+            }
+        }
+
+    }
 }
-
-
-
