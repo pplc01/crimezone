@@ -38,8 +38,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Username:"
-                    android:textColor="@color/dark"
-                    android:id="@+id/usernameLabel" />
+                    android:textColor="@color/dark" />
 
                 <EditText
                     android:layout_width="match_parent"
@@ -57,7 +56,6 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Email Address:"
                     android:textColor="@color/dark"
-                    android:id="@+id/emailLabel"
                     android:paddingTop="10dp"/>
 
                 <EditText
@@ -75,8 +73,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Password:"
                     android:textColor="@color/dark"
-                    android:paddingTop="10dp"
-                    android:id="@+id/pass1Label" />
+                    android:paddingTop="10dp"/>
 
                 <EditText
                     android:layout_width="match_parent"
@@ -93,8 +90,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="Reenter Password:"
                     android:paddingTop="10dp"
-                    android:textColor="@color/dark"
-                    android:id="@+id/pass2Label" />
+                    android:textColor="@color/dark"/>
 
                 <EditText
                     android:layout_width="match_parent"
