@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -24,11 +28,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
+import com.ppl.crimezone.fragments.DatePickerDialogFragment;
+import com.ppl.crimezone.fragments.TimePickerDialogFragment;
 import com.ppl.crimezone.model.CrimeReport;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import java.io.BufferedReader;
@@ -51,9 +58,13 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import com.google.maps.android.SphericalUtil;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 /**
  com.google.maps.android:android-maps-utils
  * This is controller for HomeMap UI
@@ -87,8 +98,22 @@ public class MapController extends ActionBarActivity {
     boolean dateFilter;
     boolean crimeTypeFilter;
 
-    Date dateStart;
-    Date dateEnd;
+    int year_start;
+    int month_start;
+    int day_start;
+
+    int year_end;
+    int month_end;
+    int day_end;
+
+    Button crimeStartDate;
+    Button crimeEndDate;
+
+    SlidingUpPanelLayout filterLayout;
+
+    /** This handles the message send from TimePickerDialogFragment on setting Time */
+    Handler dateStartHandler;
+    Handler dateEndHandler;
 
     boolean crimeCategories[] = new boolean[8];
     @Override
@@ -96,8 +121,135 @@ public class MapController extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_map_ui);
 
-        placeMarkers = new Marker[MAX_PLACES];
 
+         placeMarkers = new Marker[MAX_PLACES];
+        filterLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        ImageView dragArea = (ImageView) findViewById(R.id.show_filter);
+        filterLayout.setDragView(dragArea);
+        crimeStartDate = (Button) findViewById(R.id.crime_date_start);
+        crimeEndDate = (Button) findViewById(R.id.crime_date_end);
+
+        Calendar cal = Calendar.getInstance();
+        year_start = cal.get(Calendar.YEAR)-5;
+        month_start = 1;
+        day_start = 1;
+
+        year_end = cal.get(Calendar.YEAR);
+        month_end = cal.get(Calendar.MONTH);
+        day_end = cal.get(Calendar.DATE);
+
+        dateStartHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the year from bundle */
+                year_start = b.getInt("set_year");
+
+                /** Getting the month from bundle */
+                month_start = b.getInt("set_month");
+
+                /** Getting the day from bundle */
+                day_start = b.getInt("set_day");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                crimeStartDate.setText(month_start+"/"+day_start+"/"+year_start);
+            }
+        };
+
+        /** Click Event Handler for button */
+        View.OnClickListener dateStartListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_year", year_start);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_month", month_start);
+
+                b.putInt("set_day", day_start);
+                /** Instantiating TimePickerDialogFragment */
+                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateStartHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                datePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(datePicker, "date_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+
+        dateEndHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the year from bundle */
+                year_end = b.getInt("set_year");
+
+                /** Getting the month from bundle */
+                month_end = b.getInt("set_month");
+
+                /** Getting the day from bundle */
+                day_end = b.getInt("set_day");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                crimeStartDate.setText(month_end+"/"+day_end+"/"+year_end);
+            }
+        };
+
+        /** Click Event Handler for button */
+        View.OnClickListener dateEndListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_year", year_end);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_month", month_end);
+
+                b.putInt("set_day", day_end);
+                /** Instantiating TimePickerDialogFragment */
+                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(dateEndHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                datePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(datePicker, "date_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+
+        crimeStartDate.setOnClickListener(dateStartListener);
+        crimeEndDate.setOnClickListener(dateEndListener);
         setUpMap();
 
         setUpSearchLocation();
@@ -146,7 +298,6 @@ public class MapController extends ActionBarActivity {
         super.onResume();
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -167,10 +318,8 @@ public class MapController extends ActionBarActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("NewReportMode", true);
-
         // Commit the edits!
         editor.commit();
-
         Intent intent = new Intent(this, ReportController.class);
         startActivity(intent);
     }
@@ -184,6 +333,7 @@ public class MapController extends ActionBarActivity {
     private void setUpMap(){
         if(map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            map.setPadding(0, 0, 0, 35);
             map.setMyLocationEnabled(true);
         }
     }
