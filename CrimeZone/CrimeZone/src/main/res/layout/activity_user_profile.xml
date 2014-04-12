@@ -27,6 +27,13 @@
             android:background="@color/blue"
             android:layout_marginRight="15dp"
             android:layout_gravity="right|center_vertical" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@drawable/myprofile" />
     </FrameLayout>
 
     <ScrollView
@@ -44,7 +51,7 @@
                 android:layout_height="50dp"
                 android:background="@color/dark"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="FULL NAME"
+                android:text="Full Name"
                 android:id="@+id/namevalue"
                 android:gravity="center_horizontal|bottom"
                 />
@@ -69,10 +76,36 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="DD/MM/YYYY"
                     android:id="@+id/profjoined"
-                    android:layout_below="@id/namevalue"
+                    android:layout_below="@+id/namevalue"
                     android:gravity="center_horizontal"
                     android:layout_centerHorizontal="true" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="user.name"
+                android:id="@+id/usernamevalue"
+                android:textColor="@color/dark"
+                android:gravity="right"
+                android:background="@drawable/b_username"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="10dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="email@address"
+                android:id="@+id/emailvalue"
+                android:gravity="right"
+                android:textColor="@color/dark"
+                android:background="@drawable/b_email"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
 
         </LinearLayout>
     </ScrollView>
