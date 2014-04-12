@@ -1,5 +1,6 @@
 package com.ppl.crimezone.activities;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -66,6 +67,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.security.AccessController.getContext;
 
 public class ReportController extends FragmentActivity {
 
@@ -394,6 +397,9 @@ public class ReportController extends FragmentActivity {
 
     private void setUpButtonListener(){
         Button submitButton = (Button) findViewById(R.id.submit);
+        for(int ii=0; ii< 8; ++ii){
+            newReportCrimeType[ii] = false;
+        }
         submitButton.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -416,10 +422,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[0]) {
-                                               type[0].setImageResource(R.drawable.nc_drugs);
+                                               type[0].setImageResource(R.drawable.ic_drugs);
                                                newReportCrimeType[0] = false;
                                            }else{
-                                               type[0].setImageResource(R.drawable.ic_drugs);
+                                               type[0].setImageResource(R.drawable.nc_drugs);
                                                newReportCrimeType[0] = true;
                                            }
                                        }
@@ -429,10 +435,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[1]) {
-                                               type[1].setImageResource(R.drawable.nc_burglary);
+                                               type[1].setImageResource(R.drawable.ic_burglary);
                                                newReportCrimeType[1] = false;
                                            }else{
-                                               type[1].setImageResource(R.drawable.ic_burglary);
+                                               type[1].setImageResource(R.drawable.nc_burglary);
                                                newReportCrimeType[1] = true;
                                            }
                                        }
@@ -443,10 +449,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[2]) {
-                                               type[2].setImageResource(R.drawable.nc_homicide);
+                                               type[2].setImageResource(R.drawable.ic_homicide);
                                                newReportCrimeType[2] = false;
                                            }else{
-                                               type[2].setImageResource(R.drawable.ic_homicide);
+                                               type[2].setImageResource(R.drawable.nc_homicide);
                                                newReportCrimeType[2] = true;
                                            }
                                        }
@@ -456,10 +462,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[3]) {
-                                               type[3].setImageResource(R.drawable.nc_kidnap);
+                                               type[3].setImageResource(R.drawable.ic_kidnap);
                                                newReportCrimeType[3] = false;
                                            }else{
-                                               type[3].setImageResource(R.drawable.ic_kidnap);
+                                               type[3].setImageResource(R.drawable.nc_kidnap);
                                                newReportCrimeType[3] = true;
                                            }
                                        }
@@ -469,10 +475,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[4]) {
-                                               type[4].setImageResource(R.drawable.nc_sxassault);
+                                               type[4].setImageResource(R.drawable.ic_sxassault);
                                                newReportCrimeType[4] = false;
                                            }else{
-                                               type[4].setImageResource(R.drawable.ic_sxassault);
+                                               type[4].setImageResource(R.drawable.nc_sxassault);
                                                newReportCrimeType[4] = true;
                                            }
                                        }
@@ -482,10 +488,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[5]) {
-                                               type[5].setImageResource(R.drawable.nc_theft);
+                                               type[5].setImageResource(R.drawable.ic_theft);
                                                newReportCrimeType[5] = false;
                                            } else {
-                                               type[5].setImageResource(R.drawable.ic_theft);
+                                               type[5].setImageResource(R.drawable.nc_theft);
                                                newReportCrimeType[5] = true;
                                            }
                                        }
@@ -495,10 +501,10 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[6]) {
-                                               type[6].setImageResource(R.drawable.nc_vehicletheft);
+                                               type[6].setImageResource(R.drawable.ic_vehicletheft);
                                                newReportCrimeType[6] = false;
                                            } else {
-                                               type[6].setImageResource(R.drawable.ic_vehicletheft);
+                                               type[6].setImageResource(R.drawable.nc_vehicletheft);
                                                newReportCrimeType[6] = true;
                                            }
                                        }
@@ -508,19 +514,16 @@ public class ReportController extends FragmentActivity {
                                        @Override
                                        public void onClick(View v) {
                                            if (newReportCrimeType[7]) {
-                                               type[7].setImageResource(R.drawable.nc_violence);
+                                               type[7].setImageResource(R.drawable.ic_violence);
                                                newReportCrimeType[7] = false;
                                            }else{
-                                               type[7].setImageResource(R.drawable.ic_violence);
+                                               type[7].setImageResource(R.drawable.nc_violence);
                                                newReportCrimeType[7] = true;
                                            }
                                        }
                                    }
         );
-
-
     }
-
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -870,8 +873,6 @@ public class ReportController extends FragmentActivity {
                     String[] from = new String[] { "description"};
                     int[] to = new int[] { android.R.id.text2 };
 
-
-
                     // Creating a SimpleAdapter for the AutoCompleteTextView
                     SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.autocomplete, from, to);
                     // Setting the adapter
@@ -967,20 +968,29 @@ public class ReportController extends FragmentActivity {
 
             Toast.makeText(getApplicationContext(), "Description field empty", Toast.LENGTH_SHORT).show();
         }
-        else if(date.getText().toString().equals("Date") || !validDate){
+        else if(date.getText().toString().equals("DD/MM/YYYY")){
             date.performClick();
             Toast.makeText(getApplicationContext(), "Date field empty", Toast.LENGTH_SHORT).show();
-        }else if(timeStart.getText().toString().equals("Start") || !validTimeStart) {
+        }else if(!validDate) {
+            date.performClick();
+            Toast.makeText(getApplicationContext(), "Date field invalid", Toast.LENGTH_SHORT).show();
+        }else if(timeStart.getText().toString().equals("Start")) {
             timeStart.performClick();
             Toast.makeText(getApplicationContext(), "Start Time field empty", Toast.LENGTH_SHORT).show();
-        }else if(timeEnd.getText().toString().equals("End") || !validTimeEnd){
+        }else if(!validTimeStart) {
+            timeStart.performClick();
+            Toast.makeText(getApplicationContext(), "Start Time field invalid", Toast.LENGTH_SHORT).show();
+        }else if(timeEnd.getText().toString().equals("End") ) {
             timeEnd.performClick();
             Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
-
+        }else if(!validTimeEnd){
+            timeEnd.performClick();
+            Toast.makeText(getApplicationContext(), "End Time field invalid", Toast.LENGTH_SHORT).show();
         }else {
             boolean valid = false;
             for(int ii=0; ii<8; ++ii)
             {
+                Log.d("loop "+ii, newReportCrimeType[ii]+"");
                 if(newReportCrimeType[ii]){
                     valid = true;
                     break;
@@ -988,7 +998,7 @@ public class ReportController extends FragmentActivity {
             }
             if(valid){
                 //json
-                String url = "";
+
                 /*
                 username
                 title
@@ -1006,6 +1016,26 @@ public class ReportController extends FragmentActivity {
                 crimetype8
                  */
 
+                String username = "adesudiman";
+                String [] data = new String[14];
+
+                String dateReported = year+"/"+month+"/" + day + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
+
+
+
+                data[0] = username;
+                data[1] = titleEditText.getText().toString();
+                data[2] = cal.get(Calendar.YEAR)+ "/"+cal.get(Calendar.MONTH)+"/" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
+                data[3] =  year+"/"+month+"/" + day + " " + hour_start+ ":"+ minute_start;
+                data[4] = year+"/"+month+"/" + day + " " + hour_end+ ":"+ minute_end;
+                data[5] = descriptionEditText.getText().toString();
+                for(int jj=0; jj<8;  ++jj){
+                    data[jj+6] = newReportCrimeType[jj]+"";
+                }
+                new MyAsyncTask().execute(data);
+
+
+
             }else{
                 Toast.makeText(getApplicationContext(), "Crime Type field empty", Toast.LENGTH_SHORT).show();
             }
@@ -1014,43 +1044,85 @@ public class ReportController extends FragmentActivity {
     }
 
 
-    private class MyAsyncTask extends AsyncTask<String, Integer, Double>{
+    private class MyAsyncTask extends AsyncTask<String, Integer, String>{
 
         @Override
-        protected Double doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             // TODO Auto-generated method stub
-            postData(params[0]);
-            return null;
+            return postData(params);
+
         }
 
-        protected void onPostExecute(Double result){
+        protected void onPostExecute(String result){
+            Log.d("response ", result);
             pb.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
+            /**
+             * Tampilin progress bar
+             * kalau berhasil tampilkan notif berhasil
+             * havis itu write share preference mengenai location nya
+             * pindah ke view map
+             */
+            finish();
         }
         protected void onProgressUpdate(Integer... progress){
             pb.setProgress(progress[0]);
         }
 
-        public void postData(String valueIWantToSend) {
+        public String postData(String valueIWantToSend[]) {
             // Create a new HttpClient and Post Header
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://somewebsite.com/receiver.php");
-
+            HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/submitReport.php");
+            String message = "";
             try {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("myHttpData", valueIWantToSend));
+                nameValuePairs.add(new BasicNameValuePair("username", valueIWantToSend[0]));
+                nameValuePairs.add(new BasicNameValuePair("title", valueIWantToSend[1]));
+                nameValuePairs.add(new BasicNameValuePair("dreported", valueIWantToSend[2]));
+                nameValuePairs.add(new BasicNameValuePair("start", valueIWantToSend[3]));
+                nameValuePairs.add(new BasicNameValuePair("end", valueIWantToSend[4]));
+                nameValuePairs.add(new BasicNameValuePair("description", valueIWantToSend[5]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype1", valueIWantToSend[6]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype2", valueIWantToSend[7]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype3", valueIWantToSend[8]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype4", valueIWantToSend[9]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype5", valueIWantToSend[10]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype6", valueIWantToSend[11]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype7", valueIWantToSend[12]));
+                nameValuePairs.add(new BasicNameValuePair("crimetype8", valueIWantToSend[13]));
+
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
+
+                message =  response.getStatusLine().getStatusCode()+"";
+
+
+                /*
+                username
+                title
+                dreported
+                start
+                end
+                description
+                crimetype1
+                crimetype2
+                crimetype3
+                crimetype4
+                crimetype5
+                crimetype6
+                crimetype7
+                crimetype8
+                 */
 
             } catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block
             } catch (IOException e) {
                 // TODO Auto-generated catch block
             }
+            return message;
         }
-
     }
 }
