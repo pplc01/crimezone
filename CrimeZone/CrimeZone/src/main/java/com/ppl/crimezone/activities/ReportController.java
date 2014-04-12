@@ -1,7 +1,9 @@
 package com.ppl.crimezone.activities;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
@@ -27,10 +29,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,9 +48,9 @@ import com.ppl.crimezone.R;
 import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 import com.ppl.crimezone.fragments.TimePickerDialogFragment;
 import com.ppl.crimezone.model.CrimeReport;
-
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -71,9 +75,7 @@ public class ReportController extends FragmentActivity {
     final int PLACES=0;
     final int PLACES_DETAILS=1;
 
-
-
-    public boolean newReportMode = false;
+    public boolean newReptMode = false;
     /*
         for new Report
      */
@@ -98,7 +100,11 @@ public class ReportController extends FragmentActivity {
     EditText descriptionEditText;
     String description;
 
-
+    Boolean newReportMode;
+    /*
+    Nama Shared Prefereces: UserAccount
+    Nama string usermae: usernameKey;
+     */
 
 
 
@@ -109,7 +115,7 @@ public class ReportController extends FragmentActivity {
     CrimeReport detail;
     CrimeReport newCrimeReport;
 
-
+    boolean newReportCrimeType [] = new boolean [8];
 
     private void initReportMode(){
         final String PREFS_NAME = "ReporControllerMode";
@@ -119,9 +125,6 @@ public class ReportController extends FragmentActivity {
         newReportMode =  settings.getBoolean("NewReportMode", false);
     }
 
-    private void initWriteListener(){
-
-    }
 
     private void showDateDialog(){
         final Button crimeDate = (Button)findViewById(R.id.crime_date);
@@ -383,11 +386,37 @@ public class ReportController extends FragmentActivity {
 
     }
 
+    private void setUpButtonListener(){
+        ImageButton  type [] = new ImageButton[8];
+        type[0] = (ImageButton) findViewById(R.id.drugs);
+        type[1] = (ImageButton) findViewById(R.id.burglary);
+        type[2] = (ImageButton) findViewById(R.id.homicide);
+        type[3] = (ImageButton) findViewById(R.id.kidnap);
+        type[4] = (ImageButton) findViewById(R.id.sxassault);
+        type[5] = (ImageButton) findViewById(R.id.theft);
+        type[6] = (ImageButton) findViewById(R.id.vehicletheft);
+        type[7] = (ImageButton) findViewById(R.id.violence);
+        /*
+        for(int ii=0; ii<9; ++ii) {
+            final int finalIi = ii;
+            type[ii].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(newReportCrimeType[finalIi]){
+                        newReportCrimeType[finalIi
+                        newReportCrimeType[finalIi] = newReportCrimeType[finalIi] ?false:true;
+                    }
+            });
+        }*/
+
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initReportMode();
 
+        newReportMode = false;
 
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
@@ -395,9 +424,101 @@ public class ReportController extends FragmentActivity {
             showDateDialog();
             showTimeDialog();
             autoCollapsExpandMap();
+            //seFtUpBottonListener();
             submitForm();
         }else{
             setContentView(R.layout.report_detail_ui);
+            final ImageButton giveRatingButton = (ImageButton) findViewById(R.id.b_rate);
+
+
+            // add button listener
+            giveRatingButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    // custom dialog
+                    final Dialog dialog;
+                    dialog = new Dialog(ReportController.this);
+                    dialog.setContentView(R.layout.fragment_give_rating);
+                    dialog.setTitle("Give Rating");
+
+                    final ImageButton star1 = (ImageButton) dialog.findViewById(R.id.star1);
+                    final ImageButton star2 = (ImageButton) dialog.findViewById(R.id.star2);
+                    final ImageButton star3 = (ImageButton) dialog.findViewById(R.id.star3);
+                    final ImageButton star4 = (ImageButton) dialog.findViewById(R.id.star4);
+                    final ImageButton star5 = (ImageButton) dialog.findViewById(R.id.star5);
+
+                    // set the custom dialog components - text, image and button
+                    Button submitRating = (Button) dialog.findViewById(R.id.submitrate);
+                    Button cancelRating = (Button) dialog.findViewById(R.id.cancelrate);
+
+                    star1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_nostar);
+                            star3.setImageResource(R.drawable.r_nostar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);
+                        }
+                    });
+
+                    star2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_nostar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);                        }
+                    });
+                    star3.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_nostar);
+                            star5.setImageResource(R.drawable.r_nostar);                        }
+                    });
+                    star4.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_yesstar);
+                            star5.setImageResource(R.drawable.r_nostar);
+                        }
+                    });
+                    star5.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            star1.setImageResource(R.drawable.r_yesstar);
+                            star2.setImageResource(R.drawable.r_yesstar);
+                            star3.setImageResource(R.drawable.r_yesstar);
+                            star4.setImageResource(R.drawable.r_yesstar);
+                            star5.setImageResource(R.drawable.r_yesstar);
+                        }
+                    });
+
+                    submitRating.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                            //send to server
+                        }
+                    });
+
+                    cancelRating.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+                }
+            });
         }
     }
 
@@ -681,10 +802,44 @@ public class ReportController extends FragmentActivity {
         }
     }
 
-    private boolean submitForm(){
-        return false;
-    }
+    private void submitForm(){
 
+        EditText inputTitle = (EditText)findViewById(R.id.title);
+        EditText inputDescription = (EditText)findViewById(R.id.description);
+        Button date = (Button) findViewById(R.id.crime_date);
+        Button timeStart = (Button)findViewById(R.id.crime_time_start);
+        Button timeEnd = (Button)findViewById(R.id.crime_time_end);
+        ImageButton type1 = (ImageButton) findViewById(R.id.drugs);
+        ImageButton type2 = (ImageButton) findViewById(R.id.burglary);
+        ImageButton type3 = (ImageButton) findViewById(R.id.homicide);
+        ImageButton type4 = (ImageButton) findViewById(R.id.kidnap);
+        ImageButton type5 = (ImageButton) findViewById(R.id.sxassault);
+        ImageButton type6 = (ImageButton) findViewById(R.id.theft);
+        ImageButton type7= (ImageButton) findViewById(R.id.vehicletheft);
+        ImageButton type8 = (ImageButton) findViewById(R.id.violence);
+
+        if (inputTitle.getText().toString().equals("")) {
+            inputTitle.requestFocus();
+            Toast.makeText(getApplicationContext(), "Title field empty", Toast.LENGTH_SHORT).show();
+        }else if(inputDescription.toString().equals("")) {
+            inputDescription.requestFocus();
+            Toast.makeText(getApplicationContext(), "Description field empty", Toast.LENGTH_SHORT).show();
+        }
+        else if(date.getText().toString().equals("Date")){
+            date.performClick();
+            Toast.makeText(getApplicationContext(), "Date field empty", Toast.LENGTH_SHORT).show();
+        }else if(timeStart.getText().toString().equals("Start")) {
+            timeStart.performClick();
+            Toast.makeText(getApplicationContext(), "Start Time field empty", Toast.LENGTH_SHORT).show();
+        }else if(timeEnd.getText().toString().equals("End")){
+            timeEnd.performClick();
+            Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
+        }else {
+
+        }
+        //validate
+
+    }
 
 
 

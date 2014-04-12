@@ -2,10 +2,10 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\assets" />
+        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\assets" />
     </dataSet>
     <dataSet config="release" >
-        <source path="G:\PPL\crimezone\CrimeZone\Libraries\AndroidSlidingUpPanel\library\src\release\assets" />
+        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\src\release\assets" />
     </dataSet>
 
 </merger>
