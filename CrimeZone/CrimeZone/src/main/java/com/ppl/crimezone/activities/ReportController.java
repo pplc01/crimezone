@@ -163,7 +163,7 @@ public class ReportController extends FragmentActivity {
                 day = b.getInt("set_day");
 
                 /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeDate.setText(month+"/"+day+"/"+year);
+                crimeDate.setText(day+"/"+month+"/"+year);
             }
         };
 
@@ -696,7 +696,7 @@ public class ReportController extends FragmentActivity {
                 place = new MarkerOptions();
                 place.position(location);
                 place.title("Crime Location");
-                place.snippet("Latitude:"+location.latitude+",Longitude:"+location.longitude);
+                //place.snippet("Latitude:"+location.latitude+",Longitude:"+location.longitude);
                 place.draggable(true);
                 // Adding the marker in the Google Map
                 placeMarker = reportMap.addMarker(place);
@@ -922,14 +922,6 @@ public class ReportController extends FragmentActivity {
         Button date = (Button) findViewById(R.id.crime_date);
         Button timeStart = (Button)findViewById(R.id.crime_time_start);
         Button timeEnd = (Button)findViewById(R.id.crime_time_end);
-        ImageButton type1 = (ImageButton) findViewById(R.id.drugs);
-        ImageButton type2 = (ImageButton) findViewById(R.id.burglary);
-        ImageButton type3 = (ImageButton) findViewById(R.id.homicide);
-        ImageButton type4 = (ImageButton) findViewById(R.id.kidnap);
-        ImageButton type5 = (ImageButton) findViewById(R.id.sxassault);
-        ImageButton type6 = (ImageButton) findViewById(R.id.theft);
-        ImageButton type7= (ImageButton) findViewById(R.id.vehicletheft);
-        ImageButton type8 = (ImageButton) findViewById(R.id.violence);
         boolean validDate= true;
         final Button crimeDate = (Button)findViewById(R.id.crime_date);
         Calendar cal = Calendar.getInstance();
@@ -1006,6 +998,8 @@ public class ReportController extends FragmentActivity {
                 start
                 end
                 description
+                lat
+                long
                 crimetype1
                 crimetype2
                 crimetype3
@@ -1017,24 +1011,22 @@ public class ReportController extends FragmentActivity {
                  */
 
                 String username = "adesudiman";
-                String [] data = new String[14];
-
-                String dateReported = year+"/"+month+"/" + day + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
+                String [] data = new String[16];
 
 
 
                 data[0] = username;
                 data[1] = titleEditText.getText().toString();
                 data[2] = cal.get(Calendar.YEAR)+ "/"+cal.get(Calendar.MONTH)+"/" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
-                data[3] =  year+"/"+month+"/" + day + " " + hour_start+ ":"+ minute_start;
-                data[4] = year+"/"+month+"/" + day + " " + hour_end+ ":"+ minute_end;
+                data[3] =  day+"/"+month+"/" + year + " " + hour_start+ ":"+ minute_start;
+                data[4] = day+"/"+month+"/" + year + " " + hour_end+ ":"+ minute_end;
                 data[5] = descriptionEditText.getText().toString();
+                data[6] = location.latitude+"";
+                data[7] = location.longitude+"";
                 for(int jj=0; jj<8;  ++jj){
-                    data[jj+6] = newReportCrimeType[jj]+"";
+                    data[jj+8] = newReportCrimeType[jj]+"";
                 }
                 new MyAsyncTask().execute(data);
-
-
 
             }else{
                 Toast.makeText(getApplicationContext(), "Crime Type field empty", Toast.LENGTH_SHORT).show();
@@ -1074,7 +1066,8 @@ public class ReportController extends FragmentActivity {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/submitReport.php");
             String message = "";
-            try {
+            try
+            {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                 nameValuePairs.add(new BasicNameValuePair("username", valueIWantToSend[0]));
@@ -1083,46 +1076,43 @@ public class ReportController extends FragmentActivity {
                 nameValuePairs.add(new BasicNameValuePair("start", valueIWantToSend[3]));
                 nameValuePairs.add(new BasicNameValuePair("end", valueIWantToSend[4]));
                 nameValuePairs.add(new BasicNameValuePair("description", valueIWantToSend[5]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype1", valueIWantToSend[6]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype2", valueIWantToSend[7]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype3", valueIWantToSend[8]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype4", valueIWantToSend[9]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype5", valueIWantToSend[10]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype6", valueIWantToSend[11]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype7", valueIWantToSend[12]));
-                nameValuePairs.add(new BasicNameValuePair("crimetype8", valueIWantToSend[13]));
-
+                nameValuePairs.add(new BasicNameValuePair("lat", valueIWantToSend[6]));
+                nameValuePairs.add(new BasicNameValuePair("long", valueIWantToSend[7]));
+                if(valueIWantToSend[8].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype1", 0+""));
+                }
+                if(valueIWantToSend[9].equals("true")) {
+                    nameValuePairs.add(new BasicNameValuePair("crimetype2", 1 + ""));
+                }
+                if(valueIWantToSend[10].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype3", 2+""));
+                }
+                if(valueIWantToSend[11].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype4", 3+""));
+                }
+                if(valueIWantToSend[12].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype5", 4+""));
+                }
+                if(valueIWantToSend[13].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype6", 5+""));
+                }
+                if(valueIWantToSend[14].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype7", 6+""));
+                }
+                if(valueIWantToSend[15].equals("true")){
+                    nameValuePairs.add(new BasicNameValuePair("crimetype8", 7+""));
+                }
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
-
                 message =  response.getStatusLine().getStatusCode()+"";
-
-
-                /*
-                username
-                title
-                dreported
-                start
-                end
-                description
-                crimetype1
-                crimetype2
-                crimetype3
-                crimetype4
-                crimetype5
-                crimetype6
-                crimetype7
-                crimetype8
-                 */
-
-            } catch (ClientProtocolException e) {
+            }
+            catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+            // TODO Auto-generated catch block
             }
-            return message;
+        return message;
         }
     }
 }
