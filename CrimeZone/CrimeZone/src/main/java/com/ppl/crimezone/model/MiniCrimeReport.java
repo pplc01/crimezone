@@ -97,7 +97,7 @@ public class MiniCrimeReport {
     public boolean equals(Object other){
         if (other == null) return false;
         if (other == this) return true;
-        if (!(other instanceof MyClass))return false;
+        if (!(other instanceof MiniCrimeReport))return false;
         MiniCrimeReport otherReport = (MiniCrimeReport)other;
         if(this.getLatitude() == otherReport.getLatitude() && this.getLongitude()== otherReport.getLongitude()) return true;
         return false;
