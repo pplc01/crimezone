@@ -1,5 +1,6 @@
 package com.ppl.crimezone.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -22,13 +23,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.model.CrimeReport;
 
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import java.io.BufferedReader;
@@ -54,6 +59,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import com.google.maps.android.SphericalUtil;
+import com.ppl.crimezone.model.MiniCrimeReport;
+
 /**
  com.google.maps.android:android-maps-utils
  * This is controller for HomeMap UI
@@ -66,12 +73,10 @@ public class MapController extends ActionBarActivity {
     private Location location;
     private LocationManager locationManager;
     private LocationListener locationListener;
-    private Marker[] placeMarkers;
-    private final int MAX_PLACES = 20;
-    private MarkerOptions[] places;
 
-    //data variable
-    private CrimeReport[] locationList;
+    private ArrayList<Marker> placeMarkers;
+    private ArrayList<MarkerOptions> places;
+
 
     //for filter
     private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
@@ -90,16 +95,18 @@ public class MapController extends ActionBarActivity {
     Date dateStart;
     Date dateEnd;
 
+    List<MiniCrimeReport> reports;
+
     boolean crimeCategories[] = new boolean[8];
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_map_ui);
 
-        placeMarkers = new Marker[MAX_PLACES];
-
         setUpMap();
-
         setUpSearchLocation();
 
     }
@@ -134,10 +141,10 @@ public class MapController extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //updateLocationUser();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        updateLocationUser();
 
-        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
 
@@ -185,6 +192,7 @@ public class MapController extends ActionBarActivity {
         if(map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             map.setMyLocationEnabled(true);
+            setUpMapListener();
         }
     }
     //add listener if user swap or zoom the map
@@ -239,20 +247,26 @@ public class MapController extends ActionBarActivity {
         };
     }
 
+    /*
+        Using http  post
     private void updateCrimeMarker(String latitude, String longitude, double distance){
         String url;
         try {
-            url = "http:/http://crimezone.besaba.com/webservice/crimeLocation.php?distance="
-                    + URLEncoder.encode(String.valueOf(distance), "UTF-8")
-                    +"&latitude"
-                    +URLEncoder.encode(latitude, "UTF-8")
-                    +"&longitudee="
-                    +URLEncoder.encode(longitude, "UTF-8");
+            url = "http:/http://crimezone.besaba.com/webservice/crimeLocation.php
             new GetCrimeReport().execute(url);
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }u
+     */
+    private void updateCrimeMarker(String latitude, String longitude, double distance){
+        String url;
+
+        url = "http://crimezone.besaba.com/webservice/crimeLocation.php?distance="+distance
+                +"&latitude="+ latitude+
+                "&longitude=" +longitude;
+        Log.d("String url" , url);
+        new GetCrimeReport().execute(url);
     }
 
     //initialize autocomplete view
@@ -317,6 +331,85 @@ public class MapController extends ActionBarActivity {
         });
     }
 
+    private void handleReportList(List<MiniCrimeReport> updateReports){
+        reports = updateReports;
+
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                Log.d("report size : ", reports.size()+"");
+                if(placeMarkers!=null){
+                    for(int pm=0; pm<placeMarkers.size(); pm++){
+                        if(placeMarkers.get(pm)!=null)
+                            placeMarkers.get(pm).remove();
+                    }
+                }
+                LatLng target = new LatLng(0,0);
+                placeMarkers = new ArrayList<Marker>();
+                places = new ArrayList<MarkerOptions>();
+                int currIcon = R.drawable.mk_sxassault;
+                ArrayList<MiniCrimeReport> list = new ArrayList<MiniCrimeReport>();
+                for(int ii=0; ii< reports.size(); ++ii) {
+                    switch(reports.get(ii).getCategories().size()) {
+                        case 1:
+                            if (reports.get(ii).getCategories().get(0).equals("0")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("0")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("1")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("2")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("3")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("4")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("5")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("6")) {
+                                currIcon = R.drawable.mk_drugs;
+                            } else if (reports.get(ii).getCategories().get(0).equals("7")) {
+                                currIcon = R.drawable.mk_drugs;
+                            }
+                            break;
+                        case 2:
+                            currIcon = R.drawable.mk_2;
+                            break;
+                        case 3:
+                            currIcon = R.drawable.mk_3;
+                            break;
+                        case 4:
+                            currIcon = R.drawable.mk_4;
+                            break;
+                        case 5:
+                            currIcon = R.drawable.mk;
+                            break;
+                        case 6:
+                            currIcon = R.drawable.mk;
+                            break;
+                        case 7:
+                            currIcon = R.drawable.mk;
+                            break;
+                        case 8:
+                            currIcon = R.drawable.mk;
+                            break;
+                        default:
+                            currIcon = R.drawable.mk;
+
+                    }
+                    places.add(new MarkerOptions()
+                            .position(new LatLng(reports.get(ii).getLatitude(), reports.get(ii).getLongitude()))
+                            .title(reports.get(ii).getTitle())
+                            .icon(BitmapDescriptorFactory.fromResource(currIcon)));
+
+                }
+
+                for(int ii=0; ii< places.size(); ++ii){
+                    placeMarkers.add(map.addMarker(places.get(ii)));
+                }
+            }
+        });
+    }
 
     //fetch and parse crime report data
     private class GetCrimeReport extends AsyncTask<String, Void, String> {
@@ -325,8 +418,11 @@ public class MapController extends ActionBarActivity {
         protected String doInBackground(String... placesURL) {
             StringBuilder placesBuilder = new StringBuilder();
             //process search parameter string(s)
+            Log.d("background", "get in");
+
             for (String placeSearchURL : placesURL) {
                 //execute search
+                Log.d("url place search", placeSearchURL);
                 HttpClient placesClient = new DefaultHttpClient();
                 try {
                     //try to fetch the data
@@ -336,14 +432,33 @@ public class MapController extends ActionBarActivity {
                     Log.d("Status Code Connection ", placeSearchStatus.getStatusCode()+"");
                     if (placeSearchStatus.getStatusCode() == 200) {
                         //we have an OK response
-                        HttpEntity placesEntity = placesResponse.getEntity();
-                        InputStream placesContent = placesEntity.getContent();
-                        InputStreamReader placesInput = new InputStreamReader(placesContent);
-                        BufferedReader placesReader = new BufferedReader(placesInput);
-                        String lineIn;
-                        while ((lineIn = placesReader.readLine()) != null) {
-                            placesBuilder.append(lineIn);
+                        HttpEntity entity = placesResponse.getEntity();
+                        InputStream content = entity.getContent();
+
+                        try {
+                            //Read the server response and attempt to parse it as JSON
+                            Reader reader = new InputStreamReader(content);
+                            GsonBuilder gsonBuilder = new GsonBuilder();
+                            gsonBuilder.setDateFormat("d/MM/yyyy HH:mm");
+                            Gson gson = gsonBuilder.create();
+                            List<MiniCrimeReport> miniReports = new ArrayList<MiniCrimeReport>();
+                            Log.d("gson : ", "sebelum gson from json");
+
+
+                            miniReports = Arrays.asList(gson.fromJson(reader, MiniCrimeReport[].class));
+                            for (MiniCrimeReport p : miniReports) {
+                                //Log.d("Report ", p.getTitle()+", "+p.getLatitude()+", "+ p.getLongitude()+ ","+p.getCrimeTimeStart().toString() + p);
+                                Log.d("Report", p.toString());
+                            }
+                            content.close();
+                            handleReportList(miniReports);
+                        } catch (Exception ex) {
+                            Log.e("Exception", "Error " +ex);
+                            //failedLoadingPosts();
                         }
+                    } else {
+                        //Log.e(TAG, "Server responded with status code: " + statusLine.getStatusCode());
+                        //failedLoadingPosts();
                     }
                 }
                 catch(Exception e){
@@ -352,86 +467,13 @@ public class MapController extends ActionBarActivity {
             }
             return placesBuilder.toString();
         }
+
+
+
         @Override
         protected void onPostExecute(String result) {
             Log.d("Result on Post: ", result);
             //parse place data returned from Google Places
-            if(placeMarkers!=null){
-                for(int pm=0; pm<placeMarkers.length; pm++){
-                    if(placeMarkers[pm]!=null)
-                        placeMarkers[pm].remove();
-                }
-            }
-            try {
-                //parse JSON
-                JSONObject resultObject = new JSONObject(result);
-                JSONArray placesArray = resultObject.getJSONArray("results");
-                places = new MarkerOptions[placesArray.length()];
-
-                boolean missingValue=false;
-                LatLng placeLL=null;
-                String placeName="";
-                String vicinity="";
-                int currIcon = R.drawable.mk_sxassault;
-
-                    Log.d("Length ", placesArray.length()+"");
-
-                    //loop through places
-                    for (int p=0; p<placesArray.length(); p++) {
-                        try{
-                                //attempt to retrieve place data values
-
-                            //parse each place
-                            missingValue=false;
-                            JSONObject placeObject = placesArray.getJSONObject(p);
-                            JSONObject loc = placeObject.getJSONObject("geometry").getJSONObject("location");
-                            placeLL = new LatLng(
-                                    Double.valueOf(loc.getString("lat")),
-                                    Double.valueOf(loc.getString("lng")));
-                            JSONArray types = placeObject.getJSONArray("types");
-                            for(int t=0; t<types.length(); t++){
-                                String thisType=types.get(t).toString();   //what type is it
-                                if(thisType.contains("food")){
-                                    currIcon = R.drawable.mk_burglary;
-                                    break;
-                                }
-                                else if(thisType.contains("bar")){
-                                    currIcon = R.drawable.mk_drugs;
-                                    break;
-                                }
-                                else if(thisType.contains("store")){
-                                    currIcon = R.drawable.mk_kidnap;
-                                    break;
-                                }
-                            }
-                            vicinity = placeObject.getString("vicinity");
-                            placeName = placeObject.getString("name");
-                            }
-                        catch(JSONException jse){
-                            missingValue=true;
-                            jse.printStackTrace();
-                        }
-                        if(missingValue)places[p]=null;
-                        else
-                            places[p]=new MarkerOptions()
-                                    .position(placeLL)
-                                    .title(placeName)
-                                    .icon(BitmapDescriptorFactory.fromResource(currIcon))
-                                    .snippet(vicinity);
-                    }
-
-
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            if(places!=null && placeMarkers!=null){
-                for(int p=0; p<places.length && p<placeMarkers.length; p++){
-                    //will be null if a value was missing
-                    if(places[p]!=null)
-                        placeMarkers[p]=map.addMarker(places[p]);
-                }
-            }
         }
     }
 
