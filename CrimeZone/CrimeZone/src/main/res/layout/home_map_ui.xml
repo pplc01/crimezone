@@ -31,7 +31,6 @@
                 android:layout_centerHorizontal="true"
                 android:textSize="20dp"
                 >
-
             </com.ppl.crimezone.activities.SearchLocationUI>
 
             <RelativeLayout
@@ -65,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:background="@color/blue"
-                android:src="@drawable/back"
+                android:src="@drawable/i_filter"
                 android:layout_gravity="center"
                 android:id="@+id/show_filter"
                 />

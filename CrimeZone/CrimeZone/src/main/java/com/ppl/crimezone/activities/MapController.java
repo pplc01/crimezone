@@ -892,16 +892,16 @@ public class MapController extends ActionBarActivity {
                             currIcon = R.drawable.mk_4;
                             break;
                         case 5:
-                            currIcon = R.drawable.mk;
+                            currIcon = R.drawable.mk_5;
                             break;
                         case 6:
-                            currIcon = R.drawable.mk;
+                            currIcon = R.drawable.mk_6;
                             break;
                         case 7:
-                            currIcon = R.drawable.mk;
+                            currIcon = R.drawable.mk_7;
                             break;
                         case 8:
-                            currIcon = R.drawable.mk;
+                            currIcon = R.drawable.mk_8;
                             break;
                         default:
                             currIcon = R.drawable.mk;
