@@ -146,6 +146,7 @@ public class ReportController extends FragmentActivity {
         Calendar cal = Calendar.getInstance();
         year = cal.get(Calendar.YEAR);
         month = cal.get(Calendar.MONTH);
+        Log.d("month", month+"");
         day = cal.get(Calendar.DATE);
         final Handler dateHandler= new Handler(){
             @Override
@@ -163,7 +164,7 @@ public class ReportController extends FragmentActivity {
                 day = b.getInt("set_day");
 
                 /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeDate.setText(day+"/"+month+"/"+year);
+                crimeDate.setText(day+"/"+(month+1)+"/"+year);
             }
         };
 
@@ -1017,9 +1018,9 @@ public class ReportController extends FragmentActivity {
 
                 data[0] = username;
                 data[1] = titleEditText.getText().toString();
-                data[2] = cal.get(Calendar.YEAR)+ "/"+cal.get(Calendar.MONTH)+"/" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
-                data[3] =  day+"/"+month+"/" + year + " " + hour_start+ ":"+ minute_start;
-                data[4] = day+"/"+month+"/" + year + " " + hour_end+ ":"+ minute_end;
+                data[2] = cal.get(Calendar.YEAR)+ "/"+(cal.get(Calendar.MONTH)+1)+"/" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
+                data[3] =  day+"/"+(month+1)+"/" + year + " " + hour_start+ ":"+ minute_start;
+                data[4] = day+"/"+(month+1)+"/" + year + " " + hour_end+ ":"+ minute_end;
                 data[5] = descriptionEditText.getText().toString();
                 data[6] = location.latitude+"";
                 data[7] = location.longitude+"";
@@ -1055,6 +1056,15 @@ public class ReportController extends FragmentActivity {
              * havis itu write share preference mengenai location nya
              * pindah ke view map
              */
+            String PREFS_NAME = "NewReportLocation";
+            SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("latitude", location.latitude+"");
+            editor.putString("longitude", location.longitude+"");
+
+            // Commit the edits!
+            editor.commit();
+
             finish();
         }
         protected void onProgressUpdate(Integer... progress){
