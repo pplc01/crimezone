@@ -1,0 +1,126 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:background="@color/cream"
+    android:layout_height="fill_parent"
+    tools:context="com.ppl.crimezone.activities.ProfileUI">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="63dp"
+        android:background="@color/blue">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/back"
+            android:src="@drawable/back"
+            android:background="@color/blue"
+            android:layout_marginLeft="15dp"
+            android:layout_gravity="left|center_vertical" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings"
+            android:src="@drawable/ic_settings"
+            android:background="@color/blue"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="right|center_vertical" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@drawable/myprofile" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/scrollView" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">]
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@color/dark"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Full Name"
+                android:id="@+id/fullName"
+                android:gravity="center_horizontal|bottom"
+                />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:background="@color/dark"
+                android:gravity="center_horizontal"
+                android:layout_height="60dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Joined: "/>
+
+                <!--//buat naro joined date-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="DD/MM/YYYY"
+                    android:id="@+id/profjoined"
+                    android:layout_below="@+id/namevalue"
+                    android:gravity="center_horizontal"
+                    android:layout_centerHorizontal="true" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="user.name"
+                android:id="@+id/usernamevalue"
+                android:textColor="@color/dark"
+                android:gravity="right"
+                android:background="@drawable/b_username"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="10dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="email@address"
+                android:id="@+id/emailvalue"
+                android:gravity="right"
+                android:textColor="@color/dark"
+                android:background="@drawable/b_email"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Profile succesfully updated!"
+                android:id="@+id/successMessage"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/holo_green_dark"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
