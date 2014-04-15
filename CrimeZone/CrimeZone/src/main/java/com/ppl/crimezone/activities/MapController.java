@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -25,18 +29,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
-import com.ppl.crimezone.model.CrimeReport;
+import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Calendar;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -48,18 +48,21 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import android.util.Log;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
 import com.google.maps.android.SphericalUtil;
 import com.ppl.crimezone.model.MiniCrimeReport;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**
  com.google.maps.android:android-maps-utils
@@ -70,16 +73,19 @@ public class MapController extends ActionBarActivity {
 
     //the map variable
     private GoogleMap map = null;
-    private Location location;
+    //private Location location;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
     private ArrayList<Marker> placeMarkers;
     private ArrayList<MarkerOptions> places;
+    private LatLng location;
 
 
     //for filter
-    private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
+    private ArrayList<MiniCrimeReport> filterList = new ArrayList<MiniCrimeReport>();
+    private boolean filterReportCrimeType[] = new boolean [8];
+
     AutoCompleteTextView searchLocation;
     DownloadTask placesDownloadTask;
     DownloadTask placeDetailsDownloadTask;
@@ -92,8 +98,13 @@ public class MapController extends ActionBarActivity {
     boolean dateFilter;
     boolean crimeTypeFilter;
 
-    Date dateStart;
-    Date dateEnd;
+    int year_start;
+    int month_start;
+    int day_start;
+
+    int year_end;
+    int month_end;
+    int day_end;
 
     List<MiniCrimeReport> reports;
 
@@ -105,9 +116,19 @@ public class MapController extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_map_ui);
-
+        setUpFilter();
         setUpMap();
+
         setUpSearchLocation();
+
+    }
+
+    private void setUpFilter(){
+        SlidingUpPanelLayout slider = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+        ImageView dragArea = (ImageView) findViewById(R.id.show_filter);
+        slider.setDragView(dragArea);
+
+        setUpFilterListener();
 
     }
 
@@ -135,11 +156,380 @@ public class MapController extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void updateFilterCrimeMarker(){
+        LatLng far = map.getProjection().getVisibleRegion().farLeft;
+        double distance = SphericalUtil.computeDistanceBetween(far, location);
+       updateCrimeMarker(location.latitude, location.longitude, distance);
+    }
+
+
+    private void setUpFilterListener(){
+
+        //button listener
+            for(int ii=0; ii< 8; ++ii){
+                filterReportCrimeType[ii] = true;
+            }
+
+            year_start = 0;
+            year_end =0;
+            month_start = 0;
+            month_end = 0;
+            day_start= 0;
+            day_end = 0;
+
+            final ImageButton type [] = new ImageButton[8];
+            type[0] = (ImageButton) findViewById(R.id.drugs2);
+            type[1] = (ImageButton) findViewById(R.id.burglary2);
+            type[2] = (ImageButton) findViewById(R.id.homicide2);
+            type[3] = (ImageButton) findViewById(R.id.kidnap2);
+            type[4] = (ImageButton) findViewById(R.id.sxassault2);
+            type[5] = (ImageButton) findViewById(R.id.theft2);
+            type[6] = (ImageButton) findViewById(R.id.vehicletheft2);
+            type[7] = (ImageButton) findViewById(R.id.violence2);
+
+            type[0].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[0]) {
+                                                   type[0].setImageResource(R.drawable.ic_drugs);
+                                                   filterReportCrimeType[0] = false;
+                                               }else{
+                                                   type[0].setImageResource(R.drawable.nc_drugs);
+                                                   filterReportCrimeType[0] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[1].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[1]) {
+                                                   type[1].setImageResource(R.drawable.ic_burglary);
+                                                   filterReportCrimeType[1] = false;
+                                               }else{
+                                                   type[1].setImageResource(R.drawable.nc_burglary);
+                                                   filterReportCrimeType[1] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+
+            type[2].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[2]) {
+                                                   type[2].setImageResource(R.drawable.ic_homicide);
+                                                   filterReportCrimeType[2] = false;
+                                               }else{
+                                                   type[2].setImageResource(R.drawable.nc_homicide);
+                                                   filterReportCrimeType[2] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[3].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[3]) {
+                                                   type[3].setImageResource(R.drawable.ic_kidnap);
+                                                   filterReportCrimeType[3] = false;
+                                               }else{
+                                                   type[3].setImageResource(R.drawable.nc_kidnap);
+                                                   filterReportCrimeType[3] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[4].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[4]) {
+                                                   type[4].setImageResource(R.drawable.ic_sxassault);
+                                                   filterReportCrimeType[4] = false;
+                                               }else{
+                                                   type[4].setImageResource(R.drawable.nc_sxassault);
+                                                   filterReportCrimeType[4] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[5].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[5]) {
+                                                   type[5].setImageResource(R.drawable.ic_theft);
+                                                   filterReportCrimeType[5] = false;
+                                               } else {
+                                                   type[5].setImageResource(R.drawable.nc_theft);
+                                                   filterReportCrimeType[5] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[6].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[6]) {
+                                                   type[6].setImageResource(R.drawable.ic_vehicletheft);
+                                                   filterReportCrimeType[6] = false;
+                                               } else {
+                                                   type[6].setImageResource(R.drawable.nc_vehicletheft);
+                                                   filterReportCrimeType[6] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+            type[7].setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               if (filterReportCrimeType[7]) {
+                                                   type[7].setImageResource(R.drawable.ic_violence);
+                                                   filterReportCrimeType[7] = false;
+                                               }else{
+                                                   type[7].setImageResource(R.drawable.nc_violence);
+                                                   filterReportCrimeType[7] = true;
+                                               }
+                                               updateFilterCrimeMarker();
+                                           }
+                                       }
+            );
+
+
+        //set up date listener
+
+        final Button startDate = (Button) findViewById(R.id.start_date);
+        final Button endDate = (Button) findViewById(R.id.end_date);
+
+        Calendar cal = Calendar.getInstance();
+        year_start = cal.get(Calendar.YEAR);
+        month_start = cal.get(Calendar.MONTH);
+        day_start = cal.get(Calendar.DATE);
+        final Handler startDateHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                /** Creating a bundle object to pass currently set Time to the fragment */
+                Bundle b = m.getData();
+
+                /** Getting the year from bundle */
+                int temp_year_start = b.getInt("set_year");
+
+                /** Getting the month from bundle */
+                int temp_month_start = b.getInt("set_month");
+
+                /** Getting the day from bundle */
+                int temp_day_start = b.getInt("set_day");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                boolean valid = true;
+
+                Calendar cal = Calendar.getInstance();
+                if(temp_year_start > cal.get(Calendar.YEAR)) {
+                    valid = false;
+                }else if(temp_year_start == cal.get(Calendar.YEAR) && temp_month_start > cal.get(Calendar.MONTH)){
+                    valid = false;
+                }else if(temp_year_start == cal.get(Calendar.YEAR) && temp_month_start == cal.get(Calendar.MONTH) && temp_day_start > cal.get(Calendar.DATE)){
+                    valid = false;
+                }
+
+
+                if(valid){
+                    if(!endDate.getText().toString().equals("End")){
+                        if (year_end > cal.get(Calendar.YEAR)) {
+                            valid = false;
+                        } else if (year_end == cal.get(Calendar.YEAR) && month_end > cal.get(Calendar.MONTH)) {
+                            valid = false;
+                        } else if (year_end == cal.get(Calendar.YEAR) && month_end == cal.get(Calendar.MONTH) && day_end > cal.get(Calendar.DATE)) {
+                            valid = false;
+                        }
+
+                        if(valid){
+                            if(temp_year_start > year_end)valid = false;
+                            else if(temp_year_start == year_end && temp_month_start > month_end)valid = false;
+                            else if(temp_year_start == year_end && temp_month_start == month_end && temp_day_start > day_end)valid = false;
+
+                            if(valid){
+                                year_start = temp_year_start;
+                                month_start = temp_month_start;
+                                day_start = temp_day_start;
+                                startDate.setText(day_start+"/"+(month_start+1)+"/"+year_start);
+                                updateFilterCrimeMarker();
+                            }else{
+                                startDate.performClick();
+                            }
+                        }else {
+                            endDate.performClick();
+                        }
+                    }else{
+                        year_start = temp_year_start;
+                        month_start = temp_month_start;
+                        day_start = temp_day_start;
+                        startDate.setText(day_start+"/"+(month_start+1)+"/"+year_start);
+                    }
+                }else {
+                    startDate.performClick();
+                }
+            }
+        };
+
+        /** Click Event Handler for button */
+        View.OnClickListener startDateListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_year", year_start);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_month", month_start);
+
+                b.putInt("set_day", day_start);
+                /** Instantiating TimePickerDialogFragment */
+                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(startDateHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                datePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(datePicker, "date_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+        startDate.setOnClickListener(startDateListener);
+
+        year_end = cal.get(Calendar.YEAR);
+        month_end = cal.get(Calendar.MONTH);
+        day_end = cal.get(Calendar.DATE);
+        final Handler endDateHandler= new Handler(){
+            @Override
+            public void handleMessage(Message m){
+                Bundle b = m.getData();
+
+                /** Getting the year from bundle */
+                int temp_year_end = b.getInt("set_year");
+
+                /** Getting the month from bundle */
+                int temp_month_end = b.getInt("set_month");
+
+                /** Getting the day from bundle */
+                int temp_day_end = b.getInt("set_day");
+
+                /** Displaying a short time message containing time set by Time picker dialog fragment */
+                boolean valid = true;
+
+                Calendar cal = Calendar.getInstance();
+                if(temp_year_end > cal.get(Calendar.YEAR)) {
+                    valid = false;
+                }else if(temp_year_end == cal.get(Calendar.YEAR) && temp_month_end > cal.get(Calendar.MONTH)){
+                    valid = false;
+                }else if(temp_year_end == cal.get(Calendar.YEAR) && temp_month_end == cal.get(Calendar.MONTH) && temp_day_end > cal.get(Calendar.DATE)){
+                    valid = false;
+                }
+
+
+                if(valid){
+                    if(!startDate.getText().toString().equals("Start")){
+                        if (year_start > cal.get(Calendar.YEAR)) {
+                            valid = false;
+                        } else if (year_start == cal.get(Calendar.YEAR) && month_start > cal.get(Calendar.MONTH)) {
+                            valid = false;
+                        } else if (year_start == cal.get(Calendar.YEAR) && month_start == cal.get(Calendar.MONTH) && day_start > cal.get(Calendar.DATE)) {
+                            valid = false;
+                        }
+
+                        if(valid){
+                            if(temp_year_end < year_start)valid = false;
+                            else if(temp_year_end == year_start && temp_month_end < month_start)valid = false;
+                            else if(temp_year_end == year_start && temp_month_end == month_start && temp_day_end < day_start)valid = false;
+
+                            if(valid){
+                                year_end = temp_year_end;
+                                month_end = temp_month_end;
+                                day_end = temp_day_end;
+                                endDate.setText(day_end+"/"+(month_end+1)+"/"+year_end);
+                                updateFilterCrimeMarker();
+                            }else{
+                                endDate.performClick();
+                            }
+                        }else {
+                            startDate.performClick();
+                        }
+                    }else{
+                        year_end = temp_year_end;
+                        month_end = temp_month_end;
+                        day_end = temp_day_end;
+                        endDate.setText(day_end + "/" + (month_end + 1) + "/" + year_end);
+                    }
+                }else {
+                    endDate.performClick();
+                }
+            }
+        };
+
+        /** Click Event Handler for button */
+        View.OnClickListener endDateListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /** Creating a bundle object to pass currently set time to the fragment */
+                Bundle b = new Bundle();
+
+                /** Adding currently set hour to bundle object */
+                b.putInt("set_year", year_end);
+
+                /** Adding currently set minute to bundle object */
+                b.putInt("set_month", month_end);
+
+                b.putInt("set_day", day_end);
+                /** Instantiating TimePickerDialogFragment */
+                DatePickerDialogFragment datePicker = new DatePickerDialogFragment(endDateHandler);
+
+                /** Setting the bundle object on timepicker fragment */
+                datePicker.setArguments(b);
+
+                /** Getting fragment manger for this activity */
+                FragmentManager fm = getSupportFragmentManager();
+
+                /** Starting a fragment transaction */
+                FragmentTransaction ft = fm.beginTransaction();
+
+                /** Adding the fragment object to the fragment transaction */
+                ft.add(datePicker, "date_picker");
+
+                /** Opening the TimePicker fragment */
+                ft.commit();
+            }
+        };
+        endDate.setOnClickListener(endDateListener);
+
+    }
+
+
+
+
     /*
      * Called when the Activity becomes visible.
      */
     @Override
-    protected void onStart() {
+    protected void onStart(){
         super.onStart();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         updateLocationUser();
@@ -151,6 +541,35 @@ public class MapController extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        final String PREFS_NAME = "NewReportLocation";
+
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        double latitude =  Double.parseDouble(settings.getString("latitude", 100000+""));
+        double longitude =  Double.parseDouble(settings.getString("longitude", 100000+""));
+
+        if((int)latitude != 100000 || (int) longitude!=100000 ){
+            location = new LatLng(latitude, longitude);
+
+            LatLng target = new LatLng(location.latitude, location.longitude);
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(target)      // Sets the center of the map to Mountain View
+                    .zoom(13)                   // Sets the zoom level
+                    .bearing(0)                // Sets the orientation of the camera to east
+                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+            LatLng far = map.getProjection().getVisibleRegion().farLeft;
+            double distance = SphericalUtil.computeDistanceBetween(far, target);
+            updateCrimeMarker(location.latitude, location.longitude, distance );
+        }
+
+
+
     }
 
 
@@ -192,6 +611,7 @@ public class MapController extends ActionBarActivity {
         if(map == null) {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             map.setMyLocationEnabled(true);
+            map.setPadding(0,0,0,20);
             setUpMapListener();
         }
     }
@@ -203,11 +623,9 @@ public class MapController extends ActionBarActivity {
                         @Override
                         public void onCameraChange(CameraPosition cameraPosition)
                         {
-                            String latitude = String.valueOf(cameraPosition.target.latitude);
-                            String longitude = String.valueOf(cameraPosition.target.latitude);
                             LatLng far = map.getProjection().getVisibleRegion().farLeft;
                             double distance = SphericalUtil.computeDistanceBetween(far, cameraPosition.target);
-                            updateCrimeMarker(latitude, longitude, distance);
+                            updateCrimeMarker(location.latitude, location.longitude, distance);
                         }
                     }
                 );
@@ -218,13 +636,12 @@ public class MapController extends ActionBarActivity {
         locationListener = new LocationListener() {
             public void onLocationChanged(Location userLocation) {
                 // Called when a new location is found by the network location provider.
-                location = userLocation;
-
-                LatLng target = new LatLng(location.getLatitude(), location.getLongitude());
+                //location
+                location = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(target)      // Sets the center of the map to Mountain View
-                        .zoom(15)                   // Sets the zoom level
+                        .target(location)      // Sets the center of the map to Mountain View
+                        .zoom(13)                   // Sets the zoom level
                         .bearing(0)                // Sets the orientation of the camera to east
                         .tilt(30)                   // Sets the tilt of the camera to 30 degrees
                         .build();                   // Creates a CameraPosition from the builder
@@ -232,10 +649,8 @@ public class MapController extends ActionBarActivity {
 
 
                 LatLng far = map.getProjection().getVisibleRegion().farLeft;
-                double distance = SphericalUtil.computeDistanceBetween(far,  target);
-                String latVal=String.valueOf(location.getLatitude());
-                String lngVal=String.valueOf(location.getLongitude());
-                updateCrimeMarker(latVal, lngVal, distance );
+                double distance = SphericalUtil.computeDistanceBetween(far, location);
+                updateCrimeMarker(location.latitude, location.longitude, distance );
                 locationManager.removeUpdates(locationListener);
             }
 
@@ -259,7 +674,7 @@ public class MapController extends ActionBarActivity {
         }
     }u
      */
-    private void updateCrimeMarker(String latitude, String longitude, double distance){
+    private void updateCrimeMarker(double latitude, double longitude, double distance){
         String url;
 
         url = "http://crimezone.besaba.com/webservice/crimeLocation.php?distance="+distance
@@ -331,45 +746,117 @@ public class MapController extends ActionBarActivity {
         });
     }
 
+
+    private void setFilter(){
+        filterList = new ArrayList<MiniCrimeReport>();
+        Log.d("report size", reports.size()+"");
+        for(int ii=0; ii< reports.size(); ++ii){
+            MiniCrimeReport temp = new MiniCrimeReport(reports.get(ii).getTitle(), reports.get(ii).getCrimeTimeStart(), reports.get(ii).getCategories(), reports.get(ii).getLatitude(), reports.get(ii).getLongitude());
+            if(!filterReportCrimeType[0]){
+                temp.remove("0");
+            }
+            if(!filterReportCrimeType[1]){
+                temp.remove("1");
+            }
+            if(!filterReportCrimeType[2]){
+                temp.remove("2");
+            }
+            if(!filterReportCrimeType[3]){
+                temp.remove("3");
+            }
+            if(!filterReportCrimeType[4]){
+                temp.remove("4");
+            }
+            if(!filterReportCrimeType[5]){
+                temp.remove("5");
+            }
+            if(!filterReportCrimeType[6]){
+                temp.remove("6");
+            }
+            if(!filterReportCrimeType[7]){
+                temp.remove("7");
+            }
+            boolean valid = true;
+            final Button startDate = (Button) findViewById(R.id.start_date);
+            final Button endDate = (Button) findViewById(R.id.end_date);
+            if(!(startDate.getText().toString().equals("Start") ||  endDate.getText().toString().equals("End"))){
+                Log.d("year check start", temp.getCrimeTimeStart().getYear()+" "+ year_start);
+                Log.d("year check end", temp.getCrimeTimeStart().getYear()+" "+ year_end);
+                Log.d("month check start", temp.getCrimeTimeStart().getMonth()+" "+ month_start);
+                Log.d("month check end", temp.getCrimeTimeStart().getMonth()+" "+ month_end);
+                Log.d("date check start", temp.getCrimeTimeStart().getDate()+" "+ day_start);
+                Log.d("date check end", temp.getCrimeTimeStart().getDate()+" "+ day_end);
+
+                if (temp.getCrimeTimeStart().getYear()+1900 < year_start) valid = false;
+                else if (temp.getCrimeTimeStart().getYear()+1900 > year_end) valid = false;
+                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() < (month_start))
+                {
+                    valid = false;
+                    Log.d("date check", "1");
+                }
+                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() == (month_start) && temp.getCrimeTimeStart().getDate() < day_start)
+                {
+                    valid = false;
+                    Log.d("date check", "2");
+                }
+                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() >(month_end))
+                {
+                    valid = false;
+                    Log.d("date check", "3");
+                }
+                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() == (month_end) && temp.getCrimeTimeStart().getDate() > day_end)
+                {
+                    valid = false;
+                    Log.d("date check", "4");
+                }
+            }
+            Log.d("valid", valid+"");
+            Log.d("loop "+ii, temp.printCategories());
+            if(valid && temp.getCategories().size()>0){
+                filterList.add(temp);
+                Log.d("filterlist size", filterList.size()+"");
+            }
+        }
+    }
     private void handleReportList(List<MiniCrimeReport> updateReports){
         reports = updateReports;
 
-        runOnUiThread(new Runnable(){
+        runOnUiThread(new Runnable() {
             @Override
-            public void run(){
-                Log.d("report size : ", reports.size()+"");
-                if(placeMarkers!=null){
-                    for(int pm=0; pm<placeMarkers.size(); pm++){
-                        if(placeMarkers.get(pm)!=null)
+            public void run() {
+                setFilter();
+                if (placeMarkers != null) {
+                    for (int pm = 0; pm < placeMarkers.size(); pm++) {
+                        if (placeMarkers.get(pm) != null)
                             placeMarkers.get(pm).remove();
                     }
                 }
-                LatLng target = new LatLng(0,0);
                 placeMarkers = new ArrayList<Marker>();
                 places = new ArrayList<MarkerOptions>();
-                int currIcon = R.drawable.mk_sxassault;
-                ArrayList<MiniCrimeReport> list = new ArrayList<MiniCrimeReport>();
-                for(int ii=0; ii< reports.size(); ++ii) {
-                    switch(reports.get(ii).getCategories().size()) {
+                int currIcon = R.drawable.mk;
+
+
+                for (int ii = 0; ii < filterList.size(); ++ii)
+                {
+                    //Log.d("loop "+ ii+" ", filterList.get(ii).printCategories());
+                    switch (filterList.get(ii).getCategories().size()) {
                         case 1:
-                            if (reports.get(ii).getCategories().get(0).equals("0")) {
+                            if (filterList.get(ii).getCategories().get(0).equals("0")) {
                                 currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("0")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("1")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("2")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("3")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("4")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("5")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("6")) {
-                                currIcon = R.drawable.mk_drugs;
-                            } else if (reports.get(ii).getCategories().get(0).equals("7")) {
-                                currIcon = R.drawable.mk_drugs;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("1")) {
+                                currIcon = R.drawable.mk_burglary;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("2")) {
+                                currIcon = R.drawable.mk_homicide;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("3")) {
+                                currIcon = R.drawable.mk_kidnap;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("4")) {
+                                currIcon = R.drawable.mk_sxassault;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("5")) {
+                                currIcon = R.drawable.mk_theft;
+                            } else if (filterList.get(ii).getCategories().get(0).equals("6")) {
+                                currIcon = R.drawable.mk_vehicletheft;
+                            }else if (filterList.get(ii).getCategories().get(0).equals("7")) {
+                                currIcon = R.drawable.mk_violence;
                             }
                             break;
                         case 2:
@@ -397,15 +884,15 @@ public class MapController extends ActionBarActivity {
                             currIcon = R.drawable.mk;
 
                     }
+
+
                     places.add(new MarkerOptions()
-                            .position(new LatLng(reports.get(ii).getLatitude(), reports.get(ii).getLongitude()))
-                            .title(reports.get(ii).getTitle())
+                            .position(new LatLng(filterList.get(ii).getLatitude(), filterList.get(ii).getLongitude()))
+                            .title(filterList.get(ii).getTitle())
                             .icon(BitmapDescriptorFactory.fromResource(currIcon)));
-
-                }
-
-                for(int ii=0; ii< places.size(); ++ii){
                     placeMarkers.add(map.addMarker(places.get(ii)));
+                    Log.d("place size at "+ii, places.size()+"");
+                    Log.d("place marker size at "+ii, placeMarkers.size()+"");
                 }
             }
         });
@@ -610,57 +1097,6 @@ public class MapController extends ActionBarActivity {
 
                     break;
             }
-        }
-    }
-
-    private class Data {
-
-        String title;
-
-        @SerializedName("time_start")
-        Date crimeDateStart;
-        @SerializedName("time_end")
-        Date crimeDateEnd;
-        String [] categories;
-
-        @SerializedName("x_coordinate")
-        double latitude;
-        @SerializedName("y_coordinate")
-        double longitude;
-
-        public Data(String title, Date start, Date end,String[] categories, double lat, double lang){
-            this.title = title;
-            crimeDateStart = start;
-            crimeDateEnd = end;
-            this.categories = categories;
-            latitude = lat;
-            longitude = lang;
-
-        }
-
-
-        public String getTitle(){
-            return title;
-        }
-
-        public Date getCrimeDateStart(){
-            return crimeDateStart;
-        }
-
-        public Date getCrimeDateEnd(){
-            return crimeDateEnd;
-        }
-
-        public double getLatitude(){
-            return latitude;
-        }
-
-        public double getLongitude(){
-            return longitude;
-        }
-
-        public String[] getCategories(){
-            return categories;
         }
     }
 }

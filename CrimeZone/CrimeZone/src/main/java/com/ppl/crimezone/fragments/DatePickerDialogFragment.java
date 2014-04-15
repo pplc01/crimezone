@@ -10,6 +10,9 @@ import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by adesudiman on 4/10/2014.
  */
@@ -45,32 +48,31 @@ public class DatePickerDialogFragment extends DialogFragment {
             @Override
             public void onDateSet(DatePicker view, int cYear, int cMonth, int cDay) {
 
-                year = cYear;
-                month = cMonth;
-                day = cDay;
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
+                    year = cYear;
+                    month = cMonth;
+                    day = cDay;
+                    /** Creating a bundle object to pass currently set time to the fragment */
+                    Bundle b = new Bundle();
 
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_year", year);
+                    /** Adding currently set hour to bundle object */
+                    b.putInt("set_year", year);
 
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_month", month);
+                    /** Adding currently set minute to bundle object */
+                    b.putInt("set_month", month);
 
-                b.putInt("set_day", day);
-                /** Creating an instance of Message */
-                Message m = new Message();
+                    b.putInt("set_day", day);
+                    /** Creating an instance of Message */
+                    Message m = new Message();
 
-                /** Setting bundle object on the message object m */
-                m.setData(b);
+                    /** Setting bundle object on the message object m */
+                    m.setData(b);
 
-                /** Message m is sending using the message handler instantiated in MainActivity class */
-                mHandler.sendMessage(m);
-
-            }
+                    /** Message m is sending using the message handler instantiated in MainActivity class */
+                    mHandler.sendMessage(m);
+                }
         };
-
         /** Opening the TimePickerDialog window */
-        return new DatePickerDialog(getActivity(), listener, year, month, day);
+        return  new DatePickerDialog(getActivity(), listener, year, month, day);
+
     }
 }

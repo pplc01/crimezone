@@ -102,5 +102,9 @@ public class MiniCrimeReport {
         if(this.getLatitude() == otherReport.getLatitude() && this.getLongitude()== otherReport.getLongitude()) return true;
         return false;
     }
+
+    public void remove(String category){
+        categories.remove(category);
+    }
 }
 
