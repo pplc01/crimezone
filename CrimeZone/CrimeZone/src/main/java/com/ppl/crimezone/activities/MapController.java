@@ -339,7 +339,6 @@ public class MapController extends ActionBarActivity {
                     valid = false;
                 }
 
-
                 if(valid){
                     if(!endDate.getText().toString().equals("End")){
                         if (year_end > cal.get(Calendar.YEAR)) {
@@ -543,7 +542,6 @@ public class MapController extends ActionBarActivity {
         super.onResume();
         final String PREFS_NAME = "NewReportLocation";
 
-
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
         double latitude =  Double.parseDouble(settings.getString("latitude", 100000+""));
@@ -629,6 +627,31 @@ public class MapController extends ActionBarActivity {
                         }
                     }
                 );
+        map.setOnInfoWindowClickListener
+                (
+                        new GoogleMap.OnInfoWindowClickListener()
+                        {
+
+                            @Override
+                            public void onInfoWindowClick(Marker marker) {
+                                String PREFS_NAME = "ReporControllerMode";
+                                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                                SharedPreferences.Editor editor = settings.edit();
+                                editor.putBoolean("NewReportMode", false);
+                                editor.putString("latitude", marker.getPosition().latitude+"");
+                                editor.putString("longitude", marker.getPosition().longitude+"");
+                                // Commit the edits!
+                                editor.commit();
+                                startDetail();
+
+                            }
+                        }
+                );
+    }
+
+    private void startDetail(){
+        Intent intent = new Intent(this, ReportController.class);
+        startActivity(intent);
     }
 
     //set the map to point to current user location
