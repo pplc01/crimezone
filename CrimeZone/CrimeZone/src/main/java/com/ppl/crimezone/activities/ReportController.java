@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -42,28 +43,40 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.fragments.DatePickerDialogFragment;
 import com.ppl.crimezone.fragments.TimePickerDialogFragment;
 import com.ppl.crimezone.model.CrimeReport;
+import com.ppl.crimezone.model.MiniCrimeReport;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -127,8 +140,7 @@ public class ReportController extends FragmentActivity {
         Variable for view detail report mode
      */
 
-    CrimeReport detail;
-    CrimeReport newCrimeReport;
+    List<CrimeReport> detailReports;
 
     boolean newReportCrimeType [] = new boolean [8];
 
@@ -526,13 +538,193 @@ public class ReportController extends FragmentActivity {
         );
     }
 
+    private void fetcCrimeReport(){
 
+        final String PREFS_NAME = "ReporControllerMode";
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        double latitude =  Double.parseDouble(settings.getString("latitude", "0"));
+        double longitude =  Double.parseDouble(settings.getString("longitude", "0"));
+
+        location = new LatLng(latitude, longitude);
+        String url;
+
+
+        url = "http://crimezone.besaba.com/webservice/crimeDetail.php?"
+                +"latitude="+ latitude+
+                "&longitude=" +longitude;
+        Log.d("String url" , url);
+
+        //execute search
+        HttpClient placesClient = new DefaultHttpClient();
+        try {
+            //try to fetch the data
+            HttpGet placesGet = new HttpGet(url);
+            HttpResponse placesResponse = placesClient.execute(placesGet);
+            StatusLine placeSearchStatus = placesResponse.getStatusLine();
+            Log.d("Status Code Connection ", placeSearchStatus.getStatusCode()+"");
+            if (placeSearchStatus.getStatusCode() == 200) {
+                //we have an OK response
+                HttpEntity entity = placesResponse.getEntity();
+                InputStream content = entity.getContent();
+
+                try {
+                    //Read the server response and attempt to parse it as JSON
+                    Reader reader = new InputStreamReader(content);
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    gsonBuilder.setDateFormat("d/MM/yyyy HH:mm");
+                    Gson gson = gsonBuilder.create();
+                    Log.d("gson : ", "sebelum gson from json");
+
+                    detailReports = Arrays.asList(gson.fromJson(reader, CrimeReport[].class));
+                    for (CrimeReport p : detailReports) {
+                        Log.d("Detail Report", p.toString());
+                    }
+                    content.close();
+                    handleDetailReportList();
+                } catch (Exception ex) {
+                    Log.e("Exception", "Error " +ex);
+                    //failedLoadingPosts();
+                }
+            } else {
+                //Log.e(TAG, "Server responded with status code: " + statusLine.getStatusCode());
+
+                //failedLoadingPosts();
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private void handleDetailReportList(){
+        for(CrimeReport data:detailReports){
+            Log.d("check in", data.toString());
+            data.setLatitude(location.latitude);
+            data.setLongitude(location.longitude);
+            TextView head = (TextView) findViewById(R.id.headline_detail);
+            head.setText(data.getTitle());
+            Log.d("title ", data.getTitle());
+            TextView time = (TextView) findViewById(R.id.time_detail);
+            String timeText = data.getCrimeDateStart().getDate()+"/"+ (data.getCrimeDateStart().getMonth()+1)+"/"+ (data.getCrimeDateStart().getYear()+1900)+ " "+ data.getCrimeDateStart().getHours()+":"+data.getCrimeDateStart().getMinutes()+"->"+ data.getCrimeDateEnd().getHours()+":"+data.getCrimeDateEnd().getMinutes();
+            time.setText(timeText);
+            Log.d("time text", timeText);
+            TextView auth = (TextView) findViewById(R.id.author);
+            auth.setText(data.getUsername());
+            TextView description = (TextView) findViewById(R.id.description_detail);
+            description.setText(data.getDescription());
+            LinearLayout typeContainer = (LinearLayout) findViewById(R.id.type_container);
+
+            for(String x: data.getCategories()){
+                ImageView typeCrime = new ImageView(this);
+                int idType = Integer.parseInt(x);
+                switch (idType){
+                    case 0:
+                        typeCrime.setImageResource(R.drawable.ic_drugs);
+                        break;
+                    case 1:
+                        typeCrime.setImageResource(R.drawable.ic_burglary);
+                        break;
+                    case 2:
+                        typeCrime.setImageResource(R.drawable.ic_homicide);
+                        break;
+                    case 3:
+                        typeCrime.setImageResource(R.drawable.ic_kidnap);
+                        break;
+                    case 4:
+                        typeCrime.setImageResource(R.drawable.ic_sxassault);
+                        break;
+                    case 5:
+                        typeCrime.setImageResource(R.drawable.ic_theft);
+                        break;
+                    case 6:
+                        typeCrime.setImageResource(R.drawable.ic_vehicletheft);
+                        break;
+                    case 7:
+                        typeCrime.setImageResource(R.drawable.ic_violence);
+                        break;
+                }
+                typeContainer.addView(typeCrime);
+
+            }
+
+            TextView latlong = (TextView) findViewById(R.id.latlang);
+
+            latlong.setText("lat: "+data.getLatitude()+ ", long "+ data.getLongitude());
+
+
+            LinearLayout starContainer = (LinearLayout) findViewById(R.id.star_container);
+            /*
+                            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/star1"
+                    android:src="@drawable/r_yesstar"
+                    android:layout_marginLeft="90dp" />
+
+             */
+            if(data.getAvgScore() >0){
+                int x = (int)data.getAvgScore();
+                for(int ii=0; ii< x; ++ii){
+                    ImageView starii = new ImageView(this);
+                    starii.setImageResource(R.drawable.r_yesstar);
+
+                     starContainer.addView(starii);
+                }
+                if(Math.abs(data.getAvgScore()-(x+0.5))< Math.abs(Math.round(data.getAvgScore())-data.getAvgScore())){
+                    ImageView halfStar = new ImageView(this);
+                    halfStar.setImageResource(R.drawable.r_halfstar);
+                    starContainer.addView(halfStar);
+                }else {
+
+                    if(Math.round(data.getAvgScore()) == x+1){
+                        ImageView fullStar = new ImageView(this);
+                        fullStar.setImageResource(R.drawable.r_yesstar);
+                        starContainer.addView(fullStar);
+                    }
+                }
+            }
+        }
+
+
+    }
+
+
+    private void updateStar(){
+        LinearLayout starContainer = (LinearLayout) findViewById(R.id.star_container);
+        starContainer.removeAllViewsInLayout();
+        int x = (int)detailReports.get(0).getAvgScore();
+        for(int ii=0; ii< x; ++ii){
+            ImageView starii = new ImageView(this);
+            starii.setImageResource(R.drawable.r_yesstar);
+            if(ii==0){
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.setMargins(90, 0, 0, 0);
+                starii.setLayoutParams(lp);
+            }
+            starContainer.addView(starii);
+
+        }
+        if(Math.abs(detailReports.get(0).getAvgScore()-(x+0.5))< Math.abs(Math.round(detailReports.get(0).getAvgScore()) - detailReports.get(0).getAvgScore())){
+            ImageView halfStar = new ImageView(this);
+            halfStar.setImageResource(R.drawable.r_halfstar);
+            starContainer.addView(halfStar);
+        }else {
+
+            if(Math.round(detailReports.get(0).getAvgScore()) == x+1){
+                ImageView fullStar = new ImageView(this);
+                fullStar.setImageResource(R.drawable.r_yesstar);
+                starContainer.addView(fullStar);
+            }
+        }
+    }
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initReportMode();
-
-        newReportMode = true;
 
         if(newReportMode){
             setContentView(R.layout.report_form_ui);
@@ -544,8 +736,31 @@ public class ReportController extends FragmentActivity {
             showTimeDialog();
             autoCollapsExpandMap();
             setUpButtonListener();
+            ImageButton backHome = (ImageButton)findViewById(R.id.back_new_report);
+            backHome.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+
         }else{
             setContentView(R.layout.report_detail_ui);
+            //download data
+            ImageButton backHome = (ImageButton)findViewById(R.id.back_detail);
+
+            fetcCrimeReport();
+
+            backHome.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            //tampilkan
+
             final ImageButton giveRatingButton = (ImageButton) findViewById(R.id.b_rate);
 
             // add button listener
@@ -568,7 +783,7 @@ public class ReportController extends FragmentActivity {
                     // set the custom dialog components - text, image and button
                     Button submitRating = (Button) dialog.findViewById(R.id.submitrate);
                     Button cancelRating = (Button) dialog.findViewById(R.id.cancelrate);
-
+                    final double[] ratingScore = {0};
                     star1.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -577,6 +792,7 @@ public class ReportController extends FragmentActivity {
                             star3.setImageResource(R.drawable.r_nostar);
                             star4.setImageResource(R.drawable.r_nostar);
                             star5.setImageResource(R.drawable.r_nostar);
+                            ratingScore[0] = 1.0;
                         }
                     });
 
@@ -587,16 +803,20 @@ public class ReportController extends FragmentActivity {
                             star2.setImageResource(R.drawable.r_yesstar);
                             star3.setImageResource(R.drawable.r_nostar);
                             star4.setImageResource(R.drawable.r_nostar);
-                            star5.setImageResource(R.drawable.r_nostar);                        }
+                            star5.setImageResource(R.drawable.r_nostar);
+                            ratingScore[0] = 2.0;
+                        }
                     });
-                    star3.setOnClickListener(new View.OnClickListener() {
+
+                star3.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             star1.setImageResource(R.drawable.r_yesstar);
                             star2.setImageResource(R.drawable.r_yesstar);
                             star3.setImageResource(R.drawable.r_yesstar);
                             star4.setImageResource(R.drawable.r_nostar);
-                            star5.setImageResource(R.drawable.r_nostar);                        }
+                            star5.setImageResource(R.drawable.r_nostar);
+                            ratingScore[0] = 3.0;}
                     });
                     star4.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -606,6 +826,7 @@ public class ReportController extends FragmentActivity {
                             star3.setImageResource(R.drawable.r_yesstar);
                             star4.setImageResource(R.drawable.r_yesstar);
                             star5.setImageResource(R.drawable.r_nostar);
+                            ratingScore[0] = 4.0;
                         }
                     });
                     star5.setOnClickListener(new View.OnClickListener() {
@@ -616,13 +837,62 @@ public class ReportController extends FragmentActivity {
                             star3.setImageResource(R.drawable.r_yesstar);
                             star4.setImageResource(R.drawable.r_yesstar);
                             star5.setImageResource(R.drawable.r_yesstar);
+                            ratingScore[0] = 5.0;
                         }
                     });
 
                     submitRating.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/inUpRateValue.php");
+                            String message = "";
+                            try
+                            {
+                                // Add your data
+                                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                                nameValuePairs.add(new BasicNameValuePair("username", detailReports.get(0).getUsername()));
+                                nameValuePairs.add(new BasicNameValuePair("reportID", detailReports.get(0).getIdReport()+""));
+                                nameValuePairs.add(new BasicNameValuePair("rateVal", ratingScore[0]+""));
+
+
+                                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                                    // Execute HTTP Post Request
+                                HttpResponse response = httpclient.execute(httppost);
+                                message =  response.getStatusLine().getStatusCode()+"";
+                                StatusLine placeSearchStatus = response.getStatusLine();
+                                Log.d("Status Code Connection ", placeSearchStatus.getStatusCode()+"");
+                                if (placeSearchStatus.getStatusCode() == 200) {
+                                    //we have an OK response
+                                    HttpEntity entity = response.getEntity();
+                                    InputStream content = entity.getContent();
+
+                                    try {
+                                        //Read the server response and attempt to parse it as JSON
+                                        Reader reader = new InputStreamReader(content);
+                                        GsonBuilder gsonBuilder = new GsonBuilder();
+                                        gsonBuilder.setDateFormat("d/MM/yyyy HH:mm");
+                                        Gson gson = gsonBuilder.create();
+                                        Log.d("gson : ", "sebelum gson from json");
+
+                                        RatingTransfer newRating = gson.fromJson(reader, RatingTransfer.class);
+                                        detailReports.get(0).setAvgScore(newRating.getRatingScore());
+                                        content.close();
+                                        updateStar();
+                                    } catch (Exception ex) {
+                                        Log.e("Exception", "Error " + ex);
+                                        //failedLoadingPosts();
+                                    }
+
+                                }
+                            }
+                            catch (ClientProtocolException e) {
+                                // TODO Auto-generated catch block
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                            }
                             dialog.dismiss();
+                            Log.d("message", message);
                             //send to server
                         }
                     });
@@ -640,7 +910,18 @@ public class ReportController extends FragmentActivity {
     }
 
 
+    class RatingTransfer{
+        @SerializedName("rate_value")
+         double updateRatingScore;
 
+        RatingTransfer(double x){
+            this.updateRatingScore = x;
+        }
+
+        public double getRatingScore(){
+            return updateRatingScore;
+        }
+    }
 
     public void setUpMarkerListener(){
         reportMap.setOnMarkerDragListener(
@@ -1018,7 +1299,7 @@ public class ReportController extends FragmentActivity {
 
                 data[0] = username;
                 data[1] = titleEditText.getText().toString();
-                data[2] = cal.get(Calendar.YEAR)+ "/"+(cal.get(Calendar.MONTH)+1)+"/" + cal.get(Calendar.DATE) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
+                data[2] = cal.get(Calendar.DATE)+ "/"+(cal.get(Calendar.MONTH)+1)+"/" + cal.get(Calendar.YEAR) + " " + cal.get(Calendar.HOUR)+ ":"+cal.get(Calendar.MINUTE);
                 data[3] =  day+"/"+(month+1)+"/" + year + " " + hour_start+ ":"+ minute_start;
                 data[4] = day+"/"+(month+1)+"/" + year + " " + hour_end+ ":"+ minute_end;
                 data[5] = descriptionEditText.getText().toString();
@@ -1059,7 +1340,7 @@ public class ReportController extends FragmentActivity {
             String PREFS_NAME = "NewReportLocation";
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
             SharedPreferences.Editor editor = settings.edit();
-            editor.putString("latitude", location.latitude+"");
+            editor.putString("latitude", location.latitude + "");
             editor.putString("longitude", location.longitude+"");
 
             // Commit the edits!

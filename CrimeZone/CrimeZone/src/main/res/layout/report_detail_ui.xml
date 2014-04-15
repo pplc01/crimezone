@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:background="@color/blue"
             android:src="@drawable/back"
-            android:id="@+id/b_back"
+            android:id="@+id/back_detail"
             android:layout_marginLeft="20dp"
             android:layout_gravity="left|center_vertical" />
 
@@ -80,8 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="time"
-                    android:id="@+id/textView" />
+                    android:id="@+id/time_detail" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -94,7 +93,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="user"
                     android:layout_marginLeft="10dp"
                     android:id="@+id/author" />
             </LinearLayout>
@@ -108,7 +106,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="description..."
                 android:textColor="@color/dark"
                 android:id="@+id/description_detail" />
             <ImageView
@@ -134,27 +131,8 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/type1" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/type2" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/type3" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/type4" />
+                    android:layout_height="fill_parent"
+                    android:id="@+id/type_container">
                 </LinearLayout>
             </HorizontalScrollView>
             <ImageView
@@ -181,9 +159,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="location"
-                    android:id="@+id/location" />
-
+                    android:text="latlang"
+                    android:id="@+id/latlang" />
             </LinearLayout>
             <ImageView
                 android:layout_width="fill_parent"
@@ -196,7 +173,8 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -206,41 +184,16 @@
                     android:layout_marginTop="10dp"
                     android:textColor="@color/dark"
                     android:id="@+id/l_reportrating"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="10dp"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/star1"
-                    android:src="@drawable/r_yesstar"
-                    android:layout_marginLeft="90dp" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/star2"
-                    android:src="@drawable/r_yesstar" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/star3"
-                    android:src="@drawable/r_yesstar" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/star4"
-                    android:src="@drawable/r_yesstar" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/star5"
-                    android:src="@drawable/r_halfstar" />
-
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:id="@+id/star_container"></LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 

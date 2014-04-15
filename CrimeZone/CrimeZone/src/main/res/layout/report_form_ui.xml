@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:background="@color/blue"
             android:src="@drawable/back"
-            android:id="@+id/b_back"
+            android:id="@+id/back_new_report"
             android:layout_marginLeft="20dp"
             android:layout_gravity="left|center_vertical" />
 
