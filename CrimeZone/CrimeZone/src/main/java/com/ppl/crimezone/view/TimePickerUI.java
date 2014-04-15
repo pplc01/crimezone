@@ -1,4 +1,4 @@
-package com.ppl.crimezone.fragments;
+package com.ppl.crimezone.view;
 
 /**
  * Created by adesudiman on 4/10/2014.

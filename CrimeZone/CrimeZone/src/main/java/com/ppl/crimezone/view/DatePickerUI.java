@@ -1,30 +1,25 @@
-package com.ppl.crimezone.fragments;
+package com.ppl.crimezone.view;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
-import android.widget.TimePicker;
-
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by adesudiman on 4/10/2014.
  */
 
 
-public class DatePickerDialogFragment extends DialogFragment {
+public class DatePickerUI extends DialogFragment {
     Handler mHandler ;
     int year;
     int month;
     int day;
 
-    public DatePickerDialogFragment(Handler h){
+    public DatePickerUI(Handler h){
         /** Getting the reference to the message handler instantiated in MainActivity class */
         mHandler = h;
     }
