@@ -25,7 +25,8 @@
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
 
             <LinearLayout
                 android:id="@+id/email_login_form"
@@ -82,20 +83,23 @@
 
                 <Button
                     android:id="@+id/email_sign_in_button"
-                    android:layout_width="match_parent"
+                    android:layout_width="200dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="16dp"
                     android:background="@color/blue"
-                    android:text="@string/action_sign_in"/>
+                    android:text="@string/action_sign_in"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/white" />
 
                 <Button
-                    android:layout_width="match_parent"
+                    android:layout_width="200dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="10dp"
                     android:text="CREATE ACCOUNT"
                     android:background="@color/red"
                     android:id="@+id/signin"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/white" />
 
             </LinearLayout>
     </ScrollView>
