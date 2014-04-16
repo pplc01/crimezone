@@ -12,12 +12,12 @@ import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.widget.TimePicker;
 
-public class TimePickerDialogFragment extends DialogFragment {
+public class TimePickerUI extends DialogFragment {
     Handler mHandler ;
     int mHour;
     int mMinute;
 
-    public TimePickerDialogFragment(Handler h){
+    public TimePickerUI(Handler h){
         /** Getting the reference to the message handler instantiated in MainActivity class */
         mHandler = h;
 

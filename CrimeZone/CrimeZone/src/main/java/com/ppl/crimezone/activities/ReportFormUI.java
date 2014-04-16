@@ -45,7 +45,7 @@ import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.CrimeReport;
 import com.ppl.crimezone.classes.DatePickerUI;
 import com.ppl.crimezone.classes.GsonParser;
-import com.ppl.crimezone.classes.TimePickerDialogFragment;
+import com.ppl.crimezone.classes.TimePickerUI;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -236,7 +236,7 @@ public class ReportFormUI extends ActionBarActivity {
                 b.putInt("set_minute", minute_start);
 
                 /** Instantiating TimePickerDialogFragment */
-                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeStartHandler);
+                TimePickerUI timePicker = new TimePickerUI(timeStartHandler);
 
                 /** Setting the bundle object on timepicker fragment */
                 timePicker.setArguments(b);
@@ -290,7 +290,7 @@ public class ReportFormUI extends ActionBarActivity {
                 b.putInt("set_minute", minute_start);
 
                 /** Instantiating TimePickerDialogFragment */
-                TimePickerDialogFragment timePicker = new TimePickerDialogFragment(timeEndHandler);
+                TimePickerUI timePicker = new TimePickerUI(timeEndHandler);
 
                 /** Setting the bundle object on timepicker fragment */
                 timePicker.setArguments(b);

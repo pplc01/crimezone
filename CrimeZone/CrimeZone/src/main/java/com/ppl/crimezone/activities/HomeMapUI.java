@@ -189,119 +189,23 @@ public class HomeMapUI extends ActionBarActivity {
             type[6] = (ImageButton) findViewById(R.id.vehicletheft2);
             type[7] = (ImageButton) findViewById(R.id.violence2);
 
-            type[0].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[0]) {
-                                                   type[0].setImageResource(R.drawable.ic_drugs);
-                                                   filterReportCrimeType[0] = false;
-                                               }else{
-                                                   type[0].setImageResource(R.drawable.nc_drugs);
-                                                   filterReportCrimeType[0] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[1].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[1]) {
-                                                   type[1].setImageResource(R.drawable.ic_burglary);
-                                                   filterReportCrimeType[1] = false;
-                                               }else{
-                                                   type[1].setImageResource(R.drawable.nc_burglary);
-                                                   filterReportCrimeType[1] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-
-            type[2].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[2]) {
-                                                   type[2].setImageResource(R.drawable.ic_homicide);
-                                                   filterReportCrimeType[2] = false;
-                                               }else{
-                                                   type[2].setImageResource(R.drawable.nc_homicide);
-                                                   filterReportCrimeType[2] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[3].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[3]) {
-                                                   type[3].setImageResource(R.drawable.ic_kidnap);
-                                                   filterReportCrimeType[3] = false;
-                                               }else{
-                                                   type[3].setImageResource(R.drawable.nc_kidnap);
-                                                   filterReportCrimeType[3] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[4].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[4]) {
-                                                   type[4].setImageResource(R.drawable.ic_sxassault);
-                                                   filterReportCrimeType[4] = false;
-                                               }else{
-                                                   type[4].setImageResource(R.drawable.nc_sxassault);
-                                                   filterReportCrimeType[4] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[5].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[5]) {
-                                                   type[5].setImageResource(R.drawable.ic_theft);
-                                                   filterReportCrimeType[5] = false;
-                                               } else {
-                                                   type[5].setImageResource(R.drawable.nc_theft);
-                                                   filterReportCrimeType[5] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[6].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[6]) {
-                                                   type[6].setImageResource(R.drawable.ic_vehicletheft);
-                                                   filterReportCrimeType[6] = false;
-                                               } else {
-                                                   type[6].setImageResource(R.drawable.nc_vehicletheft);
-                                                   filterReportCrimeType[6] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
-            type[7].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (filterReportCrimeType[7]) {
-                                                   type[7].setImageResource(R.drawable.ic_violence);
-                                                   filterReportCrimeType[7] = false;
-                                               }else{
-                                                   type[7].setImageResource(R.drawable.nc_violence);
-                                                   filterReportCrimeType[7] = true;
-                                               }
-                                               updateFilterCrimeMarker();
-                                           }
-                                       }
-            );
+            for(int ii=0; ii<8; ++ii){
+                final int finalIi = ii;
+                type[ii].setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (filterReportCrimeType[finalIi]) {
+                            type[finalIi].setImageResource(R.drawable.ic_nocrime);
+                            filterReportCrimeType[finalIi] = false;
+                        }else{
+                            type[finalIi].setImageResource(android.R.color.transparent);
+                            filterReportCrimeType[finalIi] = true;
+                        }
+                        updateFilterCrimeMarker();
+                    }
+                }
+                );
+            }
 
 
         //set up date listener
@@ -588,15 +492,7 @@ public class HomeMapUI extends ActionBarActivity {
     //method for action bar moving to other activities
     public void openReport()
     {
-        String PREFS_NAME = "ReporControllerMode";
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("NewReportMode", true);
-
-        // Commit the edits!
-        editor.commit();
-
-        Intent intent = new Intent(this, DetailReportUI.class);
+        Intent intent = new Intent(this, ReportFormUI.class);
         startActivity(intent);
     }
 
@@ -635,10 +531,9 @@ public class HomeMapUI extends ActionBarActivity {
 
                             @Override
                             public void onInfoWindowClick(Marker marker) {
-                                String PREFS_NAME = "ReporControllerMode";
+                                String PREFS_NAME = "ReportLocation";
                                 SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                                 SharedPreferences.Editor editor = settings.edit();
-                                editor.putBoolean("NewReportMode", false);
                                 editor.putString("latitude", marker.getPosition().latitude+"");
                                 editor.putString("longitude", marker.getPosition().longitude+"");
                                 // Commit the edits!
@@ -904,9 +799,6 @@ public class HomeMapUI extends ActionBarActivity {
                         case 8:
                             currIcon = R.drawable.mk_8;
                             break;
-                        default:
-                            currIcon = R.drawable.mk;
-
                     }
 
 

@@ -64,11 +64,16 @@ public class ReportController {
                     gsonBuilder.setDateFormat("d/MM/yyyy HH:mm");
                     Gson gson = gsonBuilder.create();
                     Log.d("gson : ", "sebelum gson from json");
-
-                    detailReport = gson.fromJson(reader, CrimeReport.class);
-                    Log.d("detail : ", detailReport.toString());
+                    List<CrimeReport> reports = new ArrayList<CrimeReport>();
+                    reports = Arrays.asList(gson.fromJson(reader, CrimeReport[].class));
+                    for(CrimeReport report:reports){
+                        detailReport = report;
+                    }
+                    detailReport.setLatitude(latitude);
+                    detailReport.setLongitude(longitude);
                     content.close();
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     Log.e("Exception", "Error " +ex);
                 }
             }
@@ -76,23 +81,23 @@ public class ReportController {
         catch(Exception e){
             e.printStackTrace();
         }
+
         return detailReport;
     }
 
-    /*
 
-    public static void updateRating(){
+    public static Double updateRating(String username, String reportID, String rateVal){
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/inUpRateValue.php");
         String message = "";
+        Double newRating = null;
         try
         {
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new BasicNameValuePair("username", detailReports.get(0).getUsername()));
-            nameValuePairs.add(new BasicNameValuePair("reportID", detailReports.get(0).getIdReport()+""));
-            nameValuePairs.add(new BasicNameValuePair("rateVal", ratingScore[0]+""));
-
+            nameValuePairs.add(new BasicNameValuePair("username", username));
+            nameValuePairs.add(new BasicNameValuePair("reportID", reportID));
+            nameValuePairs.add(new BasicNameValuePair("rateVal", rateVal));
 
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             // Execute HTTP Post Request
@@ -112,11 +117,8 @@ public class ReportController {
                     gsonBuilder.setDateFormat("d/MM/yyyy HH:mm");
                     Gson gson = gsonBuilder.create();
                     Log.d("gson : ", "sebelum gson from json");
-
-                    RatingTransfer newRating = gson.fromJson(reader, RatingTransfer.class);
-                    detailReports.get(0).setAvgScore(newRating.getRatingScore());
+                    newRating = gson.fromJson(reader, Double.class);
                     content.close();
-                    updateStar();
                 } catch (Exception ex) {
                     Log.e("Exception", "Error " + ex);
                     //failedLoadingPosts();
@@ -129,8 +131,7 @@ public class ReportController {
         } catch (IOException e) {
             // TODO Auto-generated catch block
         }
-
+        return newRating;
     }
-    */
 
 }

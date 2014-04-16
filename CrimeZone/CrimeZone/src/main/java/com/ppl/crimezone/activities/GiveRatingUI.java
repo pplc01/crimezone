@@ -1,13 +1,20 @@
 package com.ppl.crimezone.activities;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ppl.crimezone.R;
+import com.ppl.crimezone.classes.ReportController;
+import com.ppl.crimezone.classes.User;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,109 +37,96 @@ import java.util.List;
 /**
  * Created by adesudiman on 4/15/2014.
  */
-public class GiveRatingUI extends Dialog{
-    ImageButton star1 ;
-    ImageButton star2 ;
-    ImageButton star3 ;
-    ImageButton star4 ;
-    ImageButton star5 ;
-    Button submitRating;
-    Button cancelRating;
-
+public class GiveRatingUI extends Dialog implements
+        android.view.View.OnClickListener{
+    Activity detail;
+    ImageButton star1, star2,star3,star4,star5;
+    Button submitRating, cancelRating;
     double ratingScore;
 
-
-    public void initView(){
-        this.setContentView(R.layout.fragment_give_rating);
-        this.setTitle("Give Rating");
+    public GiveRatingUI(Activity a){
+        super(a);
+        this.detail = a;
         ratingScore = 0;
     }
 
-
-
-    public void initStart(){
-        star1 = (ImageButton) this.findViewById(R.id.star1);
-        star2 = (ImageButton) this.findViewById(R.id.star2);
-        star3 = (ImageButton) this.findViewById(R.id.star3);
-        star4 = (ImageButton) this.findViewById(R.id.star4);
-        star5 = (ImageButton) this.findViewById(R.id.star5);
-        submitRating = (Button) this.findViewById(R.id.submitrate);
-        cancelRating = (Button) this.findViewById(R.id.cancelrate);
-        submitRating = (Button) this.findViewById(R.id.submitrate);
-        cancelRating = (Button) this.findViewById(R.id.cancelrate);
-
-    }
-
-
-
-    public setStarOnClickListener(){
-        star1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+            case R.id.star1:
                 star1.setImageResource(R.drawable.r_yesstar);
                 star2.setImageResource(R.drawable.r_nostar);
                 star3.setImageResource(R.drawable.r_nostar);
                 star4.setImageResource(R.drawable.r_nostar);
                 star5.setImageResource(R.drawable.r_nostar);
                 ratingScore = 1;
-            }
-        });
-
-        star2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.star2:
                 star1.setImageResource(R.drawable.r_yesstar);
                 star2.setImageResource(R.drawable.r_yesstar);
                 star3.setImageResource(R.drawable.r_nostar);
                 star4.setImageResource(R.drawable.r_nostar);
                 star5.setImageResource(R.drawable.r_nostar);
                 ratingScore =2;
-            }
-        });
-
-        star3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.star3:
                 star1.setImageResource(R.drawable.r_yesstar);
                 star2.setImageResource(R.drawable.r_yesstar);
                 star3.setImageResource(R.drawable.r_yesstar);
                 star4.setImageResource(R.drawable.r_nostar);
                 star5.setImageResource(R.drawable.r_nostar);
-                ratingScore= 3;}
-        });
-        star4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                ratingScore= 3;
+                break;
+            case R.id.star4:
                 star1.setImageResource(R.drawable.r_yesstar);
                 star2.setImageResource(R.drawable.r_yesstar);
                 star3.setImageResource(R.drawable.r_yesstar);
                 star4.setImageResource(R.drawable.r_yesstar);
                 star5.setImageResource(R.drawable.r_nostar);
                 ratingScore = 4;
-            }
-        });
-        star5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.star5:
                 star1.setImageResource(R.drawable.r_yesstar);
                 star2.setImageResource(R.drawable.r_yesstar);
                 star3.setImageResource(R.drawable.r_yesstar);
                 star4.setImageResource(R.drawable.r_yesstar);
                 star5.setImageResource(R.drawable.r_yesstar);
                 ratingScore = 5;
-            }
-        });
+                break;
+            case R.id.submitrate:
+                dismiss();
+                break;
+            case R.id.cancelrate:
+                dismiss();
+            default:
+                break;
+        }
+        dismiss();
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_give_rating);
+        setTitle("Give Rating");
+        star1 = (ImageButton) findViewById(R.id.star1);
+        star2 = (ImageButton) findViewById(R.id.star2);
+        star3 = (ImageButton) findViewById(R.id.star3);
+        star4 = (ImageButton) findViewById(R.id.star4);
+        star5 = (ImageButton) findViewById(R.id.star5);
+        submitRating = (Button) findViewById(R.id.submitrate);
+        cancelRating = (Button) findViewById(R.id.cancelrate);
+        submitRating.setOnClickListener(this);
+        cancelRating.setOnClickListener(this);
+        star1.setOnClickListener(this);
+        star2.setOnClickListener(this);
+        star3.setOnClickListener(this);
+        star4.setOnClickListener(this);
+        star5.setOnClickListener(this);
+    }
 
-    public void submitOnClickListener(){
-        submitRating.setOnClickListener(new View.OnClickListener()
-
-        {
-            @Override
-            public void onClick (View v){
-
-            }
-        });
+    public double getNewRating(){
+        return ratingScore;
     }
 }

@@ -1,101 +1,81 @@
 package com.ppl.crimezone.activities;
 
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import com.ppl.crimezone.R;
-import com.ppl.crimezone.classes.DatePickerUI;
-import com.ppl.crimezone.classes.GsonParser;
 import com.ppl.crimezone.classes.ReportController;
-import com.ppl.crimezone.classes.TimePickerDialogFragment;
 import com.ppl.crimezone.classes.CrimeReport;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+public class DetailReportUI extends FragmentActivity implements View.OnClickListener  {
 
-public class DetailReportUI extends FragmentActivity {
-
-    TextView title;
-    TextView time;
-    TextView author;
-    TextView description;
-    LinearLayout starContainer;
-    LinearLayout crimeTypeContainer;
-    ImageButton back;
-    ImageButton giveRating;
-    TextView locationDescription;
+    TextView title, time, author, description, locationDescription;
+    LinearLayout starContainer, crimeTypeContainer;
     CrimeReport detailReport;
 
     private void init(){
-        giveRating = (ImageButton) findViewById(R.id.b_rate);
-        back = (ImageButton)findViewById(R.id.back_detail);
         title = (TextView) findViewById(R.id.headline_detail);
         time = (TextView) findViewById(R.id.time_detail);
         author = (TextView) findViewById(R.id.author);
         description = (TextView) findViewById(R.id.description_detail);
         locationDescription = (TextView) findViewById(R.id.latlang);
         crimeTypeContainer = (LinearLayout) findViewById(R.id.type_container);
+        starContainer = (LinearLayout) findViewById(R.id.star_container);
     }
 
-    private void backListener(){
-        back.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
+    @Override
+    public void onClick(View v) {
+        Log.d("view id ", v.getId() + "");
+        Log.d("back id", R.id.back_detail+"");
+        Log.d("report id", R.id.b_rate+"");
+
+        switch (v.getId()) {
+            case R.id.back_detail:
+
                 finish();
-            }
-        });
-    }
-
-
-    private void giveRatingListener(){
-        giveRating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                // custom dialog
-                //dialog.dismiss();
-                //Log.d("message", message);
-                //send to server
-            }
-        });
-
-
+                break;
+             case R.id.b_rate:
+                 final GiveRatingUI rate = new GiveRatingUI(DetailReportUI.this);
+                 rate.getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+                 rate.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                     @Override
+                     public void onDismiss(DialogInterface dialog) {
+                         if(rate.getNewRating() != 0) {
+                             Double rateVal = ReportController.updateRating(detailReport.getUsername(), detailReport.getIdReport()+"", rate.getNewRating()+"");
+                             if(rateVal != null){
+                                detailReport.setAvgScore(rateVal.doubleValue());
+                                drawStar();
+                             }else {
+                                 //failed
+                             }
+                         }
+                     }
+                 });
+                 rate.show();
+                break;
+            default:
+                break;
+        }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report_detail_ui);
         init();
-        backListener();
-        giveRatingListener();
         initDetailReport();
-        handleDetailReportList();
+        viewDetailReport();
     }
 
     private void initDetailReport(){
@@ -105,15 +85,14 @@ public class DetailReportUI extends FragmentActivity {
 
         double latitude = Double.parseDouble(settings.getString("latitude", "0"));
         double longitude = Double.parseDouble(settings.getString("longitude", "0"));
-
+        Log.d("report lat long", latitude + ", "+ longitude);
         detailReport = ReportController.fetchReportDetail(latitude, longitude);
 
     }
 
 
-    private void handleDetailReportList()
+    private void viewDetailReport()
     {
-
         //init UI
         title.setText(detailReport.getTitle());
         String timeText = detailReport.getCrimeDateStart().getDate()+"/"+ (detailReport.getCrimeDateStart().getMonth()+1)+"/"+ (detailReport.getCrimeDateStart().getYear()+1900)+ " "+ detailReport.getCrimeDateStart().getHours()+":"+detailReport.getCrimeDateStart().getMinutes()+"->"+ detailReport.getCrimeDateEnd().getHours()+":"+detailReport.getCrimeDateEnd().getMinutes();
@@ -161,7 +140,7 @@ public class DetailReportUI extends FragmentActivity {
 
     private void drawStar()
     {
-        starContainer.removeAllViewsInLayout();
+        //starContainer.removeAllViewsInLayout();
         int x = (int)detailReport.getAvgScore();
         for(int ii=0; ii< x; ++ii){
             ImageView starii = new ImageView(this);
