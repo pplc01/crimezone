@@ -7,11 +7,11 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone" />
-            <option value="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\CrimeZone" />
-            <option value="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries" />
-            <option value="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel" />
-            <option value="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/CrimeZone" />
+            <option value="$PROJECT_DIR$/Libraries" />
+            <option value="$PROJECT_DIR$/Libraries/AndroidSlidingUpPanel" />
+            <option value="$PROJECT_DIR$/Libraries/AndroidSlidingUpPanel/library" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,0 +1,130 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    tools:context="com.ppl.crimezone.fragments.FilterMap">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="left|center_vertical"
+        android:background="@drawable/bg_filter"
+        android:baselineAligned="false">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FILTER MAP"
+            android:id="@+id/filtertype"
+            android:textColor="@color/dark"
+            android:layout_gravity="center_horizontal" />
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:id="@+id/horizontalScrollView" >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:layout_height="fill_parent">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/drugs"
+                    android:background="@drawable/ic_drugs" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/burglary"
+                    android:background="@drawable/ic_burglary" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/homicide"
+                    android:background="@drawable/ic_homicide" />
+
+                <ImageButton
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/kidnap"
+                    android:background="@drawable/ic_kidnap" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/sxassault"
+                    android:background="@drawable/ic_sxassault" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/theft"
+                    android:background="@drawable/ic_theft" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/vehicletheft"
+                    android:background="@drawable/ic_vehicletheft" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/violence"
+                    android:background="@drawable/ic_violence" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="Start Date"
+                android:id="@+id/start_date"
+                android:layout_gravity="left|center_vertical"
+                android:background="@color/blue"
+                android:textColor="@color/white" />
+
+            <Button
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:text="End Date"
+                android:id="@+id/end_date"
+                android:layout_gravity="right|center_vertical"
+                android:background="@color/blue"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:layout_gravity="center"
+                android:textSize="40dp" />
+
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

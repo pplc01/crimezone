@@ -20,6 +20,4 @@
     <string name="search_settings">Search Places</string>
     <string name="title_activity_report">Report</string>
     <string name="str_atv_places">Enter Place Here</string>
-    <string name="title_activity_report_form_ui">ReportFormUI</string>
-
 </resources>
