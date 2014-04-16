@@ -30,7 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ppl.crimezone.R;
-import com.ppl.crimezone.view.DatePickerUI;
+import com.ppl.crimezone.classes.DatePickerUI;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -61,7 +61,8 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.google.maps.android.SphericalUtil;
-import com.ppl.crimezone.model.MiniCrimeReport;
+import com.ppl.crimezone.classes.GsonParser;
+import com.ppl.crimezone.classes.MiniCrimeReport;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 /**

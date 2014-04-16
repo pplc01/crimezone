@@ -21,7 +21,7 @@
             android:orientation="vertical" android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.ppl.crimezone.activities.SearchLocationUI
+            <com.ppl.crimezone.classes.SearchLocationUI
                 android:id="@+id/atv_places"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
                 android:layout_centerHorizontal="true"
                 android:textSize="20dp"
                 >
-            </com.ppl.crimezone.activities.SearchLocationUI>
+            </com.ppl.crimezone.classes.SearchLocationUI>
 
             <RelativeLayout
                 android:id="@+id/content_frame"
@@ -75,74 +75,76 @@
                 android:layout_height="wrap_content"
                 android:text="by Crime Type"
                 android:id="@+id/filtertype" />
+
             <HorizontalScrollView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/filter_type"
-                >
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:id="@+id/horizontalScrollView">
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:layout_height="fill_parent">
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/drugs2"
-                        android:src="@drawable/nc_drugs" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/drugs2"
+                    android:background="@drawable/ic_drugs" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/burglary2"
-                        android:src="@drawable/nc_burglary" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/burglary2"
+                    android:background="@drawable/ic_burglary"/>
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/homicide2"
-                        android:src="@drawable/nc_homicide" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/homicide2"
+                    android:background="@drawable/ic_homicide" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/kidnap2"
-                        android:src="@drawable/nc_kidnap" />
+                <ImageButton
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/kidnap2"
+                    android:background="@drawable/ic_kidnap" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/sxassault2"
-                        android:src="@drawable/nc_sxassault" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/sxassault2"
+                    android:background="@drawable/ic_sxassault" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/theft2"
-                        android:src="@drawable/nc_theft" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/theft2"
+                    android:background="@drawable/ic_theft" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/vehicletheft2"
-                        android:src="@drawable/nc_vehicletheft" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/vehicletheft2"
+                    android:background="@drawable/ic_vehicletheft" />
 
-                    <ImageButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/color1"
-                        android:id="@+id/violence2"
-                        android:src="@drawable/nc_violence" />
-                </LinearLayout>
-            </HorizontalScrollView>
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:id="@+id/violence2"
+                    android:background="@drawable/ic_violence" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
             <RelativeLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

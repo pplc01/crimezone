@@ -1,15 +1,10 @@
-package com.ppl.crimezone.activities;
+package com.ppl.crimezone.classes;
 
 //import com.google.gson.JsonObject;
 //import com.google.gson.JsonParser;
 
 import android.util.Log;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -146,7 +140,7 @@ public class GsonParser {
 
 
     /** A method to download json data from url */
-    protected static String downloadUrl(String strUrl) throws IOException{
+    public static String downloadUrl(String strUrl) throws IOException{
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
@@ -185,7 +179,7 @@ public class GsonParser {
     }
 
 
-    protected static String getAutoCompleteUrl(String place){
+    public static String getAutoCompleteUrl(String place){
 
         // Obtain browser key from https://code.google.com/apis/console
         String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";
@@ -211,7 +205,7 @@ public class GsonParser {
         return url;
     }
 
-    protected static String getPlaceDetailsUrl(String ref){
+    public static String getPlaceDetailsUrl(String ref){
 
         // Obtain browser key from https://code.google.com/apis/console
         String key = "key=AIzaSyCP3fwzdW9BzrPrtAInLCgFUNSpIJrlgZo";

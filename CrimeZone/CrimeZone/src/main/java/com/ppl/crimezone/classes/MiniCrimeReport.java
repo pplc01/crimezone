@@ -1,4 +1,4 @@
-package com.ppl.crimezone.model;
+package com.ppl.crimezone.classes;
 
 import com.google.gson.annotations.SerializedName;
 

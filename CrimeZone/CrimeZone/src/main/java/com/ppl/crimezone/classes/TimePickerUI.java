@@ -1,4 +1,4 @@
-package com.ppl.crimezone.view;
+package com.ppl.crimezone.classes;
 
 /**
  * Created by adesudiman on 4/10/2014.

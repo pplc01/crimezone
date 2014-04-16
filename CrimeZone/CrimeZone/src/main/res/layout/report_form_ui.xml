@@ -63,7 +63,7 @@
             android:src="@drawable/mk"
             android:id="@+id/findaddress" />
 
-        <com.ppl.crimezone.activities.SearchLocationUI
+        <com.ppl.crimezone.classes.SearchLocationUI
             android:id="@+id/crime_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             android:textSize="20dp"
             android:textColor="@color/color2"
             >
-        </com.ppl.crimezone.activities.SearchLocationUI>
+        </com.ppl.crimezone.classes.SearchLocationUI>
 
     </LinearLayout>
 
