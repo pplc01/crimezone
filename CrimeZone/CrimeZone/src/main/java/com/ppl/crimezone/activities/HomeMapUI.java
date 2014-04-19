@@ -118,7 +118,7 @@ public class HomeMapUI extends ActionBarActivity {
         setUpSearchLocation();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         updateLocationUser();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         //location = new LatLng(locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER).getLatitude(),locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER).getLongitude()) ;
     }
 
