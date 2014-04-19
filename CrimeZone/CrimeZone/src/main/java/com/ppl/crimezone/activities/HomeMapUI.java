@@ -588,8 +588,8 @@ public class HomeMapUI extends ActionBarActivity {
 
             public void onProviderDisabled(String provider) {}
         };
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        locationManager.removeUpdates(locationListener);
+
+
     }
     /*
        Using http  post

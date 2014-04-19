@@ -610,7 +610,6 @@ public class ReportFormUI extends FragmentActivity {
         }
     }
 
-
     //set the map to point to current user location
     private void updateLocationUser(){
         locationListener = new LocationListener() {
@@ -646,7 +645,7 @@ public class ReportFormUI extends FragmentActivity {
 
             public void onProviderDisabled(String provider) {}
         };
-        locationManager.removeUpdates(locationListener);
+
     }
 
 
