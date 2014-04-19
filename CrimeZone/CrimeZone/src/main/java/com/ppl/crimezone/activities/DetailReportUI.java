@@ -44,7 +44,7 @@ public class DetailReportUI extends FragmentActivity implements View.OnClickList
     Double rateVal = null;
     @Override
     public void onClick(View v) {
-       switch (v.getId()) {
+        switch (v.getId()) {
             case R.id.back_detail:
                 back.setImageResource(R.drawable.ic_launcher);
                 String PREFS_NAME = "ReportLocation";
@@ -63,16 +63,16 @@ public class DetailReportUI extends FragmentActivity implements View.OnClickList
                 rate = new GiveRatingUI(DetailReportUI.this);
                 rate.getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
                 rate.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                     @Override
-                     public void onDismiss(DialogInterface dialog) {
-                         if(rate.isSubmit()) {
-                             new FetchRatingTask().execute();
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if(rate.isSubmit()) {
+                            new FetchRatingTask().execute();
 
-                         }
-                         giveRate.setImageResource(R.drawable.r_star);
-                     }
-                 });
-                 rate.show();
+                        }
+                        giveRate.setImageResource(R.drawable.r_star);
+                    }
+                });
+                rate.show();
                 break;
             default:
                 break;
@@ -107,41 +107,41 @@ public class DetailReportUI extends FragmentActivity implements View.OnClickList
         author.setText(detailReport.getUsername());
         description.setText(detailReport.getDescription());
 
-            for(String x: detailReport.getCategories()){
-                ImageView typeCrime = new ImageView(this);
-                int idType = Integer.parseInt(x);
-                switch (idType){
-                    case 0:
-                        typeCrime.setImageResource(R.drawable.ic_drugs);
-                        break;
-                    case 1:
-                        typeCrime.setImageResource(R.drawable.ic_burglary);
-                        break;
-                    case 2:
-                        typeCrime.setImageResource(R.drawable.ic_homicide);
-                        break;
-                    case 3:
-                        typeCrime.setImageResource(R.drawable.ic_kidnap);
-                        break;
-                    case 4:
-                        typeCrime.setImageResource(R.drawable.ic_sxassault);
-                        break;
-                    case 5:
-                        typeCrime.setImageResource(R.drawable.ic_theft);
-                        break;
-                    case 6:
-                        typeCrime.setImageResource(R.drawable.ic_vehicletheft);
-                        break;
-                    case 7:
-                        typeCrime.setImageResource(R.drawable.ic_violence);
-                        break;
-                }
-                crimeTypeContainer.addView(typeCrime);
+        for(String x: detailReport.getCategories()){
+            ImageView typeCrime = new ImageView(this);
+            int idType = Integer.parseInt(x);
+            switch (idType){
+                case 0:
+                    typeCrime.setImageResource(R.drawable.ic_drugs);
+                    break;
+                case 1:
+                    typeCrime.setImageResource(R.drawable.ic_burglary);
+                    break;
+                case 2:
+                    typeCrime.setImageResource(R.drawable.ic_homicide);
+                    break;
+                case 3:
+                    typeCrime.setImageResource(R.drawable.ic_kidnap);
+                    break;
+                case 4:
+                    typeCrime.setImageResource(R.drawable.ic_sxassault);
+                    break;
+                case 5:
+                    typeCrime.setImageResource(R.drawable.ic_theft);
+                    break;
+                case 6:
+                    typeCrime.setImageResource(R.drawable.ic_vehicletheft);
+                    break;
+                case 7:
+                    typeCrime.setImageResource(R.drawable.ic_violence);
+                    break;
             }
+            crimeTypeContainer.addView(typeCrime);
+        }
 
-            locationDescription.setText("lat: "+detailReport.getLatitude()+ ", long "+ detailReport.getLongitude());
+        locationDescription.setText("lat: "+detailReport.getLatitude()+ ", long "+ detailReport.getLongitude());
 
-            drawStar();
+        drawStar();
     }
 
 
@@ -186,7 +186,7 @@ public class DetailReportUI extends FragmentActivity implements View.OnClickList
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-               viewDetailReport();//Your code to run in GUI thread here
+                viewDetailReport();//Your code to run in GUI thread here
             }//public void run() {
         });
     }
