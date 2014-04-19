@@ -534,17 +534,17 @@ public class ReportFormUI extends FragmentActivity {
             type[ii].setImageResource(R.drawable.ic_nocrime);
             final int finalIi = ii;
             type[ii].setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View v) {
-                                               if (newReportCrimeType[finalIi]) {
-                                                   type[finalIi].setImageResource(R.drawable.ic_nocrime);
-                                                   newReportCrimeType[finalIi] = false;
-                                               }else{
-                                                   type[finalIi].setImageResource(android.R.color.transparent);
-                                                   newReportCrimeType[finalIi] = true;
-                                               }
-                                           }
-                                       }
+                                            @Override
+                                            public void onClick(View v) {
+                                                if (newReportCrimeType[finalIi]) {
+                                                    type[finalIi].setImageResource(R.drawable.ic_nocrime);
+                                                    newReportCrimeType[finalIi] = false;
+                                                }else{
+                                                    type[finalIi].setImageResource(android.R.color.transparent);
+                                                    newReportCrimeType[finalIi] = true;
+                                                }
+                                            }
+                                        }
             );
         }
     }
