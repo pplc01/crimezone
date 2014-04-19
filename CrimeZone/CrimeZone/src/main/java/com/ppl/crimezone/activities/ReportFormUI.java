@@ -327,7 +327,7 @@ public class ReportFormUI extends FragmentActivity {
                 if(onExpand==1) {
                     Display display = getWindowManager().getDefaultDisplay();
                     int screen_height = display.getHeight();
-                    screen_height = (int) (0.83 * screen_height);
+                    screen_height = (int) (0.72 * screen_height);
 
                     SupportMapFragment mMapFragment = (SupportMapFragment) (getSupportFragmentManager()
                             .findFragmentById(R.id.new_report_map));
