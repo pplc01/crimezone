@@ -184,6 +184,7 @@ public class ReportFormUI extends FragmentActivity {
 
         Calendar cal = Calendar.getInstance();
 
+
         hour_end = cal.get(Calendar.HOUR_OF_DAY);
         minute_end = cal.get(Calendar.MINUTE);
 
@@ -540,7 +541,7 @@ public class ReportFormUI extends FragmentActivity {
                                                     type[finalIi].setImageResource(R.drawable.ic_nocrime);
                                                     newReportCrimeType[finalIi] = false;
                                                 }else{
-                                                    type[finalIi].setImageResource(android.R.color.transparent);
+                                                    type[finalIi].setImageResource(getResources().getColor(android.R.color.transparent));
                                                     newReportCrimeType[finalIi] = true;
                                                 }
                                             }
@@ -635,6 +636,8 @@ public class ReportFormUI extends FragmentActivity {
                 place.draggable(true);
 
                 placeMarker = reportMap.addMarker(place);
+
+                locationManager.removeUpdates(locationListener);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -643,6 +646,7 @@ public class ReportFormUI extends FragmentActivity {
 
             public void onProviderDisabled(String provider) {}
         };
+        locationManager.removeUpdates(locationListener);
     }
 
 

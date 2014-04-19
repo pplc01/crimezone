@@ -1,5 +1,6 @@
 package com.ppl.crimezone.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -20,7 +21,7 @@ import com.ppl.crimezone.classes.ReportController;
 import com.ppl.crimezone.classes.CrimeReport;
 
 
-public class DetailReportUI extends FragmentActivity implements View.OnClickListener  {
+public class DetailReportUI extends Activity implements View.OnClickListener  {
 
     TextView title, time, author, description, locationDescription;
     LinearLayout starContainer, crimeTypeContainer;

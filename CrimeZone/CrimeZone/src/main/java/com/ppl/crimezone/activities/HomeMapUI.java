@@ -579,7 +579,7 @@ public class HomeMapUI extends ActionBarActivity {
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                 updateFilterCrimeMarker();
-                //locationManager.removeUpdates(locationListener);
+                locationManager.removeUpdates(locationListener);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -589,6 +589,7 @@ public class HomeMapUI extends ActionBarActivity {
             public void onProviderDisabled(String provider) {}
         };
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.removeUpdates(locationListener);
     }
     /*
        Using http  post
