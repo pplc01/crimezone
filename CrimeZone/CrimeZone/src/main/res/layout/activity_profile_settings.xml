@@ -20,7 +20,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="63dp"
         android:background="@color/blue"
         android:id="@+id/editProfileForm">
 
@@ -45,8 +45,8 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:id="@+id/scrollView"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_marginTop="15dp">
 
         <LinearLayout
@@ -54,37 +54,90 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
 
-            <EditText
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="60dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:src="@drawable/b_fname" />
+
+                <EditText
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:ems="10"
+                    android:id="@+id/firstNameEdit"
+                    android:hint="firstname"
+                    android:gravity="right"
+                    android:layout_marginTop="20dp"
+                    android:clickable="false"
+                    android:layout_gravity="right|bottom" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:src="@drawable/blueline" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="60dp">
+
+                <EditText
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:hint="lastname"
+                    android:ems="10"
+                    android:id="@+id/lastNameEdit"
+                    android:gravity="right"
+                    android:layout_marginTop="30dp"
+                    android:clickable="true"
+                    android:layout_gravity="right|bottom" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:src="@drawable/b_lname" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:src="@drawable/blueline" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
-                android:id="@+id/firstNameEdit"
-                android:hint="firstname"
-                android:gravity="right"
-                android:background="@drawable/b_fname"
-                android:layout_marginTop="20dp" />
+                android:layout_height="wrap_content">
 
-            <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="lastname"
-                android:ems="10"
-                android:id="@+id/lastNameEdit"
-                android:background="@drawable/b_lastname"
-                android:gravity="right"
-                android:layout_marginTop="30dp" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:src="@drawable/b_username" />
 
-            <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/usernameEdit"
-                android:gravity="right"
-                android:hint="username"
-                android:selectAllOnFocus="true"
-                android:background="@drawable/b_username"
-                android:layout_marginTop="30dp" />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/blueline"
+                    android:layout_gravity="center_horizontal|bottom" />
+
+                <EditText
+                    android:layout_width="200dp"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/usernameEdit"
+                    android:gravity="right"
+                    android:hint="username"
+                    android:selectAllOnFocus="true"
+                    android:layout_marginTop="30dp"
+                    android:layout_gravity="right|bottom" />
+            </FrameLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
