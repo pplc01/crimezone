@@ -1,0 +1,94 @@
+<?php
+require("config.php");
+
+if(!empty($_GET)){
+$q_checkReport = 
+
+"SELECT username, reportID, title, data_created, time_start, time_end, description, avg_rating, x_coordinate, y_coordinate , CategoryName 
+  FROM (SELECT Report_Detail.reportID, userID, title, data_created, time_start, time_end, Report_Detail.description, avg_rating , CategoryName, Report_Detail.x_coordinate, Report_Detail.y_coordinate
+      FROM (SELECT   C.reportID, userID, title, data_created, time_start, time_end, description, avg_rating, C.x_coordinate, C.y_coordinate
+        FROM (
+          SELECT Crime_Location.reportID, userID, title, data_created, time_start, time_end, description, avg_rating, Crime_Location.x_coordinate, Crime_Location.y_coordinate
+              FROM Crime_Report RIGHT JOIN Crime_Location ON Crime_Report.reportID=Crime_Location.reportID) as C
+                                                              WHERE C.reportID = :report_identifier ) AS Report_Detail
+                LEFT OUTER JOIN Crime_Categories ON Crime_Categories.reportID = Report_Detail.reportID) as Detail LEFT OUTER JOIN User ON Detail.userID = User.userID ";
+  //$q_checkReport = "SELECT CategoryName
+    //             FROM Crime_Report RIGHT JOIN Crime_Location ON Crime_Report.reportID=Crime_Location.reportID";
+  $query_params = array(
+			':report_identifier' => $_GET['reportId']
+	);
+  try{
+		$stmt = $db->prepare($q_checkReport);
+		$result = $stmt->execute($query_params);
+	} catch(PDOException $e){
+		$response["success"] = 0;
+		$response["message"] = "Database Error." . $e->getMessage();
+		die(json_encode($response));
+	}
+  $row = $stmt->fetch();
+  $crimeDetail['CrimeDetail'][] = $row;
+
+
+  if(!$row){
+    $response["success"] = 0;
+    $response["message"] = "No detail(s) found.";
+    die(json_encode($response));
+      }
+else {
+  $category= $row['CategoryName'];
+  $cekID = $row['reportID'];
+  $ctg[] = $category;
+  $row['CategoryName'] = $ctg;
+  $tmprow = $row;
+  $ctg = array();
+  $ctg[] = $category;
+
+  //source: http://stackoverflow.com/questions/21170992/mysql-query-to-pull-rows-and-print-them-as-json
+  while($row = $stmt->fetch())
+  {
+  $category= $row['CategoryName'];
+  if($row['reportID']!=$cekID){
+    $crimeReport[] = $tmprow;
+    $cekID = $row['reportID'];
+    $ctg = array($category);
+    $row['CategoryName'] = $ctg;
+  }
+  else {
+    $ctg[] = $category;
+    $row['CategoryName'] = $ctg;
+    $tmprow = $row;
+  }
+  }
+
+  $crimeReport[] = $tmprow;
+  
+  print json_encode($crimeReport);
+
+//print $_REQUEST['json'];
+	}
+}
+
+	else{
+
+echo ($_SERVER['HTTP_HOST']. $_SERVER['REQUEST_URI']);//
+//echo $_REQUEST['json'];
+
+	?>
+
+	<h1>Test GetLocation</h1>
+	<form action="crimeLocation.php" method="post">
+		<table>
+			<tr>
+				<td>x_coordinate</td>
+				<td><input type="text" name="reportId" value=""></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="submitLocation"></td>
+			</tr>
+		</table>
+	</form>
+	<?php
+
+	}
+?>
