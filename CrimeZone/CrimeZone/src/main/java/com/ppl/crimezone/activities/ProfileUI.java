@@ -101,6 +101,7 @@ public class ProfileUI extends Activity {
         successView = (TextView) findViewById(R.id.successMessage);
         if(regSucceed){
             successView.setVisibility(View.VISIBLE);
+            usernameView.setText(getIntent().getStringExtra("username"));
         }
     }
 }
