@@ -8,18 +8,15 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.ReportController;
 import com.ppl.crimezone.classes.CrimeReport;
-
 
 public class DetailReportUI extends Activity implements View.OnClickListener  {
 
@@ -43,11 +40,12 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
     }
     GiveRatingUI rate;
     Double rateVal = null;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.back_detail:
-                back.setImageResource(R.drawable.ic_launcher);
+                back.setImageResource(R.drawable.back_pressed);
                 String PREFS_NAME = "ReportLocation";
                 SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                 SharedPreferences.Editor editor = settings.edit();
