@@ -21,8 +21,9 @@
     <string name="title_activity_report">Report</string>
     <string name="str_atv_places">Enter Place Here</string>
     <string name="title_activity_register_ui">RegisterUI</string>
-
     <string name="error_reenter_password">Please re-enter password</string>
     <string name="error_password_unmatched">Password you re-entered does not match</string>
     <string name="error_password_format">Password must not contain space</string>
+    <string name="title_activity_regsiter">Regsiter</string>
+
 </resources>
