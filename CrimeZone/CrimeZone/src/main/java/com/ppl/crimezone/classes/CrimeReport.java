@@ -45,6 +45,18 @@ public class CrimeReport{
         this.avgScore = avgScore;
     }
 
+    public CrimeReport(int idReport, String title, Date start, List<String> categories, double latitude, double longitude){
+        this.idReport = idReport;
+        this.title = title;
+        this.crimeTimeStart = start;
+        this.categories = categories;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.idReport = idReport;
+        this.reportDate = reportDate;
+        this.description = description;
+        this.avgScore = avgScore;
+    }
     public CrimeReport(){
 
     }
