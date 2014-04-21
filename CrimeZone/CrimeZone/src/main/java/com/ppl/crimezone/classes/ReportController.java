@@ -32,13 +32,12 @@ import java.util.List;
 public class ReportController {
 
 
-    public static CrimeReport fetchReportDetail(double latitude, double longitude){
+    public static CrimeReport fetchReportDetail(String reportId){
 
         String url;
 
         url = "http://crimezone.besaba.com/webservice/crimeDetail.php?"
-                +"latitude="+ latitude+
-                "&longitude=" +longitude;
+                +"reportId="+reportId;
         Log.d("String url", url);
 
         CrimeReport detailReport = null;
@@ -67,8 +66,7 @@ public class ReportController {
                     for(CrimeReport report:reports){
                         detailReport = report;
                     }
-                    detailReport.setLatitude(latitude);
-                    detailReport.setLongitude(longitude);
+                    if(reports == null) Log.d("reportnull", "null");
                     content.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -77,6 +75,7 @@ public class ReportController {
             }
         }
         catch(Exception e){
+            Log.d("Error", e.toString());
             e.printStackTrace();
         }
 
