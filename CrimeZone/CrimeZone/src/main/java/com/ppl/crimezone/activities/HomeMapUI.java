@@ -41,6 +41,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.maps.android.SphericalUtil;
 import com.ppl.crimezone.R;
+import com.ppl.crimezone.classes.CrimeReport;
 import com.ppl.crimezone.classes.DatePickerUI;
 import com.ppl.crimezone.classes.GsonParser;
 import com.ppl.crimezone.classes.MiniCrimeReport;
@@ -82,7 +83,7 @@ public class HomeMapUI extends ActionBarActivity {
 
 
     //for filter
-    private ArrayList<MiniCrimeReport> filterList = new ArrayList<MiniCrimeReport>();
+    private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
     private boolean filterReportCrimeType[] = new boolean [8];
 
     AutoCompleteTextView searchLocation;
@@ -102,8 +103,8 @@ public class HomeMapUI extends ActionBarActivity {
     int month_end;
     int day_end;
 
-    List<MiniCrimeReport> reports;
-
+    List<CrimeReport> reports;
+    HashMap<Marker, CrimeReport> markerToCrimeReport;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -542,11 +543,10 @@ public class HomeMapUI extends ActionBarActivity {
 
                             @Override
                             public void onInfoWindowClick(Marker marker) {
-                                String PREFS_NAME = "ReportLocation";
+                                String PREFS_NAME = "ReportIdentifier";
                                 SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                                 SharedPreferences.Editor editor = settings.edit();
-                                editor.putString("latitude", marker.getPosition().latitude+"");
-                                editor.putString("longitude", marker.getPosition().longitude+"");
+                                editor.putString("reportId", markerToCrimeReport.get(marker).getIdReport()+"");
                                 // Commit the edits!
                                 editor.commit();
                                 startDetail();
@@ -679,92 +679,92 @@ public class HomeMapUI extends ActionBarActivity {
 
 
     private void setFilter(){
-        filterList = new ArrayList<MiniCrimeReport>();
+        filterList = new ArrayList<CrimeReport>();
         Log.d("report size", reports.size()+"");
         for(int ii=0; ii< reports.size(); ++ii){
-            MiniCrimeReport temp = new MiniCrimeReport(reports.get(ii).getTitle(), reports.get(ii).getCrimeTimeStart(), reports.get(ii).getCategories(), reports.get(ii).getLatitude(), reports.get(ii).getLongitude());
+            CrimeReport temp = new CrimeReport(reports.get(ii).getIdReport(), reports.get(ii).getTitle(), reports.get(ii).getCrimeDateStart(), reports.get(ii).getCategories(), reports.get(ii).getLatitude(), reports.get(ii).getLongitude());
             if(!filterReportCrimeType[0]){
-                temp.remove("0");
+                temp.getCategories().remove("0");
             }
             if(!filterReportCrimeType[1]){
-                temp.remove("1");
+                temp.getCategories().remove("1");
             }
             if(!filterReportCrimeType[2]){
-                temp.remove("2");
+                temp.getCategories().remove("2");
             }
             if(!filterReportCrimeType[3]){
-                temp.remove("3");
+                temp.getCategories().remove("3");
             }
             if(!filterReportCrimeType[4]){
-                temp.remove("4");
+                temp.getCategories().remove("4");
             }
             if(!filterReportCrimeType[5]){
-                temp.remove("5");
+                temp.getCategories().remove("5");
             }
             if(!filterReportCrimeType[6]){
-                temp.remove("6");
+                temp.getCategories().remove("6");
             }
             if(!filterReportCrimeType[7]){
-                temp.remove("7");
+                temp.getCategories().remove("7");
             }
             boolean valid = true;
             final Button startDate = (Button) findViewById(R.id.start_date);
             final Button endDate = (Button) findViewById(R.id.end_date);
             if(!startDate.getText().toString().equals("Start") &&  !endDate.getText().toString().equals("End"))
             {
-                Log.d("year check start", temp.getCrimeTimeStart().getYear()+" "+ year_start);
-                Log.d("year check end", temp.getCrimeTimeStart().getYear()+" "+ year_end);
-                Log.d("month check start", temp.getCrimeTimeStart().getMonth()+" "+ month_start);
-                Log.d("month check end", temp.getCrimeTimeStart().getMonth()+" "+ month_end);
-                Log.d("date check start", temp.getCrimeTimeStart().getDate()+" "+ day_start);
-                Log.d("date check end", temp.getCrimeTimeStart().getDate()+" "+ day_end);
+                Log.d("year check start", temp.getCrimeDateStart().getYear()+" "+ year_start);
+                Log.d("year check end", temp.getCrimeDateStart().getYear()+" "+ year_end);
+                Log.d("month check start", temp.getCrimeDateStart().getMonth()+" "+ month_start);
+                Log.d("month check end", temp.getCrimeDateStart().getMonth()+" "+ month_end);
+                Log.d("date check start", temp.getCrimeDateStart().getDate()+" "+ day_start);
+                Log.d("date check end", temp.getCrimeDateStart().getDate()+" "+ day_end);
 
-                if (temp.getCrimeTimeStart().getYear()+1900 < year_start) valid = false;
-                else if (temp.getCrimeTimeStart().getYear()+1900 > year_end) valid = false;
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() < (month_start))
+                if (temp.getCrimeDateStart().getYear()+1900 < year_start) valid = false;
+                else if (temp.getCrimeDateStart().getYear()+1900 > year_end) valid = false;
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() < (month_start))
                 {
                     valid = false;
                     Log.d("date check", "1");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() == (month_start) && temp.getCrimeTimeStart().getDate() < day_start)
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() == (month_start) && temp.getCrimeDateStart().getDate() < day_start)
                 {
                     valid = false;
                     Log.d("date check", "2");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() >(month_end))
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() >(month_end))
                 {
                     valid = false;
                     Log.d("date check", "3");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() == (month_end) && temp.getCrimeTimeStart().getDate() > day_end)
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() == (month_end) && temp.getCrimeDateStart().getDate() > day_end)
                 {
                     valid = false;
                     Log.d("date check", "4");
                 }
             }else if(!startDate.getText().toString().equals("Start")){
-                if (temp.getCrimeTimeStart().getYear()+1900 < year_start) valid = false;
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() < (month_start))
+                if (temp.getCrimeDateStart().getYear()+1900 < year_start) valid = false;
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() < (month_start))
                 {
                     valid = false;
                     Log.d("date check", "1");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_start && temp.getCrimeTimeStart().getMonth() == (month_start) && temp.getCrimeTimeStart().getDate() < day_start)
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() == (month_start) && temp.getCrimeDateStart().getDate() < day_start)
                 {
                     valid = false;
                     Log.d("date check", "2");
                 }
             }else if(!startDate.getText().toString().equals("Start")){
-                if (temp.getCrimeTimeStart().getYear()+1900 > year_end)
+                if (temp.getCrimeDateStart().getYear()+1900 > year_end)
                 {
                    valid = false;
                    Log.d("date check", "2");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() >(month_end))
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() >(month_end))
                 {
                     valid = false;
                     Log.d("date check", "3");
                 }
-                else if (temp.getCrimeTimeStart().getYear()+1900 == year_end && temp.getCrimeTimeStart().getMonth() == (month_end) && temp.getCrimeTimeStart().getDate() > day_end)
+                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() == (month_end) && temp.getCrimeDateStart().getDate() > day_end)
                 {
                     valid = false;
                     Log.d("date check", "4");
@@ -778,7 +778,7 @@ public class HomeMapUI extends ActionBarActivity {
             }
         }
     }
-    private void handleReportList(List<MiniCrimeReport> updateReports){
+    private void handleReportList(List<CrimeReport> updateReports){
         reports = updateReports;
 
         runOnUiThread(new Runnable() {
@@ -791,6 +791,7 @@ public class HomeMapUI extends ActionBarActivity {
                             placeMarkers.get(pm).remove();
                     }
                 }
+                markerToCrimeReport = new HashMap<Marker, CrimeReport>();
                 placeMarkers = new ArrayList<Marker>();
                 places = new ArrayList<MarkerOptions>();
                 int currIcon = R.drawable.mk;
@@ -847,7 +848,9 @@ public class HomeMapUI extends ActionBarActivity {
                             .position(new LatLng(filterList.get(ii).getLatitude(), filterList.get(ii).getLongitude()))
                             .title(filterList.get(ii).getTitle())
                             .icon(BitmapDescriptorFactory.fromResource(currIcon)));
-                    placeMarkers.add(map.addMarker(places.get(ii)));
+                    Marker mark = map.addMarker(places.get(ii));
+                    placeMarkers.add(mark);
+                    markerToCrimeReport.put(mark,filterList.get(ii));
                     Log.d("place size at "+ii, places.size()+"");
                     Log.d("place marker size at "+ii, placeMarkers.size()+"");
                 }
@@ -885,12 +888,12 @@ public class HomeMapUI extends ActionBarActivity {
                             GsonBuilder gsonBuilder = new GsonBuilder();
                             gsonBuilder.setDateFormat("dd/MM/yyyy HH:mm");
                             Gson gson = gsonBuilder.create();
-                            List<MiniCrimeReport> miniReports = new ArrayList<MiniCrimeReport>();
+                            List<CrimeReport> miniReports = new ArrayList<CrimeReport>();
                             Log.d("gson : ", "sebelum gson from json");
 
 
-                            miniReports = Arrays.asList(gson.fromJson(reader, MiniCrimeReport[].class));
-                            for (MiniCrimeReport p : miniReports) {
+                            miniReports = Arrays.asList(gson.fromJson(reader, CrimeReport[].class));
+                            for (CrimeReport p : miniReports) {
                                 //Log.d("Report ", p.getTitle()+", "+p.getLatitude()+", "+ p.getLongitude()+ ","+p.getCrimeTimeStart().toString() + p);
                                 Log.d("Report", p.toString());
                             }
