@@ -135,7 +135,7 @@ public class EditProfileUI extends Activity {
             usernameView.setError(getString(R.string.error_field_required));
             usernameView.requestFocus();
             cancel = true;
-        } else if(isUsernameValid(newUsername)){
+        } else if(!isUsernameValid(newUsername)){
             usernameView.setError(getString(R.string.error_username_format));
             cancel = true;
         }
@@ -253,6 +253,7 @@ public class EditProfileUI extends Activity {
                     Log.d("Success", "Berhasil di update");
                     Intent i = new Intent(EditProfileUI.this, ProfileUI.class);
                     i.putExtra("success", true);
+                    i.putExtra("username", mUser);
                     finish();
                     startActivity(i);
                     return true;
