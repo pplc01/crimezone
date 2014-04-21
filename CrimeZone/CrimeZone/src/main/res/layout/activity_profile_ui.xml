@@ -8,7 +8,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="63dp"
         android:background="@color/blue">
 
         <ImageButton
@@ -53,17 +53,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:background="@color/dark"
+                android:background="@color/blue"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Full Name"
                 android:id="@+id/fullName"
                 android:gravity="center_horizontal|bottom"
-                />
+                android:textColor="@color/white" />
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:background="@color/dark"
+                android:background="@color/blue"
                 android:gravity="center_horizontal"
                 android:layout_height="60dp">
 
@@ -71,7 +71,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Joined: "/>
+                    android:text="Joined: "
+                    android:textColor="@color/white" />
 
                 <!--//buat naro joined date-->
                 <TextView
@@ -81,34 +82,70 @@
                     android:text="DD/MM/YYYY"
                     android:id="@+id/profjoined"
                     android:gravity="center_horizontal"
-                     />
+                    android:textColor="@color/white" />
+
             </LinearLayout>
 
-            <TextView
+            <FrameLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="user.name"
-                android:id="@+id/usernamevalue"
-                android:textColor="@color/dark"
-                android:gravity="right"
-                android:background="@drawable/b_username"
+                android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp">
 
-            <TextView
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="60dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="email@address"
+                    android:id="@+id/emailvalue"
+                    android:gravity="bottom|right"
+                    android:textColor="@color/dark"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_gravity="right|top" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/blueline" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:src="@drawable/b_email" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="email@address"
-                android:id="@+id/emailvalue"
-                android:gravity="right"
-                android:textColor="@color/dark"
-                android:background="@drawable/b_email"
-                android:layout_marginTop="20dp"
+                android:layout_height="60dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="60dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="user.name"
+                    android:id="@+id/usernamevalue"
+                    android:textColor="@color/dark"
+                    android:gravity="center_vertical|bottom|right"
+                    android:layout_gravity="right|top" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/blueline" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/b_username"
+                    android:layout_gravity="bottom|left" />
+
+            </FrameLayout>
 
             <TextView
                 android:layout_width="match_parent"

@@ -156,7 +156,8 @@
                 android:layout_marginTop="25dp"
                 android:text="CREATE ACCOUNT"
                 android:background="#348bd3"
-                android:id="@+id/signUp" />
+                android:id="@+id/signUp"
+                android:textColor="@color/white" />
         </LinearLayout>
 
     </ScrollView>
