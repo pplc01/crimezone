@@ -604,9 +604,6 @@ public class ReportFormUI extends FragmentActivity {
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
             setUpSearchLocation();
             setUpMarkerListener();
-            //if(location.latitude == 99999 )
-
-            //locationManager.removeUpdates(locationListener);
         }
     }
 
