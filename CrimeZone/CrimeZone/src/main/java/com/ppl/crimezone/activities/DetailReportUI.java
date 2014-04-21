@@ -170,14 +170,13 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
 
         @Override
         protected String doInBackground(String... placesURL){
-            final String PREFS_NAME = "ReportLocation";
+            final String PREFS_NAME = "ReportIdentifier";
 
             SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-            double latitude = Double.parseDouble(settings.getString("latitude", "0"));
-            double longitude = Double.parseDouble(settings.getString("longitude", "0"));
-            Log.d("report lat long", latitude + ", "+ longitude);
-            detailReport = ReportController.fetchReportDetail(latitude, longitude);
+            String reportId = settings.getString("reportId", "-1");
+
+            detailReport = ReportController.fetchReportDetail(reportId);
             handler();
             return "";
         }
@@ -200,7 +199,6 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             }//public void run() {
         });
     }
-
 
     private void drawStar()
     {
