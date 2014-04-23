@@ -2,6 +2,7 @@ package com.ppl.crimezone.classes;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,10 +21,8 @@ public class CrimeReport{
     @SerializedName("avg_rating")
     private double avgScore;
     private String title;
-    @SerializedName("time_start")
-    private Date crimeTimeStart;
-    @SerializedName("time_end")
-    private Date crimeTimeEnd;
+    @SerializedName("time")
+    private Date crimeTime;
     @SerializedName("CategoryName")
     private List<String> categories;
 
@@ -32,10 +31,9 @@ public class CrimeReport{
     @SerializedName("y_coordinate")
     private double longitude;
 
-    public CrimeReport(int idReport, String title, Date reportDate, Date start, Date end, String description, List<String> categories, double latitude, double longitude, double avgScore){
+    public CrimeReport(int idReport, String title, Date reportDate, Date time,  String description, List<String> categories, double latitude, double longitude, double avgScore){
         this.title = title;
-        this.crimeTimeStart = start;
-        this.crimeTimeEnd = end;
+        this.crimeTime= time;
         this.categories = categories;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -45,22 +43,21 @@ public class CrimeReport{
         this.avgScore = avgScore;
     }
 
-    public CrimeReport(int idReport, String title, Date start, List<String> categories, double latitude, double longitude){
+    public CrimeReport(int idReport, String title, Date time, List<String> categories, double latitude, double longitude){
         this.idReport = idReport;
         this.title = title;
-        this.crimeTimeStart = start;
+        this.crimeTime = time;
         this.categories = categories;
         this.latitude = latitude;
         this.longitude = longitude;
         this.idReport = idReport;
-        this.reportDate = reportDate;
-        this.description = description;
-        this.avgScore = avgScore;
     }
     public CrimeReport(){
-
     }
 
+    public void setCrimeTime(long miliseconds){
+        crimeTime.setTime(miliseconds);
+    }
     public int getIdReport(){
         return idReport;
     }
@@ -85,12 +82,8 @@ public class CrimeReport{
         return title;
     }
 
-    public Date getCrimeDateStart(){
-        return crimeTimeStart;
-    }
-
-    public Date getCrimeDateEnd(){
-        return crimeTimeEnd;
+    public Date getCrimeTime(){
+        return crimeTime;
     }
 
     public double getLatitude(){
@@ -99,14 +92,6 @@ public class CrimeReport{
 
     public double getLongitude(){
         return longitude;
-    }
-
-    public void setLatitude(double latitude){
-        this.latitude = latitude;
-    }
-
-    public void setLongitude(double longitude){
-        this.longitude = longitude;
     }
 
     public List<String> getCategories(){
@@ -123,7 +108,7 @@ public class CrimeReport{
 
     @Override
     public String toString(){
-        return getIdReport()+" "+ getReportDate()+" "+ getDescription()+" "+ getAvgScore()+" " + getCrimeDateStart()+" "+getCrimeDateEnd()+" "+getLatitude()+" "+getLongitude()+ " "+ printCategories();
+        return getIdReport()+" "+ getReportDate()+" "+ getDescription()+" "+ getAvgScore()+" " + getCrimeTime()+" "+" "+getLatitude()+" "+getLongitude()+ " "+ printCategories();
     }
 
     public String getUsername(){
