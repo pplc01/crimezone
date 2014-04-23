@@ -43,8 +43,7 @@ import com.google.maps.android.SphericalUtil;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.CrimeReport;
 import com.ppl.crimezone.classes.DatePickerUI;
-import com.ppl.crimezone.classes.GsonParser;
-import com.ppl.crimezone.classes.MiniCrimeReport;
+import com.ppl.crimezone.classes.GsonParser;;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.apache.http.HttpEntity;
@@ -682,7 +681,7 @@ public class HomeMapUI extends ActionBarActivity {
         filterList = new ArrayList<CrimeReport>();
         Log.d("report size", reports.size()+"");
         for(int ii=0; ii< reports.size(); ++ii){
-            CrimeReport temp = new CrimeReport(reports.get(ii).getIdReport(), reports.get(ii).getTitle(), reports.get(ii).getCrimeDateStart(), reports.get(ii).getCategories(), reports.get(ii).getLatitude(), reports.get(ii).getLongitude());
+            CrimeReport temp = new CrimeReport(reports.get(ii).getIdReport(), reports.get(ii).getTitle(), reports.get(ii).getCrimeTime(), reports.get(ii).getCategories(), reports.get(ii).getLatitude(), reports.get(ii).getLongitude());
             if(!filterReportCrimeType[0]){
                 temp.getCategories().remove("0");
             }
@@ -712,59 +711,59 @@ public class HomeMapUI extends ActionBarActivity {
             final Button endDate = (Button) findViewById(R.id.end_date);
             if(!startDate.getText().toString().equals("Start") &&  !endDate.getText().toString().equals("End"))
             {
-                Log.d("year check start", temp.getCrimeDateStart().getYear()+" "+ year_start);
-                Log.d("year check end", temp.getCrimeDateStart().getYear()+" "+ year_end);
-                Log.d("month check start", temp.getCrimeDateStart().getMonth()+" "+ month_start);
-                Log.d("month check end", temp.getCrimeDateStart().getMonth()+" "+ month_end);
-                Log.d("date check start", temp.getCrimeDateStart().getDate()+" "+ day_start);
-                Log.d("date check end", temp.getCrimeDateStart().getDate()+" "+ day_end);
+                Log.d("year check start", temp.getCrimeTime().getYear()+" "+ year_start);
+                Log.d("year check end", temp.getCrimeTime().getYear()+" "+ year_end);
+                Log.d("month check start", temp.getCrimeTime().getMonth()+" "+ month_start);
+                Log.d("month check end", temp.getCrimeTime().getMonth()+" "+ month_end);
+                Log.d("date check start", temp.getCrimeTime().getDate()+" "+ day_start);
+                Log.d("date check end", temp.getCrimeTime().getDate()+" "+ day_end);
 
-                if (temp.getCrimeDateStart().getYear()+1900 < year_start) valid = false;
-                else if (temp.getCrimeDateStart().getYear()+1900 > year_end) valid = false;
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() < (month_start))
+                if (temp.getCrimeTime().getYear()+1900 < year_start) valid = false;
+                else if (temp.getCrimeTime().getYear()+1900 > year_end) valid = false;
+                else if (temp.getCrimeTime().getYear()+1900 == year_start && temp.getCrimeTime().getMonth() < (month_start))
                 {
                     valid = false;
                     Log.d("date check", "1");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() == (month_start) && temp.getCrimeDateStart().getDate() < day_start)
+                else if (temp.getCrimeTime().getYear()+1900 == year_start && temp.getCrimeTime().getMonth() == (month_start) && temp.getCrimeTime().getDate() < day_start)
                 {
                     valid = false;
                     Log.d("date check", "2");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() >(month_end))
+                else if (temp.getCrimeTime().getYear()+1900 == year_end && temp.getCrimeTime().getMonth() >(month_end))
                 {
                     valid = false;
                     Log.d("date check", "3");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() == (month_end) && temp.getCrimeDateStart().getDate() > day_end)
+                else if (temp.getCrimeTime().getYear()+1900 == year_end && temp.getCrimeTime().getMonth() == (month_end) && temp.getCrimeTime().getDate() > day_end)
                 {
                     valid = false;
                     Log.d("date check", "4");
                 }
             }else if(!startDate.getText().toString().equals("Start")){
-                if (temp.getCrimeDateStart().getYear()+1900 < year_start) valid = false;
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() < (month_start))
+                if (temp.getCrimeTime().getYear()+1900 < year_start) valid = false;
+                else if (temp.getCrimeTime().getYear()+1900 == year_start && temp.getCrimeTime().getMonth() < (month_start))
                 {
                     valid = false;
                     Log.d("date check", "1");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_start && temp.getCrimeDateStart().getMonth() == (month_start) && temp.getCrimeDateStart().getDate() < day_start)
+                else if (temp.getCrimeTime().getYear()+1900 == year_start && temp.getCrimeTime().getMonth() == (month_start) && temp.getCrimeTime().getDate() < day_start)
                 {
                     valid = false;
                     Log.d("date check", "2");
                 }
             }else if(!startDate.getText().toString().equals("Start")){
-                if (temp.getCrimeDateStart().getYear()+1900 > year_end)
+                if (temp.getCrimeTime().getYear()+1900 > year_end)
                 {
                    valid = false;
                    Log.d("date check", "2");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() >(month_end))
+                else if (temp.getCrimeTime().getYear()+1900 == year_end && temp.getCrimeTime().getMonth() >(month_end))
                 {
                     valid = false;
                     Log.d("date check", "3");
                 }
-                else if (temp.getCrimeDateStart().getYear()+1900 == year_end && temp.getCrimeDateStart().getMonth() == (month_end) && temp.getCrimeDateStart().getDate() > day_end)
+                else if (temp.getCrimeTime().getYear()+1900 == year_end && temp.getCrimeTime().getMonth() == (month_end) && temp.getCrimeTime().getDate() > day_end)
                 {
                     valid = false;
                     Log.d("date check", "4");
