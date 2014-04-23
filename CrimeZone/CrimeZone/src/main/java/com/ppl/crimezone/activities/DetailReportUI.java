@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.ppl.crimezone.R;
+import com.ppl.crimezone.classes.GiveRatingUI;
 import com.ppl.crimezone.classes.ReportController;
 import com.ppl.crimezone.classes.CrimeReport;
 
@@ -86,7 +87,7 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
     }
 
     private void getDetailReport(){
-        new FetchReportTask().execute();
+        new FetchDetailTask().execute();
     }
 
 
@@ -101,7 +102,7 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             Log.d("check null", "detailReport");
         }
         title.setText(detailReport.getTitle());
-        String timeText = detailReport.getCrimeDateStart().getDate()+"/"+ (detailReport.getCrimeDateStart().getMonth()+1)+"/"+ (detailReport.getCrimeDateStart().getYear()+1900)+ " "+ detailReport.getCrimeDateStart().getHours()+":"+detailReport.getCrimeDateStart().getMinutes()+"->"+ detailReport.getCrimeDateEnd().getHours()+":"+detailReport.getCrimeDateEnd().getMinutes();
+        String timeText = detailReport.getCrimeTime().getDate()+"/"+ (detailReport.getCrimeTime().getMonth()+1)+"/"+ (detailReport.getCrimeTime().getYear()+1900)+ " "+ detailReport.getCrimeTime().getHours()+":"+detailReport.getCrimeTime().getMinutes()+"->"+ detailReport.getCrimeTime().getHours()+":"+detailReport.getCrimeTime().getMinutes();
         time.setText(timeText);
         author.setText(detailReport.getUsername());
         description.setText(detailReport.getDescription());
@@ -157,14 +158,14 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             rateVal =  ReportController.updateRating(username, detailReport.getIdReport() + "", rate.getNewRating() + "");
             if(rateVal != null){
                 detailReport.setAvgScore(rateVal.doubleValue());
-                handler2();
+                drawStarThread();
             }else {
                 //failed
             }//drawStar();
             return "";
         }
     }
-    private class FetchReportTask extends AsyncTask<String, Void, String> {
+    private class FetchDetailTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... placesURL){
@@ -175,12 +176,12 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             String reportId = settings.getString("reportId", "-1");
 
             detailReport = ReportController.fetchReportDetail(reportId);
-            handler();
+            viewDetailThread();
             return "";
         }
     }
 
-    public void handler(){
+    public void viewDetailThread(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -189,12 +190,12 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
         });
     }
 
-    public void handler2(){
+    public void drawStarThread(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 drawStar();
-            }//public void run() {
+            }
         });
     }
 
