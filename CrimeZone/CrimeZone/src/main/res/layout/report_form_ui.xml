@@ -260,42 +260,32 @@
                 android:layout_width="fill_parent"
                 android:layout_height="50dp">
 
-                <Button
-                    android:layout_width="150dp"
-                    android:layout_height="50dp"
-                    android:background="@color/dark"
-                    android:text="DD/MM/YYYY"
-                    android:textSize="20dp"
-                    android:textColor="@color/white"
-                    android:id="@+id/crime_date"
-                    android:layout_gravity="left|center_vertical"
-                    android:gravity="left|center_vertical"/>
 
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="wrap_content"
                     android:background="@drawable/time"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical">
+                    android:layout_gravity="center">
 
                     <Button
-                        android:layout_width="90dp"
+                        android:layout_width="130dp"
                         android:layout_height="50dp"
                         android:background="@null"
-                        android:text="Start"
-                        android:textSize="20dp"
+                        android:text="DD/MM/YYYY"
+                        android:textSize="15dp"
                         android:textColor="@color/white"
-                        android:id="@+id/crime_time_start"
+                        android:id="@+id/crime_date"
                         android:layout_gravity="center" />
 
                     <Button
-                        android:layout_width="90dp"
+                        android:layout_width="130dp"
                         android:layout_height="50dp"
                         android:textColor="@color/white"
                         android:background="@null"
-                        android:text="End"
-                        android:textSize="20dp"
-                        android:id="@+id/crime_time_end"
+                        android:text="HH:MM"
+                        android:textSize="15dp"
+                        android:id="@+id/crime_time"
                         android:gravity="center"
                         android:layout_gravity="center"
                         />
@@ -318,11 +308,4 @@
     </ScrollView>
 </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp" />
 </RelativeLayout>

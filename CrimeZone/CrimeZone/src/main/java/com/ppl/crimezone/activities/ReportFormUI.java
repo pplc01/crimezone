@@ -32,10 +32,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
@@ -50,20 +48,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.DatePickerUI;
 import com.ppl.crimezone.classes.GsonParser;
+import com.ppl.crimezone.classes.ReportController;
 import com.ppl.crimezone.classes.TimePickerUI;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -79,98 +68,82 @@ public class ReportFormUI extends FragmentActivity {
     private MarkerOptions place;
 
     //for filter
-    AutoCompleteTextView searchLocation;
-    DownloadTask placesDownloadTask;
-    DownloadTask placeDetailsDownloadTask;
-    ParserTask placesParserTask;
-    ParserTask placeDetailsParserTask;
+    private AutoCompleteTextView searchLocation;
+    private DownloadTask placesDownloadTask;
+    private DownloadTask placeDetailsDownloadTask;
+    private ParserTask placesParserTask;
+    private ParserTask placeDetailsParserTask;
 
     final int PLACES=0;
     final int PLACES_DETAILS=1;
 
-    int hour_start = 15;
-    int minute_start = 15;
 
-    int hour_end = 15;
-    int minute_end = 15;
-
-    int year;
-    int month;
-    int day;
-
-    private LatLng location;
 
     private EditText titleEditText, descriptionEditText;
-    private Button crimeDate,crimeStartTime, crimeEndTime,submitButton;
+    private Button crimeDate,crimeTime, submitButton;
     ImageButton type [] = new ImageButton[8];
 
-    ProgressBar pb;
 
     boolean newReportCrimeType [] = new boolean [8];
+    Calendar time;
+    LatLng location;
+    //for progress bar
+    //ProgressBar pb;
 
+
+    private void printDate(){
+        int timeInt = time.get(Calendar.DAY_OF_MONTH);
+        String dayString = timeInt+"";
+        if(timeInt<10)dayString = "0"+ dayString;
+        timeInt = time.get(Calendar.MONTH)+1;
+        String monthString = (timeInt)+"";
+        if(timeInt<10)monthString= "0"+ monthString;
+        crimeDate.setText(dayString+"/"+ monthString+"/"+time.get(Calendar.YEAR));
+    }
+
+    private void printTIme(){
+        int timeInt = time.get(Calendar.HOUR_OF_DAY);
+        String hourString = timeInt+"";
+        if(timeInt<10)hourString = "0"+ hourString;
+        timeInt = time.get(Calendar.MINUTE);
+        String minuteString = timeInt + "";
+        if(timeInt < 10)minuteString = "0"+ minuteString;
+        crimeTime.setText(hourString + ":" + minuteString);
+    }
     private void showDateDialog(){
         crimeDate = (Button)findViewById(R.id.crime_date);
+        time = Calendar.getInstance();
 
-        Calendar cal = Calendar.getInstance();
-        year = cal.get(Calendar.YEAR);
-        month = cal.get(Calendar.MONTH);
-        Log.d("month", month + "");
-        day = cal.get(Calendar.DATE);
         final Handler dateHandler= new Handler(){
             @Override
             public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
                 Bundle b = m.getData();
-
-                /** Getting the year from bundle */
-                year = b.getInt("set_year");
-
-                /** Getting the month from bundle */
-                month = b.getInt("set_month");
-
-                /** Getting the day from bundle */
-                day = b.getInt("set_day");
-
-                String dayString = day+"";
-                if(day<10)dayString = "0"+ dayString;
-                String monthString = (month+1)+"";
-                if(month<10)monthString= "0"+ monthString;
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeDate.setText(dayString+"/"+ monthString+"/"+year);
+                time.set(Calendar.YEAR, b.getInt("set_year"));
+                time.set(Calendar.MONTH,b.getInt("set_month"));
+                time.set(Calendar.DAY_OF_MONTH, b.getInt("set_day"));
+                Calendar today = Calendar.getInstance();
+                if(time.getTimeInMillis() > today.getTimeInMillis()){
+                    crimeDate.setError("DATE NOT VALID");
+                    showAlertDialog("DATE NOT VALID", "Please Select Date Today Backward");
+                    crimeDate.setText("DD/MM/YYYY");
+                }else {
+                    printDate();
+                }
             }
         };
 
-        /** Click Event Handler for button */
         View.OnClickListener dateListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
                 Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_year", year);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_month", month);
-
-                b.putInt("set_day", day);
-                /** Instantiating TimePickerDialogFragment */
+                b.putInt("set_year", time.get(Calendar.YEAR));
+                b.putInt("set_month", time.get(Calendar.MONTH));
+                b.putInt("set_day", time.get(Calendar.DAY_OF_MONTH));
                 DatePickerUI datePicker = new DatePickerUI(dateHandler);
-
-                /** Setting the bundle object on timepicker fragment */
                 datePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
                 FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
                 FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
                 ft.add(datePicker, "date_picker");
-
-                /** Opening the TimePicker fragment */
                 ft.commit();
             }
         };
@@ -179,146 +152,46 @@ public class ReportFormUI extends FragmentActivity {
 
 
     private void showTimeDialog(){
-        crimeStartTime = (Button) findViewById(R.id.crime_time_start);
-        crimeEndTime = (Button) findViewById(R.id.crime_time_end);
+        crimeTime = (Button) findViewById(R.id.crime_time);
 
-        Calendar cal = Calendar.getInstance();
-
-
-        hour_end = cal.get(Calendar.HOUR_OF_DAY);
-        minute_end = cal.get(Calendar.MINUTE);
-
-        hour_start = cal.get(Calendar.HOUR_OF_DAY);
-        minute_start = cal.get(Calendar.MINUTE);
-
-        Log.d("Time debug",  hour_start +" " + minute_start+", "+ hour_start+" "+ minute_start);
-
-        final Handler timeStartHandler= new Handler(){
+        final Handler timeHandler= new Handler(){
             @Override
             public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
                 Bundle b = m.getData();
-
-                /** Getting the Hour of day from bundle */
-                hour_start = b.getInt("set_hour");
-
-                /** Getting the Minute of the hour from bundle */
-                minute_start = b.getInt("set_minute");
-
-                String hourString = hour_start+"";
-                if(hour_start<10)hourString = "0"+ hourString;
-                String minuteString = minute_start + "";
-                if(minute_start < 10)minuteString = "0"+ minuteString;
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeStartTime.setText(hourString + ":" + minuteString);
-
+                time.set(Calendar.HOUR_OF_DAY, b.getInt("set_hour"));
+                time.set(Calendar.MINUTE,  b.getInt("set_minute"));
+                Calendar today = Calendar.getInstance();
+                if(!crimeDate.getText().toString().equals("DD/MM/YYYY") && time.getTimeInMillis() > today.getTimeInMillis()){
+                    crimeTime.setError("TIME NOT VALID");
+                    showAlertDialog("TIME NOT VALID", "Please Select Tme Before Current Time");
+                    crimeTime.setText("HH:MM");
+                }else {
+                    printTIme();
+                }
             }
         };
 
-
-
-        /** Click Event Handler for button */
-        View.OnClickListener timeStartListener = new View.OnClickListener() {
+        View.OnClickListener timeListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_hour", hour_start);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_minute", minute_start);
-
-                /** Instantiating TimePickerDialogFragment */
-                TimePickerUI timePicker = new TimePickerUI(timeStartHandler);
-
-                /** Setting the bundle object on timepicker fragment */
+               Bundle b = new Bundle();
+                b.putInt("set_hour", time.get(Calendar.HOUR_OF_DAY));
+                b.putInt("set_minute", time.get(Calendar.MINUTE));
+                TimePickerUI timePicker = new TimePickerUI(timeHandler);
                 timePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
                 FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
                 FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
                 ft.add(timePicker, "time_picker");
-
-                /** Opening the TimePicker fragment */
                 ft.commit();
             }
         };
-
-        final Handler timeEndHandler= new Handler(){
-            @Override
-            public void handleMessage(Message m){
-                /** Creating a bundle object to pass currently set Time to the fragment */
-                Bundle b = m.getData();
-
-                /** Getting the Hour of day from bundle */
-                hour_end = b.getInt("set_hour");
-
-                /** Getting the Minute of the hour from bundle */
-                minute_end = b.getInt("set_minute");
-
-                String hourString = hour_end+"";
-                if(hour_end<10)hourString = "0"+ hourString;
-                String minuteString = minute_end + "";
-                if(minute_end < 10)minuteString = "0"+ minuteString;
-
-                /** Displaying a short time message containing time set by Time picker dialog fragment */
-                crimeEndTime.setText(hourString+":"+minuteString);
-            }
-        };
-
-
-
-        /** Click Event Handler for button */
-        View.OnClickListener timeEndListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                /** Creating a bundle object to pass currently set time to the fragment */
-                Bundle b = new Bundle();
-
-                /** Adding currently set hour to bundle object */
-                b.putInt("set_hour", hour_start);
-
-                /** Adding currently set minute to bundle object */
-                b.putInt("set_minute", minute_start);
-
-                /** Instantiating TimePickerDialogFragment */
-                TimePickerUI timePicker = new TimePickerUI(timeEndHandler);
-
-                /** Setting the bundle object on timepicker fragment */
-                timePicker.setArguments(b);
-
-                /** Getting fragment manger for this activity */
-                FragmentManager fm = getSupportFragmentManager();
-
-                /** Starting a fragment transaction */
-                FragmentTransaction ft = fm.beginTransaction();
-
-                /** Adding the fragment object to the fragment transaction */
-                ft.add(timePicker, "time_picker");
-
-                /** Opening the TimePicker fragment */
-                ft.commit();
-            }
-        };
-
-        crimeStartTime.setOnClickListener(timeStartListener);
-        crimeEndTime.setOnClickListener(timeEndListener);
-
+        crimeTime.setOnClickListener(timeListener);
     }
 
     int onExpand = 1;
     private void autoCollapsExpandMap(){
         final RelativeLayout mapContainer;
         ImageView expandCollapseMap = (ImageView) findViewById(R.id.expand_collapse_button);
-        final ScrollView exceptMap = (ScrollView) findViewById(R.id.downScrollView);
         titleEditText = (EditText) findViewById(R.id.headline);
         descriptionEditText = (EditText) findViewById(R.id.description);
         mapContainer = (RelativeLayout)findViewById(R.id.map_frame);
@@ -413,14 +286,12 @@ public class ReportFormUI extends FragmentActivity {
                     descriptionEditText.setError(null);
                 }else{
                     descriptionEditText.setError(Html.fromHtml("<font color='green'>Description Empty</font>"));
-                    int ecolor = Color.RED; // whatever color you want
-                    String estring = "Description Still Empty ";  // your error message
+                    int ecolor = Color.RED;
+                    String estring = "Description Still Empty      ";
                     ForegroundColorSpan fgcspan = new ForegroundColorSpan(ecolor);
                     SpannableStringBuilder ssbuilder = new SpannableStringBuilder(estring);
                     ssbuilder.setSpan(fgcspan, 0, estring.length(), 0);
                     descriptionEditText.setError(ssbuilder);
-
-
                 }
             }
 
@@ -435,7 +306,6 @@ public class ReportFormUI extends FragmentActivity {
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
                     Display display = getWindowManager().getDefaultDisplay();
-                    int screen_height = display.getHeight();
                     SupportMapFragment mMapFragment = (SupportMapFragment) (getSupportFragmentManager()
                             .findFragmentById(R.id.new_report_map));
                     ViewGroup.LayoutParams params2 = mMapFragment.getView().getLayoutParams();
@@ -476,7 +346,6 @@ public class ReportFormUI extends FragmentActivity {
                     screen_height = (int) (0.35*screen_height);
                     LinearLayout.LayoutParams parms = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
                     parms.height = screen_height;
-                    // Set it back.
                     mapContainer.setLayoutParams(parms);
                 }
             }
@@ -498,9 +367,7 @@ public class ReportFormUI extends FragmentActivity {
                     LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mapContainer.getLayoutParams();
                     params.height = screen_height;
                     mapContainer.setLayoutParams(params);
-
-
-                    onExpand = 1;
+                   onExpand = 1;
                 }
             }
         });
@@ -520,7 +387,6 @@ public class ReportFormUI extends FragmentActivity {
                                             }
                                         }
         );
-
 
         type[0] = (ImageButton) findViewById(R.id.drugs);
         type[1] = (ImageButton) findViewById(R.id.burglary);
@@ -554,25 +420,21 @@ public class ReportFormUI extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report_form_ui);
         showMap();
-
-        pb=(ProgressBar)findViewById(R.id.progressBar1);
-        pb=(ProgressBar)findViewById(R.id.progressBar1);
-        pb.setVisibility(View.GONE);
         showDateDialog();
         showTimeDialog();
         autoCollapsExpandMap();
         setUpButtonListener();
+
         final ImageButton backHome = (ImageButton)findViewById(R.id.back_new_report);
         backHome.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                backHome.setImageResource(R.drawable.ic_launcher);
+                backHome.setImageResource(R.drawable.back_pressed);
                 finish();
             }
         });
     }
-
 
     public void setUpMarkerListener(){
         reportMap.setOnMarkerDragListener(
@@ -593,27 +455,25 @@ public class ReportFormUI extends FragmentActivity {
         );
     }
 
-
     public void showMap(){
         if(reportMap == null) {
             reportMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.new_report_map)).getMap();
             reportMap.setMyLocationEnabled(true);
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            //location = new LatLng(99999, 99999);
+
             updateLocationUser();
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
             setUpSearchLocation();
+
             setUpMarkerListener();
+
         }
     }
 
-    //set the map to point to current user location
     private void updateLocationUser(){
         locationListener = new LocationListener() {
             public void onLocationChanged(Location userLocation) {
-                // Called when a new location is found by the network location provider.
-
-
                 location = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
                 CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -642,9 +502,7 @@ public class ReportFormUI extends FragmentActivity {
 
             public void onProviderDisabled(String provider) {}
         };
-
     }
-
 
     //initialize autocomplete view
     private void setUpSearchLocation(){
@@ -654,8 +512,6 @@ public class ReportFormUI extends FragmentActivity {
             searchLocation.setThreshold(0);
         }
     }
-
-
 
     private void setUpSearchLocationListener(){
         // Adding textchange listener
@@ -691,9 +547,7 @@ public class ReportFormUI extends FragmentActivity {
             public void onItemClick(AdapterView<?> arg0, View arg1, int index,
                                     long id) {
 
-                ListView lv = (ListView) arg0;
                 SimpleAdapter adapter = (SimpleAdapter) arg0.getAdapter();
-
                 HashMap<String, String> hm = (HashMap<String, String>) adapter.getItem(index);
 
                 // Creating a DownloadTask to download Places details of the selected place
@@ -708,8 +562,6 @@ public class ReportFormUI extends FragmentActivity {
             }
         });
     }
-
-
 
 
     // Fetches data from url passed
@@ -836,40 +688,9 @@ public class ReportFormUI extends FragmentActivity {
         }
     }
 
+    //pindahin ke Report Controller.validate
     private void submitForm(){
-        Button date = (Button) findViewById(R.id.crime_date);
-        Button timeStart = (Button)findViewById(R.id.crime_time_start);
-        Button timeEnd = (Button)findViewById(R.id.crime_time_end);
-        boolean validDate= true;
-        crimeDate = (Button)findViewById(R.id.crime_date);
-        Calendar cal = Calendar.getInstance();
-        if(year > cal.get(Calendar.YEAR)) {
-            validDate = false;
-        }else if(year == cal.get(Calendar.YEAR) && month > cal.get(Calendar.MONTH)){
-            validDate = false;
-        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day > cal.get(Calendar.DATE)){
-            validDate = false;
-        }
-
-        boolean validTimeStart = true;
-        boolean validTimeEnd = true;
-        if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start > cal.get(Calendar.HOUR_OF_DAY)) {
-            validTimeStart = false;
-        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start == cal.get(Calendar.HOUR_OF_DAY) && minute_start > cal.get(Calendar.MINUTE)){
-            validTimeStart = false;
-        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_end > cal.get(Calendar.HOUR_OF_DAY)) {
-            validTimeEnd = false;
-        }else if(year == cal.get(Calendar.YEAR) && month == cal.get(Calendar.MONTH) && day == cal.get(Calendar.DATE) && hour_start == cal.get(Calendar.HOUR_OF_DAY) && minute_end > cal.get(Calendar.MINUTE)){
-            validTimeEnd = false;
-        }else if(hour_start > hour_end) {
-            validTimeStart = false;
-        }else if(hour_start == hour_end && minute_start > minute_end){
-            validTimeStart = false;
-        }else if( hour_start == hour_end && minute_start == minute_end){
-            validTimeStart = false;
-        }
-
-
+        Calendar submitTime = Calendar.getInstance();
         if (titleEditText.getText().toString().equals("")) {
             titleEditText.requestFocus();
             int ecolor = Color.RED; // whatever color you want
@@ -894,141 +715,71 @@ public class ReportFormUI extends FragmentActivity {
             imm.showSoftInput(descriptionEditText, InputMethodManager.SHOW_IMPLICIT);
             submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
         }
-        else if(date.getText().toString().equals("DD/MM/YYYY")){
-            date.performClick();
-            Toast.makeText(getApplicationContext(), "Date field empty", Toast.LENGTH_SHORT).show();
+        else if(crimeDate.getText().toString().equals("DD/MM/YYYY")){
+            crimeDate.setError("DATE NOT SET");
+            showAlertDialog("DATE NOT SET", "Please Select Valid Date First");
             submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-
-        }else if(!validDate) {
-            date.performClick();
-            Toast.makeText(getApplicationContext(), "Date field invalid", Toast.LENGTH_SHORT).show();
+        }else if(time.get(Calendar.YEAR) > submitTime.get(Calendar.YEAR) || time.get(Calendar.MONTH) > submitTime.get(Calendar.MONTH) || time.get(Calendar.DAY_OF_MONTH) > submitTime.get(Calendar.DAY_OF_MONTH)) {
+            crimeDate.setError("DATE NOT VALID");
+            showAlertDialog("DATE NOT VALID", "Please Select Date Today Backward");
             submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-
-        }else if(timeStart.getText().toString().equals("Start")) {
-            timeStart.performClick();
-            Toast.makeText(getApplicationContext(), "Start Time field empty", Toast.LENGTH_SHORT).show();
+        }else if(crimeTime.getText().toString().equals("HH:MM")) {
+            crimeTime.setError("TIME NOT SET");
+            showAlertDialog("TIME NOT SET", "Please Select Valid Time First");
             submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-        }else if(!validTimeStart) {
-            timeStart.performClick();
-            Toast.makeText(getApplicationContext(), "Start Time field invalid", Toast.LENGTH_SHORT).show();
+        }else if(time.getTimeInMillis() > submitTime.getTimeInMillis()) {
+            crimeTime.setError("TIME NOT VALID");
+            showAlertDialog("TIME NOT VALID", "Please Select Tme Before Current Time");
             submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-        }else if(timeEnd.getText().toString().equals("End") ) {
-            timeEnd.performClick();
-            Toast.makeText(getApplicationContext(), "End Time field empty", Toast.LENGTH_SHORT).show();
-            submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-        }else if(!validTimeEnd){
-            timeEnd.performClick();
-            Toast.makeText(getApplicationContext(), "End Time field invalid", Toast.LENGTH_SHORT).show();
-            submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
-
         }else {
             boolean valid = false;
-            for(int ii=0; ii<8; ++ii)
-            {
-                Log.d("loop "+ii, newReportCrimeType[ii]+"");
-                if(newReportCrimeType[ii]){
+            for (int ii = 0; ii < 8; ++ii) {
+                Log.d("loop " + ii, newReportCrimeType[ii] + "");
+                if (newReportCrimeType[ii]) {
                     valid = true;
                     break;
                 }
             }
-            if(valid){
-                //json
-
-                /*
-                username
-                title
-                dreported
-                start
-                end
-                description
-                lat
-                long
-                crimetype1
-                crimetype2
-                crimetype3
-                crimetype4
-                crimetype5
-                crimetype6
-                crimetype7
-                crimetype8
-                 */
+            if (valid) {
                 String MYPREFERENCES = "UserAccount";
                 SharedPreferences sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
                 String username = sharedPreferences.getString("usernameKey", "");
-                String [] data = new String[16];
 
+                new SendReport().execute(ReportController.prepareNewReportData(time, submitTime, username, titleEditText.getText().toString(), descriptionEditText.getText().toString(), location, newReportCrimeType));
 
-
-                data[0] = username;
-                data[1] = titleEditText.getText().toString();
-                String dateString = cal.get(Calendar.DATE)+"";
-                if(cal.get(Calendar.DATE)<10)dateString = "0"+ dateString;
-                String monthString = (cal.get(Calendar.MONTH)+1)+"";
-                if((cal.get(Calendar.MONTH)+1)< 10)dateString = "0"+ monthString;
-                String hourString = cal.get(Calendar.HOUR_OF_DAY)+"";
-                if(cal.get(Calendar.HOUR_OF_DAY)<10)hourString= "0"+ hourString;
-                String minuteString = cal.get(Calendar.MINUTE)+"";
-                if(cal.get(Calendar.MINUTE )< 10)minuteString = "0"+ monthString;
-
-                data[2] = dateString+ "/"+monthString+"/" + cal.get(Calendar.YEAR) + " " +hourString + ":"+minuteString;
-
-                hourString = hour_start+"";
-                if(hour_start < 10)hourString = "0" + hourString;
-                minuteString = minute_start+"";
-                if(minute_start < 10)minuteString = "0"+ minuteString;
-                data[3] =  dateString+"/"+monthString+"/" + year + " " + hourString+ ":"+ minuteString;
-
-                hourString = hour_end+"";
-                if(hour_end < 10)hourString = "0" + hourString;
-                minuteString = minute_end+"";
-                if(minute_end < 10)minuteString = "0"+ minuteString;
-                data[4] = dateString+"/"+monthString+"/" + year + " " + hourString+ ":"+ minuteString;
-                data[5] = descriptionEditText.getText().toString();
-                data[6] = location.latitude+"";
-                data[7] = location.longitude+"";
-                for(int jj=0; jj<8;  ++jj){
-                    data[jj+8] = newReportCrimeType[jj]+"";
-                }
-                new MyAsyncTask().execute(data);
-
-            }else{
-                AlertDialog alertDialog = new AlertDialog.Builder(
-                        ReportFormUI.this).create();
-
-                // Setting Dialog Title
-                alertDialog.setTitle("Crime Type Still Empty");
-
-                // Setting Dialog Message
-                alertDialog.setMessage("Please select at Least one type of crime");
-
-                // Setting OK Button
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Write your code here to execute after dialog closed
-                        //Toast.makeText(getApplicationContext(), "You haven' choosen type of crime", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                // Showing Alert Message
-                alertDialog.show();
+            } else {
+                showAlertDialog("CRIME TYPE EMPTY", "Please Select At Least One Crime Type");
                 submitButton.setBackgroundColor(getResources().getColor(R.color.color4));
             }
         }
-        //validate
     }
 
+    private void showAlertDialog(String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ReportFormUI.this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setNegativeButton("Close",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
-    private class MyAsyncTask extends AsyncTask<String, Integer, String>{
+    private class SendReport extends AsyncTask<String, Integer, String>{
 
         @Override
         protected String doInBackground(String... params) {
             // TODO Auto-generated method stub
-            return postData(params);
+            return ReportController.postData(params);
 
         }
 
         protected void onPostExecute(String result){
             Log.d("response ", result);
-            pb.setVisibility(View.GONE);
+            //pb.setVisibility(View.GONE);
             Toast.makeText(getApplicationContext(), "Succesful", Toast.LENGTH_LONG).show();
             /**
              * Tampilin progress bar
@@ -1049,61 +800,7 @@ public class ReportFormUI extends FragmentActivity {
             finish();
         }
         protected void onProgressUpdate(Integer... progress){
-            pb.setProgress(progress[0]);
-        }
-
-        public String postData(String valueIWantToSend[]) {
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/submitReport.php");
-            String message = "";
-            try
-            {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("username", valueIWantToSend[0]));
-                nameValuePairs.add(new BasicNameValuePair("title", valueIWantToSend[1]));
-                nameValuePairs.add(new BasicNameValuePair("dreported", valueIWantToSend[2]));
-                nameValuePairs.add(new BasicNameValuePair("start", valueIWantToSend[3]));
-                nameValuePairs.add(new BasicNameValuePair("end", valueIWantToSend[4]));
-                nameValuePairs.add(new BasicNameValuePair("description", valueIWantToSend[5]));
-                nameValuePairs.add(new BasicNameValuePair("lat", valueIWantToSend[6]));
-                nameValuePairs.add(new BasicNameValuePair("long", valueIWantToSend[7]));
-                if(valueIWantToSend[8].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype1", 0+""));
-                }
-                if(valueIWantToSend[9].equals("true")) {
-                    nameValuePairs.add(new BasicNameValuePair("crimetype2", 1 + ""));
-                }
-                if(valueIWantToSend[10].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype3", 2+""));
-                }
-                if(valueIWantToSend[11].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype4", 3+""));
-                }
-                if(valueIWantToSend[12].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype5", 4+""));
-                }
-                if(valueIWantToSend[13].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype6", 5+""));
-                }
-                if(valueIWantToSend[14].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype7", 6+""));
-                }
-                if(valueIWantToSend[15].equals("true")){
-                    nameValuePairs.add(new BasicNameValuePair("crimetype8", 7+""));
-                }
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-                message =  response.getStatusLine().getStatusCode()+"";
-            }
-            catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-            }
-            return message;
+            //pb.setProgress(progress[0]);
         }
     }
 }
