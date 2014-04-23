@@ -1,4 +1,4 @@
-package com.ppl.crimezone.activities;
+package com.ppl.crimezone.classes;
 
 import android.app.Activity;
 import android.app.Dialog;
