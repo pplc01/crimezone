@@ -15,8 +15,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
-import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -42,6 +40,9 @@ public class MapController {
 
     private byte filterTime;
     private byte filterType;
+
+    private final boolean START = true;
+    private final boolean END = false;;
 
     private HashMap<Marker, CrimeReport> markerToCrimeReport;
     public MapController() {
@@ -74,7 +75,7 @@ public class MapController {
     }
 
     public boolean resetStartDate() {
-        if(start!=null) {
+        if (start != null){
             setFilterStartDate(false);
             return true;
         }
@@ -89,19 +90,31 @@ public class MapController {
         }return false;
     }
 
+
+
     public boolean setStartDate(int day, int month, int year) {
-        if(validDate(day, month, year, true)){
-            if (start == null) {
-                start = Calendar.getInstance();
+        if(validDate(day, month, year, true))
+        {
+            if(start != null){
+                setFilterStartDate(false);
             }
+            start = Calendar.getInstance();
             start.set(Calendar.DAY_OF_MONTH, day);
             start.set(Calendar.MONTH, month);
             start.set(Calendar.YEAR, year);
-            setFilterEndDate(true);
+            start.set(Calendar.HOUR_OF_DAY, 0);
+            start.set(Calendar.MINUTE, 0);
+            if(end == null){
+                setFilterStartDate(true);
+            }else {
+                setFilterRangeDate(true);
+            }
             return true;
         }
         return false;
     }
+
+
 
     public boolean getReportList(double distance){
         List<CrimeReport> miniReports= null;
@@ -165,30 +178,44 @@ public class MapController {
             if(timeInt<10)monthString= "0"+ monthString;
             return (dayString + "/" + monthString + "/" + end.get(Calendar.YEAR));
     }
-    private boolean validDate(int day, int month, int year, boolean startDate) {
+    private boolean validDate(int day, int month, int year, boolean type) {
+        Calendar chosen = Calendar.getInstance();
+        chosen.set(Calendar.DAY_OF_MONTH, day);
+        chosen.set(Calendar.MONTH, month);
+        chosen.set(Calendar.YEAR, year);
         Calendar now = Calendar.getInstance();
-        if (year > now.get(Calendar.YEAR) || month > now.get(Calendar.MONTH) || day > now.get(Calendar.DAY_OF_MONTH))
-            return false;
-        if (startDate && (end != null && (year > end.get(Calendar.YEAR) || month > end.get(Calendar.MONTH) || day > end.get(Calendar.DAY_OF_MONTH))))
-            return false;
-        else if (start != null && (start.get(Calendar.YEAR) > year || start.get(Calendar.MONTH) > month || start.get(Calendar.DAY_OF_MONTH) > day))
-            return false;
-       return true;
+        if(chosen.getTimeInMillis() > now.getTimeInMillis())return false;
+        chosen.set(Calendar.HOUR_OF_DAY, 0);
+        chosen.set(Calendar.MINUTE, 0);
+        if((type == START && end != null ) && (chosen.getTimeInMillis() > end.getTimeInMillis()) )return false;
+        chosen = Calendar.getInstance();
+        chosen.set(Calendar.DAY_OF_MONTH, day);
+        chosen.set(Calendar.MONTH, month);
+        chosen.set(Calendar.YEAR, year);
+        if((type == END && start != null ) && (chosen.getTimeInMillis() < start.getTimeInMillis()) )return false;
+        return true;
     }
 
     public boolean setEndDate(int day, int month, int year){
         if(validDate(day, month, year, false)) {
-            if (end == null) {
-                end = Calendar.getInstance();
+            if(end != null) {
+                setFilterEndDate(false);
             }
+            end = Calendar.getInstance();
             end.set(Calendar.DAY_OF_MONTH, day);
             end.set(Calendar.MONTH, month);
             end.set(Calendar.YEAR, year);
-            setFilterEndDate(true);
+            if(start != null){
+                setFilterRangeDate(true);
+            }else {
+                setFilterEndDate(true);
+            }
             return true;
         }
         return false;
     }
+
+
 
 
     public int getStartDate(int type){
@@ -203,10 +230,8 @@ public class MapController {
                 return cal.get(Calendar.DAY_OF_MONTH);
             case 1:
                 return cal.get(Calendar.MONTH);
-            case 2:
+             default:
                 return cal.get(Calendar.YEAR);
-            default:
-                return -1;
         }
 
     }
@@ -223,10 +248,9 @@ public class MapController {
                 return cal.get(Calendar.DAY_OF_MONTH);
             case 1:
                 return cal.get(Calendar.MONTH);
-            case 2:
-                return cal.get(Calendar.YEAR);
             default:
-                return -1;
+                return cal.get(Calendar.YEAR);
+
         }
     }
 
@@ -277,7 +301,7 @@ public class MapController {
             iterator = filterList.entrySet().iterator();
             while(iterator.hasNext()){
                 HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
-                Log.d("true =>" , entry.getValue().printCategories());
+                Log.d("true =>", entry.getValue().printCategories());
             }
 
             for(int ii=0; ii< reports.size(); ++ii){
@@ -298,16 +322,51 @@ public class MapController {
 
     private void setFilterStartDate(boolean value){
         if(!value) {
+            for(int ii=0; ii<reports.size(); ++ii){
+                Log.d("false before report :-> ", reports.get(ii).getCrimeTime().toString());
+            }
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("false before filter :=>", entry.getValue().getCrimeTime().toString());
+            }
             for (int ii = 0; ii < reports.size(); ++ii) {
-                if (reports.get(ii).getCrimeTime().before(start.getTime())) {
+                if (start.getTime().after(reports.get(ii).getCrimeTime())) {
                     filterList.put(reports.get(ii).getIdReport(), copyReport(reports.get(ii)));
                 }
             }
+            for(int ii=0; ii<reports.size(); ++ii){
+                Log.d("false after report :da-> ", reports.get(ii).getCrimeTime().toString());
+            }
+            iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("false after filter :=>", entry.getValue().getCrimeTime().toString());
+            }
             start = null;
         }else {
-            for (Integer idReport : filterList.keySet()) {
-                if(filterList.get(idReport).getCrimeTime().before(start.getTime()))filterList.remove(idReport);
+            for(int ii=0; ii<reports.size(); ++ii){
+                Log.d("true before report -> ", reports.get(ii).getCrimeTime().toString());
             }
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("true before filter =>", entry.getValue().getCrimeTime().toString());
+            }
+            iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                if(start.getTime().after(entry.getValue().getCrimeTime())) iterator.remove(); // right way to remove entries from Map,
+            }
+            for(int ii=0; ii<reports.size(); ++ii){
+                Log.d("true after report -> ", reports.get(ii).getCrimeTime().toString());
+            }
+            iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("true after filter =>", entry.getValue().getCrimeTime().toString());
+            }
+
         }
     }
 
@@ -320,8 +379,30 @@ public class MapController {
             }
             end = null;
         }else {
-            for (Integer idReport : filterList.keySet()) {
-                if(filterList.get(idReport).getCrimeTime().after(start.getTime()))filterList.remove(idReport);
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                if(entry.getValue().getCrimeTime().after(end.getTime())) iterator.remove(); // right way to remove entries from Map,
+            }
+
+        }
+    }
+
+
+    private void setFilterRangeDate(boolean value){
+        if(!value) {
+            for (int ii = 0; ii < reports.size(); ++ii) {
+                if (reports.get(ii).getCrimeTime().after(end.getTime()) || reports.get(ii).getCrimeTime().before(start.getTime())) {
+                    filterList.put(reports.get(ii).getIdReport(), copyReport(reports.get(ii)));
+                }
+            }
+            start = null;
+            end = null;
+        }else {
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                if(entry.getValue().getCrimeTime().after(end.getTime()) || entry.getValue().getCrimeTime().before(start.getTime())) iterator.remove(); // right way to remove entries from Map,
             }
         }
     }
