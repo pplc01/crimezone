@@ -47,23 +47,45 @@ public class ReportController {
 
     public static String[] prepareNewReportData(Calendar time, Calendar submitTime,String username, String title, String description, LatLng location, boolean [] categories){
         String data[] = new String[15];
+        /*
+        nameValuePairs.add(new BasicNameValuePair("username", valueIWantToSend[0]));
+            nameValuePairs.add(new BasicNameValuePair("title", valueIWantToSend[1]));
+            nameValuePairs.add(new BasicNameValuePair("dreported", valueIWantToSend[2]));
+            nameValuePairs.add(new BasicNameValuePair("time", valueIWantToSend[3]));
+            nameValuePairs.add(new BasicNameValuePair("description", valueIWantToSend[4]));
+            nameValuePairs.add(new BasicNameValuePair("lat", valueIWantToSend[5]));
+            nameValuePairs.add(new BasicNameValuePair("long", valueIWantToSend[6]));
+
+         */
         data[0] = username;
         data[1] = title;
-        String dateString = submitTime.get(Calendar.DATE)+"";
-        if(submitTime.get(Calendar.DATE)<10)dateString = "0"+ dateString;
+        String dateString = submitTime.get(Calendar.DAY_OF_MONTH)+"";
+        if(submitTime.get(Calendar.DAY_OF_MONTH)<10)dateString = "0"+ dateString;
+
         String monthString = (submitTime.get(Calendar.MONTH)+1)+"";
-        if((submitTime.get(Calendar.MONTH)+1)< 10)dateString = "0"+ monthString;
+        if((submitTime.get(Calendar.MONTH)+1)< 10)monthString = "0"+ monthString;
+
         String hourString = submitTime.get(Calendar.HOUR_OF_DAY)+"";
         if(submitTime.get(Calendar.HOUR_OF_DAY)<10)hourString= "0"+ hourString;
+
         String minuteString = submitTime.get(Calendar.MINUTE)+"";
-        if(submitTime.get(Calendar.MINUTE )< 10)minuteString = "0"+ monthString;
+        if(submitTime.get(Calendar.MINUTE )< 10)minuteString = "0"+ minuteString;
 
         data[2] = dateString+ "/"+monthString+"/" + submitTime.get(Calendar.YEAR) + " " +hourString + ":"+minuteString;
 
+
+        dateString = time.get(Calendar.DAY_OF_MONTH)+"";
+        if(time.get(Calendar.DAY_OF_MONTH)<10)dateString = "0"+ dateString;
+
+        monthString = (time.get(Calendar.MONTH)+1)+"";
+        if((time.get(Calendar.MONTH)+1)< 10)monthString = "0"+ monthString;
+
         hourString = time.get(Calendar.HOUR_OF_DAY)+"";
         if(time.get(Calendar.HOUR_OF_DAY) < 10)hourString = "0" + hourString;
+
         minuteString = time.get(Calendar.MINUTE)+"";
         if(time.get(Calendar.MINUTE) < 10)minuteString = "0"+ minuteString;
+
         data[3] =  dateString+"/"+monthString+"/" + time.get(Calendar.YEAR) + " " + hourString+ ":"+ minuteString;
 
         data[4] = description;
