@@ -1,622 +1,357 @@
 package com.ppl.crimezone.classes;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.annotations.SerializedName;
-import com.google.maps.android.SphericalUtil;
-import com.ppl.crimezone.R;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 /**
- com.google.maps.android:android-maps-utils
- * This is controller for HomeMap UI
+ * This is controller for HomeMapUI
  */
-public class MapController extends ActionBarActivity {
+public class MapController {
 
+    private Calendar start, end;
+    private HashMap<Integer, CrimeReport> filterList;
+    private boolean filterCrimeTtype[];
+    ;
+    private List<CrimeReport> reports;
+    private LatLng location;
 
-    //the map variable
-    private GoogleMap map = null;
-    private Location location;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
-    private Marker[] placeMarkers;
-    private final int MAX_PLACES = 20;
-    private MarkerOptions[] places;
+    private byte filterTime;
+    private byte filterType;
 
-    //data variable
-    private CrimeReport[] locationList;
-
-    //for filter
-    private ArrayList<CrimeReport> filterList = new ArrayList<CrimeReport>();
-    AutoCompleteTextView searchLocation;
-    DownloadTask placesDownloadTask;
-    DownloadTask placeDetailsDownloadTask;
-    ParserTask placesParserTask;
-    ParserTask placeDetailsParserTask;
-
-    final int PLACES=0;
-    final int PLACES_DETAILS=1;
-
-    boolean dateFilter;
-    boolean crimeTypeFilter;
-
-    Date dateStart;
-    Date dateEnd;
-
-    boolean crimeCategories[] = new boolean[8];
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_map_ui);
-
-        placeMarkers = new Marker[MAX_PLACES];
-
-        setUpMap();
-
-        setUpSearchLocation();
-
-    }
-
-    //set up the action bar menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu items for use in the action bar
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.map_controller_actions, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    //set up the response for action bar menu
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.action_report:
-                openReport();
-                return true;
-            case R.id.action_settings:
-                openSettings();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    private HashMap<Marker, CrimeReport> markerToCrimeReport;
+    public MapController() {
+        filterList = new HashMap<Integer, CrimeReport>();
+        filterCrimeTtype = new boolean[8];
+        for (int ii = 0; ii < filterCrimeTtype.length; ++ii) {
+            filterCrimeTtype[ii] = false;
         }
-    }
-    /*
-     * Called when the Activity becomes visible.
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //updateLocationUser();
-
-        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        markerToCrimeReport = new HashMap<Marker, CrimeReport>();
+        start = null;
+        end = null;
+        filterType = 0;
+        filterTime = 0;
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public int getIdReport(Marker marker) {
+        return markerToCrimeReport.get(marker).getIdReport();
     }
 
-
-    @Override
-    public void onPause() {
-        super.onPause();
+    public boolean getFilterType(int ii) {
+        return filterCrimeTtype[ii];
     }
 
-    /*
-     * Called when the Activity is no longer visible.
-     */
-    @Override
-    protected void onStop() {
-        super.onStop();
+    public void setLocation(double latitude, double longitude) {
+        location = new LatLng(latitude, longitude);
     }
 
-    //method for action bar moving to other activities
-    public void openReport()
-    {
-        String PREFS_NAME = "ReporControllerMode";
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("NewReportMode", true);
-
-        // Commit the edits!
-        editor.commit();
-
-        Intent intent = new Intent(this, ReportController.class);
-        startActivity(intent);
+    public LatLng getLocation() {
+        return location;
     }
 
-    public void openSettings()
-    {
-
-    }
-
-    //initialize map
-    private void setUpMap(){
-        if(map == null) {
-            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            map.setMyLocationEnabled(true);
+    public boolean resetStartDate() {
+        if(start!=null) {
+            setFilterStartDate(false);
+            return true;
         }
-    }
-    //add listener if user swap or zoom the map
-    private void setUpMapListener(){
-        map.setOnCameraChangeListener
-                (   new GoogleMap.OnCameraChangeListener()
-                    {
-                        @Override
-                        public void onCameraChange(CameraPosition cameraPosition)
-                        {
-                            String latitude = String.valueOf(cameraPosition.target.latitude);
-                            String longitude = String.valueOf(cameraPosition.target.latitude);
-                            LatLng far = map.getProjection().getVisibleRegion().farLeft;
-                            double distance = SphericalUtil.computeDistanceBetween(far, cameraPosition.target);
-                            updateCrimeMarker(latitude, longitude, distance);
-                        }
-                    }
-                );
+        return false;
+
     }
 
-    //set the map to point to current user location
-    private void updateLocationUser(){
-        locationListener = new LocationListener() {
-            public void onLocationChanged(Location userLocation) {
-                // Called when a new location is found by the network location provider.
-                location = userLocation;
+    public boolean resetEndDate() {
+        if(end != null){
+            setFilterEndDate(false);
+            return true;
+        }return false;
+    }
 
-                LatLng target = new LatLng(location.getLatitude(), location.getLongitude());
-
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(target)      // Sets the center of the map to Mountain View
-                        .zoom(15)                   // Sets the zoom level
-                        .bearing(0)                // Sets the orientation of the camera to east
-                        .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
-                LatLng far = map.getProjection().getVisibleRegion().farLeft;
-                double distance = SphericalUtil.computeDistanceBetween(far,  target);
-                String latVal=String.valueOf(location.getLatitude());
-                String lngVal=String.valueOf(location.getLongitude());
-                updateCrimeMarker(latVal, lngVal, distance );
-                locationManager.removeUpdates(locationListener);
+    public boolean setStartDate(int day, int month, int year) {
+        if(validDate(day, month, year, true)){
+            if (start == null) {
+                start = Calendar.getInstance();
             }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            public void onProviderEnabled(String provider) {}
-
-            public void onProviderDisabled(String provider) {}
-        };
+            start.set(Calendar.DAY_OF_MONTH, day);
+            start.set(Calendar.MONTH, month);
+            start.set(Calendar.YEAR, year);
+            setFilterEndDate(true);
+            return true;
+        }
+        return false;
     }
 
-    private void updateCrimeMarker(String latitude, String longitude, double distance){
-        String url;
+    public boolean getReportList(double distance){
+        List<CrimeReport> miniReports= null;
+        boolean success = false;
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/crimeLocation.php");
         try {
-            url = "http:/http://crimezone.besaba.com/webservice/crimeLocation.php?distance="
-                    + URLEncoder.encode(String.valueOf(distance), "UTF-8")
-                    +"&latitude"
-                    +URLEncoder.encode(latitude, "UTF-8")
-                    +"&longitudee="
-                    +URLEncoder.encode(longitude, "UTF-8");
-            new GetCrimeReport().execute(url);
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    //initialize autocomplete view
-    private void setUpSearchLocation(){
-        if(searchLocation == null) {
-            searchLocation = (AutoCompleteTextView) findViewById(R.id.atv_places);
-            searchLocation.setThreshold(1);
-            setUpSearchLocationListener();
-        }
-    }
-
-    private void setUpSearchLocationListener(){
-        // Adding textchange listener
-        searchLocation.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Creating a DownloadTask to download Google Places matching "s"
-                placesDownloadTask = new DownloadTask(PLACES);
-
-                // Getting url to the Google Places Autocomplete api
-                String url = GsonParser.getAutoCompleteUrl(s.toString());
-
-                // Start downloading Google Places
-                // This causes to execute doInBackground() of DownloadTask class
-                placesDownloadTask.execute(url);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
-            }
-        });
-
-        // Setting an item click listener for the AutoCompleteTextView dropdown list
-        searchLocation.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int index,
-                                    long id) {
-
-                ListView lv = (ListView) arg0;
-                SimpleAdapter adapter = (SimpleAdapter) arg0.getAdapter();
-
-                HashMap<String, String> hm = (HashMap<String, String>) adapter.getItem(index);
-
-                // Creating a DownloadTask to download Places details of the selected place
-                placeDetailsDownloadTask = new DownloadTask(PLACES_DETAILS);
-
-                // Getting url to the Google Places details api
-                String url = GsonParser.getPlaceDetailsUrl(hm.get("reference"));
-
-                // Start downloading Google Place Details
-                // This causes to execute doInBackground() of DownloadTask class
-                placeDetailsDownloadTask.execute(url);
-            }
-        });
-    }
-
-
-    //fetch and parse crime report data
-    private class GetCrimeReport extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... placesURL) {
-            StringBuilder placesBuilder = new StringBuilder();
-            //process search parameter string(s)
-            for (String placeSearchURL : placesURL) {
-                //execute search
-                HttpClient placesClient = new DefaultHttpClient();
-                try {
-                    //try to fetch the data
-                    HttpGet placesGet = new HttpGet(placeSearchURL);
-                    HttpResponse placesResponse = placesClient.execute(placesGet);
-                    StatusLine placeSearchStatus = placesResponse.getStatusLine();
-                    Log.d("Status Code Connection ", placeSearchStatus.getStatusCode()+"");
-                    if (placeSearchStatus.getStatusCode() == 200) {
-                        //we have an OK response
-                        HttpEntity placesEntity = placesResponse.getEntity();
-                        InputStream placesContent = placesEntity.getContent();
-                        InputStreamReader placesInput = new InputStreamReader(placesContent);
-                        BufferedReader placesReader = new BufferedReader(placesInput);
-                        String lineIn;
-                        while ((lineIn = placesReader.readLine()) != null) {
-                            placesBuilder.append(lineIn);
-                        }
+                //try to fetch the data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
+            nameValuePairs.add(new BasicNameValuePair("latitude", location.latitude+""));
+            nameValuePairs.add(new BasicNameValuePair("longitude", location.longitude+""));
+            Log.d("parameter", location.latitude +" "+ location.longitude + " " + distance);
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                HttpResponse response = httpclient.execute(httppost);
+                StatusLine status = response.getStatusLine();
+                if (status.getStatusCode() == 200) {
+                    //we have an OK response
+                    HttpEntity entity = response.getEntity();
+                    InputStream content = entity.getContent();
+                    try {
+                        //Read the server response and attempt to parse it as JSON
+                        Reader reader = new InputStreamReader(content);
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        gsonBuilder.setDateFormat("dd/MM/yyyy HH:mm");
+                        Gson gson = gsonBuilder.create();
+                        miniReports = Arrays.asList(gson.fromJson(reader, CrimeReport[].class));
+                        content.close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
             }
-            return placesBuilder.toString();
-        }
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d("Result on Post: ", result);
-            //parse place data returned from Google Places
-            if(placeMarkers!=null){
-                for(int pm=0; pm<placeMarkers.length; pm++){
-                    if(placeMarkers[pm]!=null)
-                        placeMarkers[pm].remove();
-                }
-            }
-            try {
-                //parse JSON
-                JSONObject resultObject = new JSONObject(result);
-                JSONArray placesArray = resultObject.getJSONArray("results");
-                places = new MarkerOptions[placesArray.length()];
-
-                boolean missingValue=false;
-                LatLng placeLL=null;
-                String placeName="";
-                String vicinity="";
-                int currIcon = R.drawable.mk_sxassault;
-
-                    Log.d("Length ", placesArray.length()+"");
-
-                    //loop through places
-                    for (int p=0; p<placesArray.length(); p++) {
-                        try{
-                                //attempt to retrieve place data values
-
-                            //parse each place
-                            missingValue=false;
-                            JSONObject placeObject = placesArray.getJSONObject(p);
-                            JSONObject loc = placeObject.getJSONObject("geometry").getJSONObject("location");
-                            placeLL = new LatLng(
-                                    Double.valueOf(loc.getString("lat")),
-                                    Double.valueOf(loc.getString("lng")));
-                            JSONArray types = placeObject.getJSONArray("types");
-                            for(int t=0; t<types.length(); t++){
-                                String thisType=types.get(t).toString();   //what type is it
-                                if(thisType.contains("food")){
-                                    currIcon = R.drawable.mk_burglary;
-                                    break;
-                                }
-                                else if(thisType.contains("bar")){
-                                    currIcon = R.drawable.mk_drugs;
-                                    break;
-                                }
-                                else if(thisType.contains("store")){
-                                    currIcon = R.drawable.mk_kidnap;
-                                    break;
-                                }
-                            }
-                            vicinity = placeObject.getString("vicinity");
-                            placeName = placeObject.getString("name");
-                            }
-                        catch(JSONException jse){
-                            missingValue=true;
-                            jse.printStackTrace();
-                        }
-                        if(missingValue)places[p]=null;
-                        else
-                            places[p]=new MarkerOptions()
-                                    .position(placeLL)
-                                    .title(placeName)
-                                    .icon(BitmapDescriptorFactory.fromResource(currIcon))
-                                    .snippet(vicinity);
-                    }
-
-
-            }
-            catch (Exception e) {
+            catch(Exception e){
                 e.printStackTrace();
             }
-            if(places!=null && placeMarkers!=null){
-                for(int p=0; p<places.length && p<placeMarkers.length; p++){
-                    //will be null if a value was missing
-                    if(places[p]!=null)
-                        placeMarkers[p]=map.addMarker(places[p]);
+        if(miniReports != null){
+            reports = miniReports;
+            applyFilter();
+            success = true;
+        }
+        return success;
+    }
+
+    public String printStartDate(){
+            int timeInt = start.get(Calendar.DAY_OF_MONTH);
+            String dayString = timeInt+"";
+            if(timeInt<10)dayString = "0"+ dayString;
+            timeInt = start.get(Calendar.MONTH)+1;
+            String monthString = (timeInt)+"";
+            if(timeInt<10)monthString= "0"+ monthString;
+            return (dayString + "/" + monthString + "/" + start.get(Calendar.YEAR));
+    }
+
+    public String printEndDate(){
+            int timeInt = end.get(Calendar.DAY_OF_MONTH);
+            String dayString = timeInt+"";
+            if(timeInt<10)dayString = "0"+ dayString;
+            timeInt = end.get(Calendar.MONTH)+1;
+            String monthString = (timeInt)+"";
+            if(timeInt<10)monthString= "0"+ monthString;
+            return (dayString + "/" + monthString + "/" + end.get(Calendar.YEAR));
+    }
+    private boolean validDate(int day, int month, int year, boolean startDate) {
+        Calendar now = Calendar.getInstance();
+        if (year > now.get(Calendar.YEAR) || month > now.get(Calendar.MONTH) || day > now.get(Calendar.DAY_OF_MONTH))
+            return false;
+        if (startDate && (end != null && (year > end.get(Calendar.YEAR) || month > end.get(Calendar.MONTH) || day > end.get(Calendar.DAY_OF_MONTH))))
+            return false;
+        else if (start != null && (start.get(Calendar.YEAR) > year || start.get(Calendar.MONTH) > month || start.get(Calendar.DAY_OF_MONTH) > day))
+            return false;
+       return true;
+    }
+
+    public boolean setEndDate(int day, int month, int year){
+        if(validDate(day, month, year, false)) {
+            if (end == null) {
+                end = Calendar.getInstance();
+            }
+            end.set(Calendar.DAY_OF_MONTH, day);
+            end.set(Calendar.MONTH, month);
+            end.set(Calendar.YEAR, year);
+            setFilterEndDate(true);
+            return true;
+        }
+        return false;
+    }
+
+
+    public int getStartDate(int type){
+        Calendar cal;
+        if(start == null){
+            cal = Calendar.getInstance();
+        }else {
+            cal = start;
+        }
+        switch(type){
+            case 0:
+                return cal.get(Calendar.DAY_OF_MONTH);
+            case 1:
+                return cal.get(Calendar.MONTH);
+            case 2:
+                return cal.get(Calendar.YEAR);
+            default:
+                return -1;
+        }
+
+    }
+
+    public int getEndDate(int type){
+        Calendar cal;
+        if(end == null){
+            cal = Calendar.getInstance();
+        }else {
+            cal = end;
+        }
+        switch(type){
+            case 0:
+                return cal.get(Calendar.DAY_OF_MONTH);
+            case 1:
+                return cal.get(Calendar.MONTH);
+            case 2:
+                return cal.get(Calendar.YEAR);
+            default:
+                return -1;
+        }
+    }
+
+    private CrimeReport getFilteredReport(CrimeReport x, Byte initialCrimeType){
+        List<Byte> crimeType = new ArrayList<Byte>();
+        crimeType.add(initialCrimeType);
+        return new CrimeReport(x.getIdReport(), x.getTitle(), x.getCrimeTime(), crimeType, x.getLatitude(), x.getLongitude());
+    }
+
+
+    public void setFilterType(byte type, boolean value){
+        if(!value) {
+            Log.d("reports size", reports.size()+"");
+            for (int ii = 0; ii < reports.size(); ++ii) {
+                Log.d("truth false", reports.get(ii).getCategories().contains(type) + " :-> " + reports.get(ii).printCategories());
+                if (reports.get(ii).getCategories().contains(type)) {
+                   Log.d("truth2", (filterList.get(reports.get(ii).getIdReport()) != null)+"");
+                    if (filterList.get(reports.get(ii).getIdReport()) != null) {
+                        CrimeReport temp = filterList.get(reports.get(ii).getIdReport());
+                        temp.addCategories(type);
+                        filterList.put(reports.get(ii).getIdReport(),temp) ;
+                    } else {
+                        filterList.put(reports.get(ii).getIdReport(), getFilteredReport(reports.get(ii), type));
+                    }
                 }
             }
+
+            for(int ii=0; ii< reports.size(); ++ii){
+                Log.d("after false :=>", reports.get(ii).printCategories());
+            }
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("after false =>" , entry.getValue().printCategories());
+            }
+            filterType--;
+            filterCrimeTtype[type] = false;
+        }else {
+
+            Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                entry.getValue().removeCategories(type);
+                if(entry.getValue().getCategories().size() == 0) iterator.remove(); // right way to remove entries from Map,
+                // avoids ConcurrentModificationException
+            }
+            iterator = filterList.entrySet().iterator();
+            while(iterator.hasNext()){
+                HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
+                Log.d("true =>" , entry.getValue().printCategories());
+            }
+
+            for(int ii=0; ii< reports.size(); ++ii){
+                Log.d("after true :=>", reports.get(ii).printCategories());
+            }
+            filterType++;
+            filterCrimeTtype[type] = true;
         }
     }
 
-    // Fetches data from url passed
-    private class DownloadTask extends AsyncTask<String, Void, String>{
-
-        private int downloadType=0;
-
-        // Constructor
-        public DownloadTask(int type){
-            this.downloadType = type;
+    private CrimeReport copyReport(CrimeReport x) {
+        List<Byte> categories = new ArrayList<Byte>();
+        for(int ii=0; ii<x.getCategories().size(); ++ii){
+            categories.add(new Byte(x.getCategories().get(ii).byteValue()));
         }
-
-        @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
-            String data = "";
-
-            try{
-                // Fetching the data from web service
-                data = GsonParser.downloadUrl(url[0]);
-            }catch(Exception e){
-                Log.d("Background Task",e.toString());
-            }
-            Log.d("Hasil Data ", data);
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            switch(downloadType){
-                case PLACES:
-                    // Creating ParserTask for parsing Google Places
-                    placesParserTask = new ParserTask(PLACES);
-
-                    // Start parsing google places json data
-                    // This causes to execute doInBackground() of ParserTask class
-                    placesParserTask.execute(result);
-                    break;
-
-                case PLACES_DETAILS :
-                    // Creating ParserTask for parsing Google Places
-                    placeDetailsParserTask = new ParserTask(PLACES_DETAILS);
-
-                    // Starting Parsing the JSON string
-                    // This causes to execute doInBackground() of ParserTask class
-                    placeDetailsParserTask.execute(result);
-            }
-        }
+        return new CrimeReport(x.getIdReport(),x.getTitle(), x.getCrimeTime(), categories, x.getLatitude(), x.getLongitude());
     }
 
-    private class ParserTask extends AsyncTask<String, Integer, List<HashMap<String,String>>>{
-
-        int parserType = 0;
-
-        public ParserTask(int type){
-            this.parserType = type;
-        }
-
-        @Override
-        protected List<HashMap<String, String>> doInBackground(String... jsonData) {
-
-            JSONObject jObject;
-            List<HashMap<String, String>> list = null;
-
-            try{
-                jObject = new JSONObject(jsonData[0]);
-
-                switch(parserType){
-                    case PLACES :
-                        // Getting the parsed data as a List construct
-                        list = GsonParser.parsePlace(jObject);
-                        break;
-                    case PLACES_DETAILS :
-
-                        // Getting the parsed data as a List construct
-                        list = GsonParser.parseDetailPlace(jObject);
+    private void setFilterStartDate(boolean value){
+        if(!value) {
+            for (int ii = 0; ii < reports.size(); ++ii) {
+                if (reports.get(ii).getCrimeTime().before(start.getTime())) {
+                    filterList.put(reports.get(ii).getIdReport(), copyReport(reports.get(ii)));
                 }
-
-            }catch(Exception e){
-                Log.d("Exception",e.toString());
             }
-            return list;
-        }
-
-        @Override
-        protected void onPostExecute(List<HashMap<String, String>> result) {
-
-            switch(parserType){
-                case PLACES :
-                    String[] from = new String[] { "description"};
-                    int[] to = new int[] { android.R.id.text2 };
-
-
-
-                    // Creating a SimpleAdapter for the AutoCompleteTextView
-                    SimpleAdapter adapter = new SimpleAdapter(getBaseContext(), result, R.layout.autocomplete, from, to);
-                    // Setting the adapter
-                    searchLocation.setAdapter(adapter);
-                    break;
-                case PLACES_DETAILS :
-                    HashMap<String, String> hm = result.get(0);
-
-                    // Getting latitude from the parsed data
-                    double latitude = Double.parseDouble(hm.get("lat"));
-
-                    // Getting longitude from the parsed data
-                    double longitude = Double.parseDouble(hm.get("lng"));
-
-                    // Getting reference to the SupportMapFragment of the activity_main.xml
-                    SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-                    // Getting GoogleMap from SupportMapFragment
-
-                    LatLng point = new LatLng(latitude, longitude);
-
-                    CameraUpdate cameraPosition = CameraUpdateFactory.newLatLng(point);
-                    CameraUpdate cameraZoom = CameraUpdateFactory.zoomBy(5);
-
-                    // Showing the user input location in the Google Map
-                    map.moveCamera(cameraPosition);
-                    map.animateCamera(cameraZoom);
-
-                    MarkerOptions options = new MarkerOptions();
-                    options.position(point);
-                    options.title("Position");
-                    options.snippet("Latitude:"+latitude+",Longitude:"+longitude);
-
-                    // Adding the marker in the Google Map
-                    map.addMarker(options);
-
-                    break;
+            start = null;
+        }else {
+            for (Integer idReport : filterList.keySet()) {
+                if(filterList.get(idReport).getCrimeTime().before(start.getTime()))filterList.remove(idReport);
             }
         }
     }
 
-    private class Data {
-
-        String title;
-
-        @SerializedName("time_start")
-        Date crimeDateStart;
-        @SerializedName("time_end")
-        Date crimeDateEnd;
-        String [] categories;
-
-        @SerializedName("x_coordinate")
-        double latitude;
-        @SerializedName("y_coordinate")
-        double longitude;
-
-        public Data(String title, Date start, Date end,String[] categories, double lat, double lang){
-            this.title = title;
-            crimeDateStart = start;
-            crimeDateEnd = end;
-            this.categories = categories;
-            latitude = lat;
-            longitude = lang;
-
+    private void setFilterEndDate(boolean value){
+        if(!value) {
+            for (int ii = 0; ii < reports.size(); ++ii) {
+                if (reports.get(ii).getCrimeTime().after(end.getTime())) {
+                    filterList.put(reports.get(ii).getIdReport(), copyReport(reports.get(ii)));
+                }
+            }
+            end = null;
+        }else {
+            for (Integer idReport : filterList.keySet()) {
+                if(filterList.get(idReport).getCrimeTime().after(start.getTime()))filterList.remove(idReport);
+            }
         }
+    }
+
+    public CrimeReport getCrimeReport(int idReport){
+        return filterList.get(idReport);
+    }
+
+    public void addMarkerToCrimeReport(Marker mark, CrimeReport report){
+        markerToCrimeReport.put(mark, report);
+    }
+
+    public HashMap<Integer, CrimeReport> getFilterList(){return filterList;}
 
 
-        public String getTitle(){
-            return title;
+    private void applyFilter(){
+        filterList = new HashMap<Integer, CrimeReport>();
+        Log.d("report size", reports.size() + "");
+        //copy from report to filterList
+        for(int ii=0; ii< reports.size(); ++ii){
+            filterList.put(reports.get(ii).getIdReport(), copyReport(reports.get(ii)));
         }
-
-        public Date getCrimeDateStart(){
-            return crimeDateStart;
-        }
-
-        public Date getCrimeDateEnd(){
-            return crimeDateEnd;
-        }
-
-        public double getLatitude(){
-            return latitude;
-        }
-
-        public double getLongitude(){
-            return longitude;
-        }
-
-        public String[] getCategories(){
-            return categories;
+        if(start != null)setFilterStartDate(true);
+        if(end != null)setFilterEndDate(true);
+        if(filterType > 0) {
+            for (byte ii = 0; ii < filterCrimeTtype.length; ++ii) {
+                if (filterCrimeTtype[ii]) {
+                    setFilterType(ii, true);
+                }
+            }
         }
     }
 }
