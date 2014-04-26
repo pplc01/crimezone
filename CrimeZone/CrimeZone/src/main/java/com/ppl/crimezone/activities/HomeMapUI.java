@@ -192,17 +192,22 @@ public class HomeMapUI extends ActionBarActivity {
         alert.show();
     }
 
-    private View.OnClickListener getDateListener(final int day, final int month, final int year, final Handler handler){
+    private View.OnClickListener getDateListener(final int type, final Handler handler){
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 /** Creating a bundle object to pass currently set time to the fragment */
                 Bundle b = new Bundle();
-
-                b.putInt("set_day", day);
-                b.putInt("set_month", month);
-                b.putInt("set_year", year);
+                if(type == 0){
+                    b.putInt("set_day", mapController.getStartDate(0));
+                    b.putInt("set_month", mapController.getStartDate(1));
+                    b.putInt("set_year", mapController.getStartDate(2));
+                }else {
+                    b.putInt("set_day", mapController.getEndDate(0));
+                    b.putInt("set_month", mapController.getEndDate(1));
+                    b.putInt("set_year", mapController.getEndDate(2));
+                }
 
                 /** Instantiating TimePickerDialogFragment */
                 DatePickerUI datePicker = new DatePickerUI(handler);
@@ -251,7 +256,7 @@ public class HomeMapUI extends ActionBarActivity {
             @Override
             public void handleMessage(Message m){
                 Bundle b = m.getData();
-                if(mapController.setStartDate(b.getInt("set_day"), b.getInt("set_year"),b.getInt("set_month"))){
+                if(mapController.setStartDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
                     drawReportList();
                     startDate.setText(mapController.printStartDate());
                 }else{
@@ -262,7 +267,7 @@ public class HomeMapUI extends ActionBarActivity {
             }
         };
 
-        startDate.setOnClickListener(getDateListener(mapController.getStartDate(0), mapController.getStartDate(1), mapController.getStartDate(2), startDateHandler));
+        startDate.setOnClickListener(getDateListener(0, startDateHandler));
         startDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -276,23 +281,23 @@ public class HomeMapUI extends ActionBarActivity {
             @Override
             public void handleMessage(Message m){
                 Bundle b = m.getData();
-                if(mapController.setEndDate(b.getInt("set_day"), b.getInt("set_year"), b.getInt("set_month"))){
+                if(mapController.setEndDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
                     drawReportList();
                     endDate.setText(mapController.printEndDate());
                 }else{
                     if(mapController.resetEndDate())drawReportList();
                     showAlertDialog("END DATE NOT VALID", "Please Select Date Before Current Date");
-                    startDate.setText("End");
+                    endDate.setText("End");
                 }
             }
         };
 
-        endDate.setOnClickListener(getDateListener(mapController.getEndDate(0), mapController.getEndDate(1), mapController.getEndDate(2), endDateHandler));
+        endDate.setOnClickListener(getDateListener(1, endDateHandler));
         endDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if(mapController.resetEndDate())drawReportList();
-                endDate.setText("Start");
+                endDate.setText("End");
                 return true;
             }
         });
@@ -379,9 +384,6 @@ public class HomeMapUI extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                placesDownloadTask = new DownloadTask(PLACES);
-                String url = GsonParser.getAutoCompleteUrl(s.toString());
-                placesDownloadTask.execute(url);
             }
         });
 
