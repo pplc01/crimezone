@@ -134,8 +134,8 @@ public class CrimeReport{
         else timeText = timeText +timeInt;
         timeText+="/"+ convertDatetoCalendar.get(Calendar.YEAR)+ " ";
         timeInt = convertDatetoCalendar.get(Calendar.HOUR_OF_DAY);
-        if(timeInt < 10)timeText += "0"+ timeInt;
-        else timeText +=timeInt;
+        if(timeInt < 10)timeText += "0"+ timeInt+":";
+        else timeText +=timeInt+":";
         timeInt = convertDatetoCalendar.get(Calendar.MINUTE);
         if(timeInt < 10)timeText += "0"+ timeInt;
         else timeText +=timeInt;
