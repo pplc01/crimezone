@@ -3,6 +3,7 @@ package com.ppl.crimezone.classes;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -24,14 +25,14 @@ public class CrimeReport{
     @SerializedName("time")
     private Date crimeTime;
     @SerializedName("CategoryName")
-    private List<String> categories;
+    private List<Byte> categories;
 
     @SerializedName("x_coordinate")
     private double latitude;
     @SerializedName("y_coordinate")
     private double longitude;
 
-    public CrimeReport(int idReport, String title, Date reportDate, Date time,  String description, List<String> categories, double latitude, double longitude, double avgScore){
+    public CrimeReport(int idReport, String title, Date reportDate, Date time,  String description, List<Byte> categories, double latitude, double longitude, double avgScore){
         this.title = title;
         this.crimeTime= time;
         this.categories = categories;
@@ -43,7 +44,7 @@ public class CrimeReport{
         this.avgScore = avgScore;
     }
 
-    public CrimeReport(int idReport, String title, Date time, List<String> categories, double latitude, double longitude){
+    public CrimeReport(int idReport, String title, Date time, List<Byte> categories, double latitude, double longitude){
         this.idReport = idReport;
         this.title = title;
         this.crimeTime = time;
@@ -54,6 +55,7 @@ public class CrimeReport{
     }
     public CrimeReport(){
     }
+
 
     public void setCrimeTime(long miliseconds){
         crimeTime.setTime(miliseconds);
@@ -94,13 +96,22 @@ public class CrimeReport{
         return longitude;
     }
 
-    public List<String> getCategories(){
+    public List<Byte> getCategories(){
         return categories;
     }
 
+    public void removeCategories(byte category){
+        categories.remove(new Byte(category));
+    }
+
+    public void addCategories(byte category){
+        if(categories.contains(category))categories.add(new Byte(category));
+    }
+
+
     public String printCategories(){
         String result="";
-        for(String x:categories){
+        for(Byte x:categories){
             result+= x+",";
         }
         return result;
@@ -109,6 +120,26 @@ public class CrimeReport{
     @Override
     public String toString(){
         return getIdReport()+" "+ getReportDate()+" "+ getDescription()+" "+ getAvgScore()+" " + getCrimeTime()+" "+" "+getLatitude()+" "+getLongitude()+ " "+ printCategories();
+    }
+
+    public String printDate(){
+        Calendar convertDatetoCalendar = Calendar.getInstance();
+        convertDatetoCalendar.setTimeInMillis(crimeTime.getTime());
+        int timeInt = convertDatetoCalendar.get(Calendar.DAY_OF_MONTH);
+        String timeText = timeInt+"";
+        if(timeInt < 10)timeText= "0"+timeText;
+        timeText+="/";
+        timeInt= (convertDatetoCalendar.get(Calendar.MONTH)+1);
+        if(timeInt < 10)timeText= timeText+ "0"+timeInt;
+        else timeText = timeText +timeInt;
+        timeText+="/"+ convertDatetoCalendar.get(Calendar.YEAR)+ " ";
+        timeInt = convertDatetoCalendar.get(Calendar.HOUR_OF_DAY);
+        if(timeInt < 10)timeText += "0"+ timeInt+":";
+        else timeText +=timeInt+":";
+        timeInt = convertDatetoCalendar.get(Calendar.MINUTE);
+        if(timeInt < 10)timeText += "0"+ timeInt;
+        else timeText +=timeInt;
+        return timeText;
     }
 
     public String getUsername(){

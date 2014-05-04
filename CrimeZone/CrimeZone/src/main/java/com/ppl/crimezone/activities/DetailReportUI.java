@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,15 +16,19 @@ import android.widget.TextView;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.GiveRatingUI;
 import com.ppl.crimezone.classes.ReportController;
-import com.ppl.crimezone.classes.CrimeReport;
 
-public class DetailReportUI extends Activity implements View.OnClickListener  {
+public class DetailReportUI extends Activity  {
 
     TextView title, time, author, description, locationDescription;
     LinearLayout starContainer, crimeTypeContainer;
-    CrimeReport detailReport;
     ImageButton back, giveRate;
-    private void initView(){
+    GiveRatingUI rateUI;
+
+    ReportController reportController;
+
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.report_detail_ui);
         title = (TextView) findViewById(R.id.headline_detail);
         time = (TextView) findViewById(R.id.time_detail);
         author = (TextView) findViewById(R.id.author);
@@ -35,115 +38,49 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
         starContainer = (LinearLayout) findViewById(R.id.star_container);
         back = (ImageButton) findViewById(R.id.back_detail);
         giveRate = (ImageButton) findViewById(R.id.rate_detail);
-        back.setOnClickListener(this);
-        giveRate.setOnClickListener(this);
-        detailReport = new CrimeReport();
-    }
-    GiveRatingUI rate;
-    Double rateVal = null;
+        reportController = new ReportController();
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.back_detail:
+        View.OnClickListener backListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 back.setImageResource(R.drawable.back_pressed);
                 String PREFS_NAME = "ReportLocation";
                 SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
                 SharedPreferences.Editor editor = settings.edit();
                 editor.putBoolean("NotHome", true);
-                editor.putString("latitude", detailReport.getLatitude()+ "");
-                editor.putString("longitude", detailReport.getLongitude()+"");
-
-                // Commit the edits!
+                editor.putString("latitude", reportController.getDetailReport().getLatitude() + "");
+                editor.putString("longitude", reportController.getDetailReport().getLongitude() + "");
                 editor.commit();
                 finish();
-                break;
-            case R.id.rate_detail:
+            }
+        };
+
+        View.OnClickListener rateListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 giveRate.setImageResource(R.drawable.r_yesstar);
-                rate = new GiveRatingUI(DetailReportUI.this);
-                rate.getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
-                rate.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                rateUI = new GiveRatingUI(DetailReportUI.this);
+                rateUI.getWindow().setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+                rateUI.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialog) {
-                        if(rate.isSubmit()) {
+                        if (rateUI.isSubmit()) {
                             new FetchRatingTask().execute();
 
                         }
                         giveRate.setImageResource(R.drawable.r_star);
                     }
                 });
-                rate.show();
-                break;
-            default:
-                break;
-        }
-    }
+                rateUI.show();
+            }
+        };
 
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.report_detail_ui);
-        initView();
-        getDetailReport();
-    }
+        back.setOnClickListener(backListener);
 
-    private void getDetailReport(){
+        giveRate.setOnClickListener(rateListener);
+
         new FetchDetailTask().execute();
     }
-
-
-    private void viewDetailReport()
-    {
-        //init UI
-        title = (TextView) findViewById(R.id.headline_detail);
-        if(title == null){
-            Log.d("check null", "title");
-        }
-        if(detailReport == null){
-            Log.d("check null", "detailReport");
-        }
-        title.setText(detailReport.getTitle());
-        String timeText = detailReport.getCrimeTime().getDate()+"/"+ (detailReport.getCrimeTime().getMonth()+1)+"/"+ (detailReport.getCrimeTime().getYear()+1900)+ " "+ detailReport.getCrimeTime().getHours()+":"+detailReport.getCrimeTime().getMinutes()+"->"+ detailReport.getCrimeTime().getHours()+":"+detailReport.getCrimeTime().getMinutes();
-        time.setText(timeText);
-        author.setText(detailReport.getUsername());
-        description.setText(detailReport.getDescription());
-
-        for(String x: detailReport.getCategories()){
-            ImageView typeCrime = new ImageView(this);
-            int idType = Integer.parseInt(x);
-            switch (idType){
-                case 0:
-                    typeCrime.setImageResource(R.drawable.ic_drugs);
-                    break;
-                case 1:
-                    typeCrime.setImageResource(R.drawable.ic_burglary);
-                    break;
-                case 2:
-                    typeCrime.setImageResource(R.drawable.ic_homicide);
-                    break;
-                case 3:
-                    typeCrime.setImageResource(R.drawable.ic_kidnap);
-                    break;
-                case 4:
-                    typeCrime.setImageResource(R.drawable.ic_sxassault);
-                    break;
-                case 5:
-                    typeCrime.setImageResource(R.drawable.ic_theft);
-                    break;
-                case 6:
-                    typeCrime.setImageResource(R.drawable.ic_vehicletheft);
-                    break;
-                case 7:
-                    typeCrime.setImageResource(R.drawable.ic_violence);
-                    break;
-            }
-            crimeTypeContainer.addView(typeCrime);
-        }
-
-        locationDescription.setText("lat: "+detailReport.getLatitude()+ ", long "+ detailReport.getLongitude());
-
-        drawStar();
-    }
-
 
 
 
@@ -155,13 +92,12 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             SharedPreferences sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
 
             String username = sharedPreferences.getString("usernameKey", "");
-            rateVal =  ReportController.updateRating(username, detailReport.getIdReport() + "", rate.getNewRating() + "");
-            if(rateVal != null){
-                detailReport.setAvgScore(rateVal.doubleValue());
+
+            if(reportController.updateRating(username)){
                 drawStarThread();
             }else {
                 //failed
-            }//drawStar();
+            }
             return "";
         }
     }
@@ -175,17 +111,61 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
 
             String reportId = settings.getString("reportId", "-1");
 
-            detailReport = ReportController.fetchReportDetail(reportId);
-            viewDetailThread();
+            if(reportController.fetchReportDetail(reportId))
+                showDetailReport();
+            else {
+                finish();
+            }
             return "";
         }
     }
 
-    public void viewDetailThread(){
+    public void showDetailReport(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                viewDetailReport();//Your code to run in GUI thread here
+                //init UI
+                title = (TextView) findViewById(R.id.headline_detail);
+
+                title.setText(reportController.getDetailReport().getTitle());
+
+                time.setText(reportController.getDetailReport().printDate());
+                author.setText(reportController.getDetailReport().getUsername());
+                description.setText(reportController.getDetailReport().getDescription());
+
+                for(Byte x: reportController.getDetailReport().getCategories()){
+                    ImageView typeCrime = new ImageView(DetailReportUI.this);
+                    byte idType = x;
+                    switch (idType){
+                        case 0:
+                            typeCrime.setImageResource(R.drawable.ic_drugs);
+                            break;
+                        case 1:
+                            typeCrime.setImageResource(R.drawable.ic_burglary);
+                            break;
+                        case 2:
+                            typeCrime.setImageResource(R.drawable.ic_homicide);
+                            break;
+                        case 3:
+                            typeCrime.setImageResource(R.drawable.ic_kidnap);
+                            break;
+                        case 4:
+                            typeCrime.setImageResource(R.drawable.ic_sxassault);
+                            break;
+                        case 5:
+                            typeCrime.setImageResource(R.drawable.ic_theft);
+                            break;
+                        case 6:
+                            typeCrime.setImageResource(R.drawable.ic_vehicletheft);
+                            break;
+                        case 7:
+                            typeCrime.setImageResource(R.drawable.ic_violence);
+                            break;
+                    }
+                    crimeTypeContainer.addView(typeCrime);
+                }
+                locationDescription.setText("lat: "+reportController.getDetailReport().getLatitude()+ ", long "+ reportController.getDetailReport().getLongitude());
+                drawStar();//Your code to run in GUI thread here
             }//public void run() {
         });
     }
@@ -202,7 +182,7 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
     private void drawStar()
     {
         starContainer.removeAllViewsInLayout();
-        int x = (int)detailReport.getAvgScore();
+        int x = (int)reportController.getDetailReport().getAvgScore();
         for(int ii=0; ii< x; ++ii){
             ImageView starii = new ImageView(this);
             starii.setImageResource(R.drawable.r_yesstar);
@@ -214,12 +194,12 @@ public class DetailReportUI extends Activity implements View.OnClickListener  {
             starContainer.addView(starii);
 
         }
-        if(Math.abs(detailReport.getAvgScore()-(x+0.5))< Math.abs(Math.round(detailReport.getAvgScore()) - detailReport.getAvgScore())){
+        if(Math.abs(reportController.getDetailReport().getAvgScore()-(x+0.5))< Math.abs(Math.round(reportController.getDetailReport().getAvgScore()) - reportController.getDetailReport().getAvgScore())){
             ImageView halfStar = new ImageView(this);
             halfStar.setImageResource(R.drawable.r_halfstar);
             starContainer.addView(halfStar);
         }else {
-            if(Math.round(detailReport.getAvgScore()) == x+1){
+            if(Math.round(reportController.getDetailReport().getAvgScore()) == x+1){
                 ImageView fullStar = new ImageView(this);
                 fullStar.setImageResource(R.drawable.r_yesstar);
                 starContainer.addView(fullStar);
