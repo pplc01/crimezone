@@ -156,7 +156,7 @@
                 <Button
                     android:layout_width="160dp"
                     android:layout_height="70dp"
-                    android:background="@null"
+                    android:background="@color/dark"
                     android:text="Start"
                     android:textSize="20dp"
                     android:textColor="@color/white"
@@ -167,14 +167,15 @@
                     android:layout_width="160dp"
                     android:layout_height="70dp"
                     android:textColor="@color/white"
-                    android:background="@null"
+                    android:background="@color/dark"
                     android:text="End"
                     android:textSize="20dp"
                     android:id="@+id/end_date"
                     android:gravity="center"
-                    android:layout_gravity="center"
+                    android:layout_gravity="right|center_vertical"
                     />
             </LinearLayout>
+
         </LinearLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </RelativeLayout>
