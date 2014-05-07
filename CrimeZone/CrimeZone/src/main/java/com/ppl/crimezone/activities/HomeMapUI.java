@@ -38,7 +38,10 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.CrimeReport;
 import com.ppl.crimezone.classes.DatePickerUI;
@@ -78,7 +81,8 @@ public class HomeMapUI extends ActionBarActivity {
     private SlidingUpPanelLayout slider;
     private ImageView dragArea;
     private ImageButton type [];
-    private Button startDate ;
+    private Button
+            startDate ;
     private Button endDate;
 
 
@@ -124,6 +128,88 @@ public class HomeMapUI extends ActionBarActivity {
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
+    public void showZones(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (placeMarkers != null) {
+                    for (int pm = 0; pm < placeMarkers.size(); pm++) {
+                        if (placeMarkers.get(pm) != null)
+                            placeMarkers.get(pm).remove();
+                    }
+                }
+                places = new ArrayList<MarkerOptions>();
+                placeMarkers = new ArrayList<Marker>();
+                int ii=0;
+                for (Integer idReport : mapController.getFilteredReports().keySet()) {
+                    int currIcon;
+                    CrimeReport report = mapController.getCrimeReport(idReport);
+                    switch (report.getCategories().size()) {
+                        case 1:
+                            switch(report.getCategories().get(0)) {
+                                case 0:
+                                    currIcon = R.drawable.mk_drugs;
+                                    break;
+                                case 1:
+                                    currIcon = R.drawable.mk_burglary;
+                                    break;
+                                case 2:
+                                    currIcon = R.drawable.mk_homicide;
+                                    break;
+                                case 3:
+                                    currIcon = R.drawable.mk_kidnap;
+                                    break;
+                                case 4:
+                                    currIcon = R.drawable.mk_sxassault;
+                                    break;
+                                case 5:
+                                    currIcon = R.drawable.mk_theft;
+                                    break;
+                                case 6:
+                                    currIcon = R.drawable.mk_vehicletheft;
+                                    break;
+                                default:
+                                    currIcon = R.drawable.mk_violence;
+                                    break;
+                            }
+                            break;
+                        case 2:
+                            currIcon = R.drawable.mk_2;
+                            break;
+                        case 3:
+                            currIcon = R.drawable.mk_3;
+                            break;
+                        case 4:
+                            currIcon = R.drawable.mk_4;
+                            break;
+                        case 5:
+                            currIcon = R.drawable.mk_5;
+                            break;
+                        case 6:
+                            currIcon = R.drawable.mk_6;
+                            break;
+                        case 7:
+                            currIcon = R.drawable.mk_7;
+                            break;
+                        default:
+                            currIcon = R.drawable.mk_8;
+                            break;
+                    }
+
+                    places.add(new MarkerOptions()
+                            .position(new LatLng(report.getLatitude(), report.getLongitude()))
+                            .title(report.getTitle())
+                            .icon(BitmapDescriptorFactory.fromResource(currIcon)));
+                    Marker mark = map.addMarker(places.get(ii));
+                    placeMarkers.add(mark);
+                    mapController.addMarkerToCrimeReport(mark, report);
+                    ii++;
+                }
+            }
+        });
+    }
+
     //initialize map
     private void setUpMap(){
         map.setMyLocationEnabled(true);
@@ -155,11 +241,10 @@ public class HomeMapUI extends ActionBarActivity {
                 );
     }
 
-
     private void changeLocation(CameraPosition cameraPosition){
         mapController.setLocation(cameraPosition.target.latitude, cameraPosition.target.longitude);
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        LatLng far = map.getProjection().getVisibleRegion().farLeft;
+        //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        LatLng far = map.getProjection().getVisibleRegion().farLeft;                        
         double distance = SphericalUtil.computeDistanceBetween(far, mapController.getLocation());
         new GetCrimeReport().execute(distance);
     }
@@ -245,7 +330,7 @@ public class HomeMapUI extends ActionBarActivity {
                                                     type[finalIi].setImageResource(R.drawable.ic_nocrime);
                                                     mapController.setFilterType(finalIi, true);
                                                 }
-                                                drawReportList();
+                                                viewZones();//viewReports();
                                             }
                                         }
             );
@@ -257,10 +342,10 @@ public class HomeMapUI extends ActionBarActivity {
             public void handleMessage(Message m){
                 Bundle b = m.getData();
                 if(mapController.setStartDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
-                    drawReportList();
+                    viewZones();//();
                     startDate.setText(mapController.printStartDate());
                 }else{
-                    if(mapController.resetStartDate())drawReportList();
+                    if(mapController.resetStartDate()) viewReports();
                     showAlertDialog("START DATE NOT VALID", "Please Select Valid Date Before Current Date");
                     startDate.setText("Start");
                 }
@@ -271,7 +356,7 @@ public class HomeMapUI extends ActionBarActivity {
         startDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(mapController.resetStartDate())drawReportList();
+                if(mapController.resetStartDate()) viewReports();
                 startDate.setText("Start");
                 return true;
             }
@@ -282,10 +367,11 @@ public class HomeMapUI extends ActionBarActivity {
             public void handleMessage(Message m){
                 Bundle b = m.getData();
                 if(mapController.setEndDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
-                    drawReportList();
+                    //viewReports();
+                    viewZones();
                     endDate.setText(mapController.printEndDate());
                 }else{
-                    if(mapController.resetEndDate())drawReportList();
+                    if(mapController.resetEndDate())viewZones(); //viewReports();
                     showAlertDialog("END DATE NOT VALID", "Please Select Date Before Current Date");
                     endDate.setText("End");
                 }
@@ -296,7 +382,7 @@ public class HomeMapUI extends ActionBarActivity {
         endDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(mapController.resetEndDate())drawReportList();
+                if(mapController.resetEndDate()) viewZones();//viewReports();
                 endDate.setText("End");
                 return true;
             }
@@ -411,7 +497,10 @@ public class HomeMapUI extends ActionBarActivity {
         });
     }
 
-    private void drawReportList(){
+
+
+
+    private void viewReports(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -425,7 +514,7 @@ public class HomeMapUI extends ActionBarActivity {
                 places = new ArrayList<MarkerOptions>();
                 placeMarkers = new ArrayList<Marker>();
                 int ii=0;
-                for (Integer idReport : mapController.getFilterList().keySet()) {
+                for (Integer idReport : mapController.getFilteredReports().keySet()) {
                     int currIcon;
                     CrimeReport report = mapController.getCrimeReport(idReport);
                     switch (report.getCategories().size()) {
@@ -498,7 +587,7 @@ public class HomeMapUI extends ActionBarActivity {
 
         @Override
         protected Boolean doInBackground(Double... params) {
-            if(mapController.getReportList(params[0]))drawReportList();
+            if(mapController.getReportList(params[0])) viewZones();//viewReports();
             else {
                 return false;
                 //notification about connection
@@ -610,5 +699,38 @@ public class HomeMapUI extends ActionBarActivity {
                    break;
             }
         }
+    }
+
+    HeatmapTileProvider mProvider= null;
+    TileOverlay mOverlay = null;
+    public void viewZones(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (placeMarkers != null) {
+                    for (int pm = 0; pm < placeMarkers.size(); pm++) {
+                        if (placeMarkers.get(pm) != null)
+                            placeMarkers.get(pm).remove();
+                    }
+                }
+                places = null;
+                placeMarkers =null;
+                List<LatLng> list = new ArrayList<LatLng>();
+                for (Integer idReport : mapController.getFilteredReports().keySet()) {
+                    CrimeReport report = mapController.getCrimeReport(idReport);
+                    list.add(new LatLng(report.getLatitude(), report.getLongitude()));
+                }
+                // Get the data: latitude/longitude positions of police stations.
+                // Create a heat map tile provider, passing it the latlngs of the police stations.
+                mProvider = new HeatmapTileProvider.Builder()
+                        .data(list)
+                        .build();
+                // Add a tile overlay to the map, using the heat map tile provider.
+                if(mOverlay != null) mOverlay.remove();
+                mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+
+            }
+        });
     }
 }
