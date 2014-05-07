@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is controller for HomeMapUI
@@ -93,7 +92,7 @@ public class MapController {
 
 
     public boolean setStartDate(int day, int month, int year) {
-        if(validDate(day, month, year, true))
+        if(isValidDate(day, month, year, true))
         {
             if(start != null){
                 setFilterStartDate(false);
@@ -153,7 +152,7 @@ public class MapController {
             }
         if(miniReports != null){
             reports = miniReports;
-            applyFilter();
+            applyCurrentFilterSettings();
             success = true;
         }
         return success;
@@ -178,7 +177,7 @@ public class MapController {
             if(timeInt<10)monthString= "0"+ monthString;
             return (dayString + "/" + monthString + "/" + end.get(Calendar.YEAR));
     }
-    private boolean validDate(int day, int month, int year, boolean type) {
+    private boolean isValidDate(int day, int month, int year, boolean type) {
         Calendar chosen = Calendar.getInstance();
         chosen.set(Calendar.DAY_OF_MONTH, day);
         chosen.set(Calendar.MONTH, month);
@@ -197,7 +196,7 @@ public class MapController {
     }
 
     public boolean setEndDate(int day, int month, int year){
-        if(validDate(day, month, year, false)) {
+        if(isValidDate(day, month, year, false)) {
             if(end != null) {
                 setFilterEndDate(false);
             }
@@ -415,10 +414,10 @@ public class MapController {
         markerToCrimeReport.put(mark, report);
     }
 
-    public HashMap<Integer, CrimeReport> getFilterList(){return filterList;}
+    public HashMap<Integer, CrimeReport> getFilteredReports(){return filterList;}
 
 
-    private void applyFilter(){
+    private void applyCurrentFilterSettings(){
         filterList = new HashMap<Integer, CrimeReport>();
         Log.d("report size", reports.size() + "");
         //copy from report to filterList
