@@ -2,19 +2,19 @@
 <merger>
 
     <dataSet config="main" >
-        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res" >
-            <file
-                name="above_shadow"
-                path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\drawable\above_shadow.xml"
-                qualifiers=""
-                type="drawable" />
+        <source path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res" >
             <file
                 name="below_shadow"
-                path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\drawable\below_shadow.xml"
+                path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/below_shadow.xml"
                 qualifiers=""
                 type="drawable" />
             <file
-                path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\res\values\attrs.xml"
+                name="above_shadow"
+                path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/drawable/above_shadow.xml"
+                qualifiers=""
+                type="drawable" />
+            <file
+                path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/values/attrs.xml"
                 qualifiers="" >
                 <declare-styleable name="SlidingUpPanelLayout" >
                     <attr
@@ -41,11 +41,11 @@
                 </declare-styleable>
             </file>
         </source>
-        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\build\res\rs\release" />
-        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\build\res\generated\release" />
+        <source path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/build/res/rs/release" />
+        <source path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/build/res/generated/release" />
     </dataSet>
     <dataSet config="release" >
-        <source path="C:\Users\adesudiman\AndroidStudioProjects\ppl\CrimeZone\Libraries\AndroidSlidingUpPanel\library\src\release\res" />
+        <source path="/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/src/release/res" />
     </dataSet>
 
 </merger>
