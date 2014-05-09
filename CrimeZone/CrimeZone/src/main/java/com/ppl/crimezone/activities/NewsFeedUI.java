@@ -1,5 +1,7 @@
 package com.ppl.crimezone.activities;
 
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,7 +12,7 @@ import android.widget.TextView;
 import com.ppl.crimezone.R;
 
 
-public class NewsFeed extends ActionBarActivity {
+public class NewsFeedUI extends ActionBarActivity {
     ListView newsContainer;
     TextView title, timestamp, author;
 
@@ -39,6 +41,15 @@ public class NewsFeed extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class FetchReportTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... placesURL){
+
+            return "";
+        }
     }
 
 }
