@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="wrap_content"
@@ -10,15 +11,13 @@
         android:id="@+id/nf_headline"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/dark" />
+        android:layout_alignParentStart="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="timestamp"
         android:id="@+id/timestamp"
-        android:textColor="@color/blue"
         android:layout_below="@+id/nf_headline"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
@@ -29,5 +28,13 @@
         android:text="JOHN DOE reported"
         android:id="@+id/report_author"
         android:layout_above="@+id/nf_headline" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+
+        android:layout_alignBottom="@+id/nf_headline"
+        android:layout_alignRight="@+id/nf_headline" />
 
 </RelativeLayout>
