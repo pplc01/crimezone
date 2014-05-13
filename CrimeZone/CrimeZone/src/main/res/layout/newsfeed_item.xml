@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:gravity="center_vertical"
-        android:layout_height="fill_parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:layout_width="74dp"
             android:layout_height="74dp"
-            android:id="@+id/imageView"
+            android:id="@+id/nf_crimetype"
             android:src="@drawable/nf_burglary"
             android:layout_alignBottom="@+id/nf_headline"
             android:layout_alignRight="@+id/nf_headline" />
@@ -54,6 +50,4 @@
 
         </LinearLayout>
 
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>
