@@ -19,11 +19,20 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageButton"
+            android:id="@+id/nf_back"
             android:layout_gravity="left|center_vertical"
             android:background="@null"
             android:src="@drawable/back"
             android:layout_marginLeft="10dp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/refresh"
+            android:layout_gravity="right|center_vertical"
+            android:background="@null"
+            android:src="@drawable/refresh"
+            android:layout_marginRight="10dp" />
     </FrameLayout>
 
     <ListView

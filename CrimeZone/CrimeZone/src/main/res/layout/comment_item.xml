@@ -2,7 +2,15 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="timestamp"
+        android:id="@+id/comment_timestamp"
+        android:gravity="right" />
 
     <TextView
         android:layout_width="match_parent"
@@ -10,13 +18,6 @@
         android:text="JOHN DOE says"
         android:id="@+id/user_comment"
         android:textColor="@color/blue" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="timestamp"
-        android:id="@+id/comment_timestamp" />
 
     <TextView
         android:layout_width="match_parent"
