@@ -3,12 +3,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
+        android:background="@color/cream"
         android:gravity="center_vertical"
         android:layout_height="wrap_content">
 
         <ImageView
             android:layout_width="74dp"
             android:layout_height="74dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginBottom="12dp"
             android:id="@+id/nf_crimetype"
             android:src="@drawable/nf_burglary"
             android:layout_alignBottom="@+id/nf_headline"
@@ -16,6 +20,8 @@
 
         <LinearLayout
             android:orientation="vertical"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="12dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -23,6 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="timestamp"
+                android:layout_marginRight="5dp"
                 android:id="@+id/timestamp"
                 android:layout_below="@+id/nf_headline"
                 android:layout_alignParentRight="true"
