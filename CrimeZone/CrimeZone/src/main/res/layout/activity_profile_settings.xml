@@ -146,6 +146,30 @@
                     android:layout_gravity="right|bottom" />
             </FrameLayout>
 
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="60dp">
+
+                <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New ToggleButton"
+                    android:id="@+id/toggleButton"
+                    android:layout_gravity="center_vertical|right" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:src="@drawable/b_notification" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:background="@drawable/blueline" />
+            </FrameLayout>
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

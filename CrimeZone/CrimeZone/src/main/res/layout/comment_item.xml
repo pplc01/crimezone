@@ -2,21 +2,34 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:text="\u003cUSERNAME\u003e says"
         android:id="@+id/user_comment"
         android:textColor="@color/blue" />
+=======
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="timestamp"
+        android:id="@+id/comment_timestamp"
+        android:gravity="right" />
+>>>>>>> 84910304314dad18ba27b931ff79100aec08936e
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="\u003ctimestamp\u003emanga"
         android:id="@+id/comment_timestamp" />
+=======
+        android:text="JOHN DOE says"
+        android:id="@+id/user_comment"
+        android:textColor="@color/blue" />
+>>>>>>> 84910304314dad18ba27b931ff79100aec08936e
 
     <TextView
         android:layout_width="match_parent"

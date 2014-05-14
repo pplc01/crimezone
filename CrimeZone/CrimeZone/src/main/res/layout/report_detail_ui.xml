@@ -208,7 +208,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Add Comment"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:textColor="@color/dark" />
 
             <EditText
                 android:layout_width="fill_parent"
@@ -220,19 +221,44 @@
                 android:background="@color/white"
                 android:layout_marginRight="10dp" />
 
-            <Button
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:text="POST"
-                android:id="@+id/submit_comment"
-                android:layout_gravity="right"
-                android:layout_marginRight="10dp"
-                android:background="@color/blue"
-                android:layout_marginTop="10dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:gravity="right">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/share_fb"
+                    android:src="@drawable/share_fb"
+                    android:background="@null"
+                    android:layout_marginRight="10dp" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/share_tw"
+                    android:src="@drawable/share_tw"
+                    android:background="@null"
+                    android:layout_marginRight="10dp" />
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="60dp"
+                    android:text="POST"
+                    android:id="@+id/submit_comment"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:background="@color/blue"
+                    android:layout_marginTop="10dp"
+                    android:textSize="20dp"
+                    android:textColor="@color/cream" />
+            </LinearLayout>
 
             <ListView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="200dp"
                 android:id="@+id/listView"
                 android:layout_marginTop="10dp" />
 

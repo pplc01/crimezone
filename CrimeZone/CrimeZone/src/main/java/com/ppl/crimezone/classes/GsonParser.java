@@ -43,6 +43,35 @@ public class GsonParser {
     static JSONObject obj = null;
     static String json = null;
 
+    public static JSONObject parseToJSON(InputStream content){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+
+        try {
+            while((line = reader.readLine()) != null){
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            content.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonString = sb.toString();
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
     public JSONObject makeHTTPRequest(String url, String method, List<NameValuePair> params) throws JSONException {
         try{
             if(method.equalsIgnoreCase("POST")){

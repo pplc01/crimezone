@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- From: file:/Users/tanya/Documents/ProjectCrimeZone/crimezone/Libraries/AndroidSlidingUpPanel/library/res/values/attrs.xml -->
+    <!-- From: file:/home/ajiutamaa/projects/crimezone/CrimeZone/Libraries/AndroidSlidingUpPanel/library/res/values/attrs.xml -->
     <eat-comment />
 
     <declare-styleable name="SlidingUpPanelLayout">
