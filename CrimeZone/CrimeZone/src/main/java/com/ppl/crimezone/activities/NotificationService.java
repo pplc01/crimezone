@@ -1,8 +1,22 @@
 package com.ppl.crimezone.activities;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.ppl.crimezone.R;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -11,81 +25,78 @@ import android.content.Context;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class NotificationService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.ppl.crimezone.activities.action.FOO";
-    private static final String ACTION_BAZ = "com.ppl.crimezone.activities.action.BAZ";
+public class NotificationService extends Service {
+    private NotificationManager mNM;
 
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.ppl.crimezone.activities.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.ppl.crimezone.activities.extra.PARAM2";
+    // Unique Identification Number for the Notification.
+    // We use it on Notification start, and to cancel it.
+    private int NOTIFICATION = R.string.local_service_started;
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
      */
-    // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, NotificationService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, NotificationService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    public NotificationService() {
-        super("NotificationService");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
-            }
+    public class LocalBinder extends Binder {
+        NotificationService getService() {
+            return NotificationService.this;
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
+    @Override
+    public void onCreate() {
+        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        // Display a notification about us starting.  We put an icon in the status bar.
+        showNotification();
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i("LocalService", "Received start id " + startId + ": " + intent);
+        // We want this service to continue running until it is explicitly
+        // stopped, so return sticky.
+        return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        // Cancel the persistent notification.
+        mNM.cancel(NOTIFICATION);
+
+        // Tell the user we stopped.
+        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
+
     /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
+     * Show a notification while this service is running.
      */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void showNotification() {
+        // In this sample, we'll use the same text for the ticker and the expanded notification
+        CharSequence text = getText(R.string.local_service_started);
+
+        // Set the icon, scrolling text and timestamp
+        Notification notification = new Notification(R.drawable.ic_launcher, text,
+                System.currentTimeMillis());
+
+        // The PendingIntent to launch our activity if the user selects this notification
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, HomeMapUI.class), 0);
+
+        // Set the info for the views that show in the notification panel.
+        notification.setLatestEventInfo(this, getText(R.string.app_name),
+                text, contentIntent);
+
+        // Send the notification.
+        mNM.notify(NOTIFICATION, notification);
     }
 }
