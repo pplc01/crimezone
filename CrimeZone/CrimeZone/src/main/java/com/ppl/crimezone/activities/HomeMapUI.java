@@ -53,7 +53,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import android.graphics.Point;
 /**
  * This is controller for HomeMap UI
  */
@@ -81,9 +81,10 @@ public class HomeMapUI extends ActionBarActivity {
     private SlidingUpPanelLayout slider;
     private ImageView dragArea;
     private ImageButton type [];
-    private Button
-            startDate ;
+    private Button startDate ;
     private Button endDate;
+    private Button zones;
+    private Button reports;
 
 
     private Handler startDateHandler;
@@ -112,6 +113,8 @@ public class HomeMapUI extends ActionBarActivity {
         startDate = (Button) findViewById(R.id.start_date);
         endDate = (Button) findViewById(R.id.end_date);
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        zones = (Button) findViewById(R.id.zones);
+        reports = (Button) findViewById(R.id.reports);
 
         //set up for the first time report location to false\
         String PREFS_NAME = "ReportLocation";
@@ -330,7 +333,9 @@ public class HomeMapUI extends ActionBarActivity {
                                                     type[finalIi].setImageResource(R.drawable.ic_nocrime);
                                                     mapController.setFilterType(finalIi, true);
                                                 }
-                                                viewZones();//viewReports();
+                                                if(mapController.getZonesMode())
+                                                    viewZones();
+                                                 else viewReports();
                                             }
                                         }
             );
@@ -342,10 +347,16 @@ public class HomeMapUI extends ActionBarActivity {
             public void handleMessage(Message m){
                 Bundle b = m.getData();
                 if(mapController.setStartDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
-                    viewZones();//();
+                    if(mapController.getZonesMode() )
+                        viewZones();
+                    else viewReports();
                     startDate.setText(mapController.printStartDate());
                 }else{
-                    if(mapController.resetStartDate()) viewReports();
+                    if(mapController.resetStartDate()){
+                        if(mapController.getZonesMode() )
+                            viewZones();
+                        else viewReports();
+                    }
                     showAlertDialog("START DATE NOT VALID", "Please Select Valid Date Before Current Date");
                     startDate.setText("Start");
                 }
@@ -356,7 +367,11 @@ public class HomeMapUI extends ActionBarActivity {
         startDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(mapController.resetStartDate()) viewReports();
+                if(mapController.resetStartDate()) {
+                    if(mapController.getZonesMode() )
+                        viewZones();
+                    else viewReports();
+                }
                 startDate.setText("Start");
                 return true;
             }
@@ -367,11 +382,16 @@ public class HomeMapUI extends ActionBarActivity {
             public void handleMessage(Message m){
                 Bundle b = m.getData();
                 if(mapController.setEndDate(b.getInt("set_day"), b.getInt("set_month"), b.getInt("set_year"))){
-                    //viewReports();
-                    viewZones();
+                    if(mapController.getZonesMode() )
+                        viewZones();
+                    else viewReports();
                     endDate.setText(mapController.printEndDate());
                 }else{
-                    if(mapController.resetEndDate())viewZones(); //viewReports();
+                    if(mapController.resetEndDate()){
+                        if(mapController.getZonesMode() )
+                            viewZones();
+                        else viewReports();
+                    }
                     showAlertDialog("END DATE NOT VALID", "Please Select Date Before Current Date");
                     endDate.setText("End");
                 }
@@ -382,12 +402,39 @@ public class HomeMapUI extends ActionBarActivity {
         endDate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(mapController.resetEndDate()) viewZones();//viewReports();
+                if(mapController.resetEndDate())
+                {
+                    if(mapController.getZonesMode() )
+                        viewZones();
+                    else viewReports();
+                }
                 endDate.setText("End");
                 return true;
             }
         });
+
+        zones.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                mapController.setZonesMode(true);
+                zones.setBackgroundResource(R.color.blue);
+                reports.setBackgroundResource(R.color.white);
+                viewZones();
+            }
+        });
+        reports.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                mapController.setZonesMode(false);
+                reports.setBackgroundResource(R.color.blue);
+                zones.setBackgroundResource(R.color.white);
+                viewReports();
+            }
+        });
     }
+
 
     //set up the action bar menu
     @Override
@@ -501,85 +548,80 @@ public class HomeMapUI extends ActionBarActivity {
 
 
     private void viewReports(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (placeMarkers != null) {
-                    for (int pm = 0; pm < placeMarkers.size(); pm++) {
-                        if (placeMarkers.get(pm) != null)
-                            placeMarkers.get(pm).remove();
-                    }
-                }
-                places = new ArrayList<MarkerOptions>();
-                placeMarkers = new ArrayList<Marker>();
-                int ii=0;
-                for (Integer idReport : mapController.getFilteredReports().keySet()) {
-                    int currIcon;
-                    CrimeReport report = mapController.getCrimeReport(idReport);
-                    switch (report.getCategories().size()) {
+        if (placeMarkers != null) {
+            for (int pm = 0; pm < placeMarkers.size(); pm++) {
+                if (placeMarkers.get(pm) != null)
+                    placeMarkers.get(pm).remove();
+            }
+        }
+        if(mOverlay != null) mOverlay.remove();
+        places = new ArrayList<MarkerOptions>();
+        placeMarkers = new ArrayList<Marker>();
+        int ii=0;
+        for (Integer idReport : mapController.getFilteredReports().keySet()) {
+            int currIcon;
+            CrimeReport report = mapController.getCrimeReport(idReport);
+            switch (report.getCategories().size()) {
+                case 1:
+                    switch(report.getCategories().get(0)) {
+                        case 0:
+                            currIcon = R.drawable.mk_drugs;
+                            break;
                         case 1:
-                            switch(report.getCategories().get(0)) {
-                                case 0:
-                                    currIcon = R.drawable.mk_drugs;
-                                    break;
-                                case 1:
-                                    currIcon = R.drawable.mk_burglary;
-                                    break;
-                                case 2:
-                                    currIcon = R.drawable.mk_homicide;
-                                    break;
-                                case 3:
-                                    currIcon = R.drawable.mk_kidnap;
-                                    break;
-                                case 4:
-                                    currIcon = R.drawable.mk_sxassault;
-                                    break;
-                                case 5:
-                                    currIcon = R.drawable.mk_theft;
-                                    break;
-                                case 6:
-                                    currIcon = R.drawable.mk_vehicletheft;
-                                    break;
-                                default:
-                                    currIcon = R.drawable.mk_violence;
-                                    break;
-                            }
+                            currIcon = R.drawable.mk_burglary;
                             break;
                         case 2:
-                            currIcon = R.drawable.mk_2;
+                            currIcon = R.drawable.mk_homicide;
                             break;
                         case 3:
-                            currIcon = R.drawable.mk_3;
+                            currIcon = R.drawable.mk_kidnap;
                             break;
                         case 4:
-                            currIcon = R.drawable.mk_4;
+                            currIcon = R.drawable.mk_sxassault;
                             break;
                         case 5:
-                            currIcon = R.drawable.mk_5;
+                            currIcon = R.drawable.mk_theft;
                             break;
                         case 6:
-                            currIcon = R.drawable.mk_6;
-                            break;
-                        case 7:
-                            currIcon = R.drawable.mk_7;
+                            currIcon = R.drawable.mk_vehicletheft;
                             break;
                         default:
-                            currIcon = R.drawable.mk_8;
+                            currIcon = R.drawable.mk_violence;
                             break;
                     }
-
-                    places.add(new MarkerOptions()
-                            .position(new LatLng(report.getLatitude(), report.getLongitude()))
-                            .title(report.getTitle())
-                            .icon(BitmapDescriptorFactory.fromResource(currIcon)));
-                    Marker mark = map.addMarker(places.get(ii));
-                    placeMarkers.add(mark);
-                    mapController.addMarkerToCrimeReport(mark, report);
-                    ii++;
-                }
+                    break;
+                case 2:
+                    currIcon = R.drawable.mk_2;
+                    break;
+                case 3:
+                    currIcon = R.drawable.mk_3;
+                    break;
+                case 4:
+                    currIcon = R.drawable.mk_4;
+                    break;
+                case 5:
+                    currIcon = R.drawable.mk_5;
+                    break;
+                case 6:
+                    currIcon = R.drawable.mk_6;
+                    break;
+                case 7:
+                    currIcon = R.drawable.mk_7;
+                    break;
+                default:
+                    currIcon = R.drawable.mk_8;
+                    break;
             }
-        });
+
+            places.add(new MarkerOptions()
+                    .position(new LatLng(report.getLatitude(), report.getLongitude()))
+                    .title(report.getTitle())
+                    .icon(BitmapDescriptorFactory.fromResource(currIcon)));
+            Marker mark = map.addMarker(places.get(ii));
+            placeMarkers.add(mark);
+            mapController.addMarkerToCrimeReport(mark, report);
+            ii++;
+        }
     }
 
     //fetch and parse crime report data
@@ -587,12 +629,19 @@ public class HomeMapUI extends ActionBarActivity {
 
         @Override
         protected Boolean doInBackground(Double... params) {
-            if(mapController.getReportList(params[0])) viewZones();//viewReports();
-            else {
-                return false;
-                //notification about connection
+            return mapController.getReportList(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result.booleanValue()) {
+                if (mapController.getZonesMode()) {
+                    viewZones();
+                } else {
+                    viewReports();
+                }
             }
-            return true;
+
         }
     }
 
@@ -703,34 +752,48 @@ public class HomeMapUI extends ActionBarActivity {
 
     HeatmapTileProvider mProvider= null;
     TileOverlay mOverlay = null;
-    public void viewZones(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+    List<LatLng>  list = new ArrayList<LatLng>();
 
-                if (placeMarkers != null) {
-                    for (int pm = 0; pm < placeMarkers.size(); pm++) {
-                        if (placeMarkers.get(pm) != null)
-                            placeMarkers.get(pm).remove();
-                    }
-                }
-                places = null;
-                placeMarkers =null;
-                List<LatLng> list = new ArrayList<LatLng>();
-                for (Integer idReport : mapController.getFilteredReports().keySet()) {
-                    CrimeReport report = mapController.getCrimeReport(idReport);
-                    list.add(new LatLng(report.getLatitude(), report.getLongitude()));
-                }
-                // Get the data: latitude/longitude positions of police stations.
-                // Create a heat map tile provider, passing it the latlngs of the police stations.
-                mProvider = new HeatmapTileProvider.Builder()
-                        .data(list)
-                        .build();
-                // Add a tile overlay to the map, using the heat map tile provider.
-                if(mOverlay != null) mOverlay.remove();
-                mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-
+    public void viewZones()
+    {
+        if (placeMarkers != null) {
+            for (int pm = 0; pm < placeMarkers.size(); pm++) {
+                if (placeMarkers.get(pm) != null)
+                    placeMarkers.get(pm).remove();
             }
-        });
+        }
+        places = null;
+        placeMarkers =null;
+        list.clear();
+      for (Integer idReport : mapController.getFilteredReports().keySet()) {
+            CrimeReport report = mapController.getCrimeReport(idReport);
+            list.add(new LatLng(report.getLatitude(), report.getLongitude()));
+        }
+
+        //int radiusInPixel = converMetertoPixels(mapController.getLocation().latitude, mapController.getLocation().longitude, 200);
+        // Get the data: latitude/longitude positions of police stations.
+        //if(radiusInPixel <=0) radiusInPixel = 1;
+
+        //Log.d("radius", radiusInPixel+"");
+        // Create a heat map tile provider, passing it the latlngs of the police stations.
+        mProvider = new HeatmapTileProvider.Builder()
+                .data(list)
+                .radius(31)
+                .build();
+        // Add a tile overlay to the fmap, using the heat map tile provider.
+        if(mOverlay != null) mOverlay.remove();
+        mOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+
+    }
+
+    private static final double EARTH_RADIUS = 6378100.0;
+    private int converMetertoPixels(double lat, double lng, double radiusInMeters){
+        double lat1 = radiusInMeters/EARTH_RADIUS;
+        double lng1 = radiusInMeters/(EARTH_RADIUS * Math.cos((Math.PI*lat/180)));
+        double lat2 = lat + lat1 * 180/ Math.PI;
+        double lng2 = lng+ lng1 * 180 / Math.PI;
+        Point p1 = map.getProjection().toScreenLocation(new LatLng(lat, lng));
+        Point p2 = map.getProjection().toScreenLocation(new LatLng(lat2, lng2));
+        return Math.abs(p1.x - p2.x);
     }
 }

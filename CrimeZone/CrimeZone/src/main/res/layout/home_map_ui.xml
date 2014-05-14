@@ -184,7 +184,7 @@
             <Button
                 android:layout_width="160dp"
                 android:layout_height="70dp"
-                android:background="@null"
+                android:background="@color/white"
                 android:text="ZONES"
                 android:textSize="15dp"
                 android:textColor="#c23"
@@ -194,7 +194,7 @@
             <Button
                 android:layout_width="160dp"
                 android:layout_height="70dp"
-                android:textColor="@color/white"
+                android:textColor="#c23"
                 android:background="@color/blue"
                 android:text="REPORTS"
                 android:textSize="15dp"
