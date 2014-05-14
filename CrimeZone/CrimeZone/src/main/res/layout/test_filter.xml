@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal|top">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:background="@null"
+        android:src="@drawable/btn_filter"
+        android:layout_gravity="center"
+        android:id="@+id/show_filter"
+    />
+
+
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:background="@drawable/bg_filter"
+        android:id="@+id/horizontalScrollView">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            android:layout_height="fill_parent">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/drugs2"
+                android:background="@drawable/ic_drugs" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/burglary2"
+                android:background="@drawable/ic_burglary"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/homicide2"
+                android:background="@drawable/ic_homicide" />
+
+            <ImageButton
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/kidnap2"
+                android:background="@drawable/ic_kidnap" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/sxassault2"
+                android:background="@drawable/ic_sxassault" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/theft2"
+                android:background="@drawable/ic_theft" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/vehicletheft2"
+                android:background="@drawable/ic_vehicletheft" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/violence2"
+                android:background="@drawable/ic_violence" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_filter"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="140dp"
+            android:layout_height="50dp"
+            android:background="@color/dark"
+            android:text="START"
+            android:layout_marginRight="10dp"
+            android:textSize="15dp"
+            android:textColor="@color/cream"
+            android:id="@+id/start_date"
+            android:layout_gravity="left|center_vertical" />
+
+        <Button
+            android:layout_width="140dp"
+            android:layout_height="50dp"
+            android:textColor="@color/cream"
+            android:background="@color/dark"
+            android:text="END"
+            android:textSize="15dp"
+            android:id="@+id/end_date"
+            android:layout_gravity="right|center_vertical"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_weight="0.5"
+            android:layout_height="70dp"
+            android:background="@color/blue"
+            android:text="ZONES"
+            android:textSize="15dp"
+            android:textColor="@color/dark"
+            android:id="@+id/zones"
+            android:layout_gravity="left|center_vertical" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="70dp"
+            android:layout_weight="0.5"
+            android:textColor="@color/blue"
+            android:background="@color/dark"
+            android:text="REPORTS"
+            android:textSize="15dp"
+            android:id="@+id/reports"
+            android:gravity="center"
+            android:layout_gravity="center"
+            />
+
+    </LinearLayout>
+</LinearLayout>
