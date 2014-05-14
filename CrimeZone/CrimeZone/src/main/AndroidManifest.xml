@@ -24,23 +24,26 @@
             android:name="com.ppl.crimezone.activities.HomeMapUI"
             android:label="Home Map UI" >
         </activity>
+
         <activity
             android:name="com.ppl.crimezone.activities.ReportFormUI"
             android:label="Report Form UI" >
         </activity>
+
         <activity
             android:name="com.ppl.crimezone.activities.DetailReportUI"
             android:label="Report Form UI" >
         </activity>
+
         <activity
             android:name="com.ppl.crimezone.activities.ProfileUI"
             android:label="Report Form UI" >
         </activity>
+
         <activity
             android:name="com.ppl.crimezone.activities.EditProfileUI"
             android:label="Report Form UI" >
         </activity>
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyD1KscAY1Q5OEmc6LOVSgQAcEBqO_HVJJw" />
@@ -48,10 +51,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <service
-            android:name="com.ppl.crimezone.activities.NotificationService"
-            android:exported="false" >
-        </service>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -70,9 +69,5 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
 
 </manifest>

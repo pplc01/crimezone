@@ -38,8 +38,11 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/cream"
         android:dividerHeight="0.1dp"
-        android:divider="@color/blue"
+        android:divider="@color/dark"
         android:id="@+id/newsfeedview"
-        android:stackFromBottom="false" />
+        android:stackFromBottom="false"
+        android:drawSelectorOnTop="false"
+        android:entries="5" />
 </LinearLayout>

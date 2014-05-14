@@ -39,14 +39,9 @@ public class MapController {
 
     private byte filterTime;
     private byte filterType;
-    private boolean zoneMode = false;
 
     private final boolean START = true;
     private final boolean END = false;;
-
-    private List<LatLng> list;
-
-
 
     private HashMap<Marker, CrimeReport> markerToCrimeReport;
     public MapController() {
@@ -60,7 +55,6 @@ public class MapController {
         end = null;
         filterType = 0;
         filterTime = 0;
-        list = new ArrayList<LatLng>();
     }
 
     public int getIdReport(Marker marker) {
@@ -119,13 +113,7 @@ public class MapController {
         return false;
     }
 
-    public void setZonesMode(boolean value){
-        this.zoneMode = value;
-    }
 
-    public boolean getZonesMode(){
-        return zoneMode;
-    }
 
     public boolean getReportList(double distance){
         List<CrimeReport> miniReports= null;
@@ -431,7 +419,6 @@ public class MapController {
 
     private void applyCurrentFilterSettings(){
         filterList = new HashMap<Integer, CrimeReport>();
-
         Log.d("report size", reports.size() + "");
         //copy from report to filterList
         for(int ii=0; ii< reports.size(); ++ii){
@@ -446,14 +433,5 @@ public class MapController {
                 }
             }
         }
-        Iterator<HashMap.Entry<Integer, CrimeReport>> iterator = filterList.entrySet().iterator();
-        iterator = filterList.entrySet().iterator();
-        while(iterator.hasNext()){
-            HashMap.Entry<Integer, CrimeReport> entry = iterator.next();
-            list.add(new LatLng(entry.getValue().getLatitude(), entry.getValue().getLongitude()));
-            Log.d("after false =>" , entry.getValue().printCategories());
-        }
-
-
     }
 }

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ToggleButton;
 
 import com.ppl.crimezone.R;
 import com.ppl.crimezone.classes.GsonParser;
@@ -53,12 +54,38 @@ public class EditProfileUI extends Activity {
     private static final String USERNAME = "usernameKey";
     private static final String EMAIL = "emailKey";
 
+    final String NOTIF_PREFERENCES  = "NotifPreferences";
+
+    final String NOTIF_SETTING  = "NotifSetting";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_settings);
-
+        final ToggleButton notifButton = (ToggleButton)findViewById(R.id.notif);
         // Get data from shared preferences
+        SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
+        boolean notifSetting = settings.getBoolean("NotHome", false);
+        notifButton.setChecked(notifSetting);
+        notifButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(notifButton.isChecked()){
+                    notifButton.setChecked(false);
+                    SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putBoolean(NOTIF_SETTING, false);
+                    editor.commit();
+                    //stop service
+                }else{
+                    notifButton.setChecked(true);
+                    SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putBoolean(NOTIF_SETTING, true);
+                    editor.commit();
+                    //start service
+                }
+            }
+        });
         SharedPreferences sharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
         if(sharedPreferences.contains(USERNAME)){
             username = sharedPreferences.getString(USERNAME,"");
