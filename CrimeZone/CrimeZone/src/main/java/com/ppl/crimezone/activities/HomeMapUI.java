@@ -247,6 +247,16 @@ public class HomeMapUI extends ActionBarActivity {
     private void changeLocation(CameraPosition cameraPosition){
         mapController.setLocation(cameraPosition.target.latitude, cameraPosition.target.longitude);
         //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        if(cameraPosition.zoom > 13){
+            CameraPosition position = new CameraPosition.Builder()
+                    .target(mapController.getLocation())      // Sets the center of the map to Mountain View
+                    .zoom(13)                   // Sets the zoom level
+                    .bearing(0)                // Sets the orientation of the camera to east
+                    .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+        }
+
         LatLng far = map.getProjection().getVisibleRegion().farLeft;                        
         double distance = SphericalUtil.computeDistanceBetween(far, mapController.getLocation());
         new GetCrimeReport().execute(distance);
@@ -770,15 +780,16 @@ public class HomeMapUI extends ActionBarActivity {
             list.add(new LatLng(report.getLatitude(), report.getLongitude()));
         }
 
-        //int radiusInPixel = converMetertoPixels(mapController.getLocation().latitude, mapController.getLocation().longitude, 200);
+        int radiusInPixel = converMetertoPixels(mapController.getLocation().latitude, mapController.getLocation().longitude, 200);
         // Get the data: latitude/longitude positions of police stations.
-        //if(radiusInPixel <=0) radiusInPixel = 1;
 
+        if(radiusInPixel < 10) radiusInPixel = 10;
+        if(radiusInPixel > 59)radiusInPixel = 50;
         //Log.d("radius", radiusInPixel+"");
         // Create a heat map tile provider, passing it the latlngs of the police stations.
         mProvider = new HeatmapTileProvider.Builder()
                 .data(list)
-                .radius(31)
+                .radius(radiusInPixel)
                 .build();
         // Add a tile overlay to the fmap, using the heat map tile provider.
         if(mOverlay != null) mOverlay.remove();

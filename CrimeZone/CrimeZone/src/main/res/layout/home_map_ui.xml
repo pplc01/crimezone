@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -42,7 +43,8 @@
                     android:id="@+id/map"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    class="com.google.android.gms.maps.SupportMapFragment" />
+                    class="com.google.android.gms.maps.SupportMapFragment"
+                    tools:layout="@layout/home_map_ui" />
 
                 <!-- Transparent View -->
                 <View
@@ -64,7 +66,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:background="@null"
-                android:src="@drawable/btn_filter"
                 android:layout_gravity="center"
                 android:id="@+id/show_filter"
                 />
