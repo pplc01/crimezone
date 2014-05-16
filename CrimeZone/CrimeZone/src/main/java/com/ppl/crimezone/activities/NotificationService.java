@@ -10,13 +10,19 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.ppl.crimezone.R;
+import com.ppl.crimezone.classes.CrimeReport;
+import com.ppl.crimezone.classes.MapController;
+
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -27,11 +33,14 @@ import com.ppl.crimezone.R;
  */
 public class NotificationService extends Service {
     private NotificationManager mNM;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private LatLng location;
 
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = R.string.local_service_started;
-
+    private List<CrimeReport> list = null;
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -46,9 +55,28 @@ public class NotificationService extends Service {
     @Override
     public void onCreate() {
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        updateLocationUser();
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         // Display a notification about us starting.  We put an icon in the status bar.
-        showNotification();
+    }
+
+    //set the map to point to current user location
+    private void updateLocationUser(){
+
+        locationListener = new LocationListener() {
+            public void onLocationChanged(Location userLocation) {
+                location = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+                new GetCrimeReport().execute();
+                locationManager.removeUpdates(locationListener);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {}
+
+            public void onProviderDisabled(String provider) {}
+        };
     }
 
     @Override
@@ -65,7 +93,7 @@ public class NotificationService extends Service {
         mNM.cancel(NOTIFICATION);
 
         // Tell the user we stopped.
-        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.notif_stop, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -77,14 +105,15 @@ public class NotificationService extends Service {
     // RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
 
+
     /**
+     *
      * Show a notification while this service is running.
      */
     private void showNotification() {
         // In this sample, we'll use the same text for the ticker and the expanded notification
-        CharSequence text = getText(R.string.local_service_started);
+        CharSequence text = getText(R.string.dangerous);
 
-        // Set the icon, scrolling text and timestamp
         Notification notification = new Notification(R.drawable.ic_launcher, text,
                 System.currentTimeMillis());
 
@@ -99,4 +128,25 @@ public class NotificationService extends Service {
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);
     }
+
+    private class GetCrimeReport extends AsyncTask<Double, Void, Boolean> {
+
+        int threshold = 3;
+        @Override
+        protected Boolean doInBackground(Double... params) {
+            list =  MapController.getReportList(location);
+            if(list!=null)return true;
+            else return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result.booleanValue()) {
+                if(list.size() > threshold ) showNotification();
+            }
+
+        }
+    }
+
+
 }

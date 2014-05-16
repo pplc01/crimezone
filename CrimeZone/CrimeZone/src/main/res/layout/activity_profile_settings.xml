@@ -149,12 +149,11 @@
             <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="60dp">
-
                 <ToggleButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New ToggleButton"
-                    android:id="@+id/toggleButton"
+                    android:id="@+id/notif"
                     android:layout_gravity="center_vertical|right" />
 
                 <ImageView

@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +27,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -64,25 +67,38 @@ public class EditProfileUI extends Activity {
         final ToggleButton notifButton = (ToggleButton)findViewById(R.id.notif);
         // Get data from shared preferences
         SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
-        boolean notifSetting = settings.getBoolean("NotHome", false);
+        boolean notifSetting = settings.getBoolean(NOTIF_SETTING, false);
+        Log.d("notifSetting", notifSetting+"");
         notifButton.setChecked(notifSetting);
         notifButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(notifButton.isChecked()){
-                    notifButton.setChecked(false);
+                Log.d("notif", notifButton.isChecked()+"");
+                if(!notifButton.isChecked()){
                     SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putBoolean(NOTIF_SETTING, false);
                     editor.commit();
                     //stop service
+                    Intent intent = new Intent(EditProfileUI.this, NotificationService.class);
+                    PendingIntent sender = PendingIntent.getBroadcast(EditProfileUI.this, 0, intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+                    alarmManager.cancel(sender);
                 }else{
-                    notifButton.setChecked(true);
                     SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putBoolean(NOTIF_SETTING, true);
                     editor.commit();
                     //start service
+
+                    Calendar cal = Calendar.getInstance();
+                    Intent intent = new Intent(EditProfileUI.this, NotificationService.class);
+                    PendingIntent pintent = PendingIntent.getService(EditProfileUI.this, 0, intent, 0);
+                    AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                    Log.d("Main",String.valueOf( cal.getTimeInMillis()));
+                    //make the alarm goes off every 10 sec (not exact help to save battery life)
+                    alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 3000000, pintent);
                 }
             }
         });

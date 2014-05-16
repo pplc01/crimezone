@@ -25,5 +25,9 @@
     <string name="error_password_unmatched">Password you re-entered does not match</string>
     <string name="error_password_format">Password must not contain space</string>
     <string name="title_activity_regsiter">Regsiter</string>
+    <string name="local_service_started">local service started</string>
+    <string name="local_service_stopped">local service stop</string>
+    <string name="dangerous">You are in dangerous zone</string>
+    <string name="notif_stop">Notification Stopped</string>
 
 </resources>

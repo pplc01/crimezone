@@ -170,6 +170,46 @@ public class MapController {
         return success;
     }
 
+
+    public static List<CrimeReport> getReportList(LatLng location){
+        List<CrimeReport> miniReports= null;
+        double distance = 250;
+        boolean success = false;
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://crimezone.besaba.com/webservice/crimeLocation.php");
+        try {
+            //try to fetch the data
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
+            nameValuePairs.add(new BasicNameValuePair("latitude", location.latitude+""));
+            nameValuePairs.add(new BasicNameValuePair("longitude", location.longitude+""));
+            Log.d("parameter", location.latitude +" "+ location.longitude + " " + distance);
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            HttpResponse response = httpclient.execute(httppost);
+            StatusLine status = response.getStatusLine();
+            if (status.getStatusCode() == 200) {
+                //we have an OK response
+                HttpEntity entity = response.getEntity();
+                InputStream content = entity.getContent();
+                try {
+                    //Read the server response and attempt to parse it as JSON
+                    Reader reader = new InputStreamReader(content);
+                    GsonBuilder gsonBuilder = new GsonBuilder();
+                    gsonBuilder.setDateFormat("dd/MM/yyyy HH:mm");
+                    Gson gson = gsonBuilder.create();
+                    miniReports = Arrays.asList(gson.fromJson(reader, CrimeReport[].class));
+                    content.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return miniReports;
+    }
+
     public String printStartDate(){
             int timeInt = start.get(Calendar.DAY_OF_MONTH);
             String dayString = timeInt+"";
