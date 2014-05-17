@@ -57,9 +57,9 @@ public class EditProfileUI extends Activity {
     private static final String USERNAME = "usernameKey";
     private static final String EMAIL = "emailKey";
 
-    final String NOTIF_PREFERENCES  = "NotifPreferences";
+    static final String NOTIF_PREFERENCES  = "NotifPreferences";
 
-    final String NOTIF_SETTING  = "NotifSetting";
+    static final String NOTIF_SETTING  = "NotifSetting";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,11 +80,13 @@ public class EditProfileUI extends Activity {
                     editor.putBoolean(NOTIF_SETTING, false);
                     editor.commit();
                     //stop service
-                    Intent intent = new Intent(EditProfileUI.this, NotificationService.class);
-                    PendingIntent sender = PendingIntent.getBroadcast(EditProfileUI.this, 0, intent, 0);
+                    Context ctx = getApplicationContext();
+                    Intent intent = new Intent(ctx, NotificationService.class);
+                    PendingIntent sender = PendingIntent.getBroadcast(ctx, 0, intent, 0);
                     AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
                     alarmManager.cancel(sender);
+                    stopService(intent);
                 }else{
                     SharedPreferences settings = getSharedPreferences(NOTIF_PREFERENCES, 0);
                     SharedPreferences.Editor editor = settings.edit();
@@ -98,7 +100,7 @@ public class EditProfileUI extends Activity {
                     AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
                     Log.d("Main",String.valueOf( cal.getTimeInMillis()));
                     //make the alarm goes off every 10 sec (not exact help to save battery life)
-                    alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 3000000, pintent);
+                    alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 300000, pintent);
                 }
             }
         });

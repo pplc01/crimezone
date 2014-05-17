@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -54,10 +55,19 @@ public class NotificationService extends Service {
 
     @Override
     public void onCreate() {
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        updateLocationUser();
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        SharedPreferences settings = getSharedPreferences(EditProfileUI.NOTIF_PREFERENCES,
+                Context.MODE_PRIVATE);
+
+
+        boolean notifSetting = settings.getBoolean(EditProfileUI.NOTIF_SETTING, false);
+        if(notifSetting) {
+            mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            updateLocationUser();
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        }else {
+            onDestroy();
+        }
         // Display a notification about us starting.  We put an icon in the status bar.
     }
 

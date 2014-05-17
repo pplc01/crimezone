@@ -24,26 +24,23 @@
             android:name="com.ppl.crimezone.activities.HomeMapUI"
             android:label="Home Map UI" >
         </activity>
-
         <activity
             android:name="com.ppl.crimezone.activities.ReportFormUI"
             android:label="Report Form UI" >
         </activity>
-
         <activity
             android:name="com.ppl.crimezone.activities.DetailReportUI"
             android:label="Report Form UI" >
         </activity>
-
         <activity
             android:name="com.ppl.crimezone.activities.ProfileUI"
             android:label="Report Form UI" >
         </activity>
-
         <activity
             android:name="com.ppl.crimezone.activities.EditProfileUI"
             android:label="Report Form UI" >
         </activity>
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyD1KscAY1Q5OEmc6LOVSgQAcEBqO_HVJJw" />
@@ -53,12 +50,18 @@
 
         <service
             android:name="com.ppl.crimezone.activities.NotificationService"
-            android:process=":remote">
+            android:process=":remote" >
             <intent-filter>
-                <action
-                    android:name="com.ppl.crimezone.activities.NotificationService" />
+                <action android:name="com.ppl.crimezone.activities.NotificationService" />
             </intent-filter>
         </service>
+
+        <receiver android:name="com.ppl.crimezone.activities.autostart" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -77,5 +80,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

@@ -336,20 +336,12 @@ public class ReportFormUI extends FragmentActivity {
     }
 
     public void setUpMarkerListener(){
-        reportMap.setOnMarkerDragListener(
-                new GoogleMap.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {}
-
-                    @Override
-                    public void onMarkerDrag(Marker marker) {}
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-                        location = marker.getPosition();
-                    }
-                }
-        );
+        reportMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                changeMarkerPosition(latLng.latitude, latLng.longitude);
+            }
+        });
     }
 
     public void showMap(){
